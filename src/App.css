@@ -10,6 +10,15 @@ body {
   padding: 0 20px;
 }
 
+/* Container for centering the login button */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40vh; /* Full height to center vertically */
+}
+
+/* Login Button Styles */
 .login-button {
   display: inline-block;
   padding: 12px 24px;
