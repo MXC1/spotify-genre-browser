@@ -38,9 +38,10 @@ body {
 .search-sort-container {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 10px; /* Space between search bar and dropdown */
+  align-content: left;
   margin-bottom: 5px;
 }
 
@@ -67,9 +68,9 @@ body {
 }
 
 .sort-dropdown {
-  /* width: 50%; */
+  /* width: 100%; */
+  /* max-width: 100px; */
   padding: 10px;
-  margin: 10px auto;
   border: none;
   border-radius: 10px;
   background-color: #282828;
