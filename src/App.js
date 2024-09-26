@@ -148,7 +148,7 @@ function App() {
     <div className="App">
       {!token ? (
         <div className="login-container">
-        <a href="/login" className="login-button">Login with Spotify</a>
+        <a href={loginUrl} className="login-button">Login with Spotify</a>
       </div>
       ) : (
         <div className="albums-container">
