@@ -1,5 +1,5 @@
-import { Logger } from '@aws-amplify/core';
+import { ConsoleLogger } from '@aws-amplify/core';
 
-const logger = new Logger('MyLogger');
+const logger = new ConsoleLogger('MyLogger');
 
 export default logger;

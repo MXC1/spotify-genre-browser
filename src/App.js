@@ -2,8 +2,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { getTokenFromUrl, loginUrl } from './Spotify';
 import spotifyApi from './Spotify';
 import './App.css'
-import Amplify from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
+import logger from './loggingConfig';
 
 Amplify.configure(awsconfig);
 
