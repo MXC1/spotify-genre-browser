@@ -1,5 +1,26 @@
-import { ConsoleLogger } from '@aws-amplify/core';
+// loggingConfig.js
+import AWS from 'aws-sdk';
 
-const logger = new ConsoleLogger('MyLogger');
+AWS.config.update({ region: 'eu-west-2' });
 
-export default logger;
+const cloudwatchlogs = new AWS.CloudWatchLogs();
+
+const logToCloudWatch = (message) => {
+  const params = {
+    logGroupName: 'SGB_Operational_Logs',
+    logStreamName: 'SGB_Operational_Logs',
+    logEvents: [
+      {
+        message: JSON.stringify(message),
+        timestamp: new Date().getTime(),
+      },
+    ],
+  };
+
+  cloudwatchlogs.putLogEvents(params, (err, data) => {
+    if (err) console.log(err, err.stack);
+    else console.log(data);
+  });
+};
+
+export default logToCloudWatch;
