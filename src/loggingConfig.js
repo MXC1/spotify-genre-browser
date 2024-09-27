@@ -1,7 +1,11 @@
 // loggingConfig.js
 import AWS from 'aws-sdk';
 
-AWS.config.update({ region: 'eu-west-2' });
+AWS.config.update({ region: 'eu-west-2',
+    credentials: new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: 'eu-west-2:e1f1f662-0c4a-46b4-b707-123a98e849f1'
+    })
+ });
 
 const cloudwatchlogs = new AWS.CloudWatchLogs();
 
