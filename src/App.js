@@ -2,6 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { getTokenFromUrl, loginUrl } from './Spotify';
 import spotifyApi from './Spotify';
 import './App.css'
+import Amplify from 'aws-amplify';
+import awsconfig from './aws-exports';
+
+Amplify.configure(awsconfig);
 
 function App() {
   const [token, setToken] = useState(null);
@@ -19,7 +23,7 @@ function App() {
       const limit = 50; // Maximum limit per request
 
       while (true) {
-        console.log(`Requesting saved albums with offset: ${offset}, limit: ${limit}`);
+        logger.info(`Requesting saved albums with offset: ${offset}, limit: ${limit}`);
         setLoadingMessage(`Requesting saved albums (${offset} / ?)...`);
         const response = await spotifyApi.getMySavedAlbums({ limit, offset });
         const albums = response.items.map(item => item.album);
@@ -34,7 +38,7 @@ function App() {
         await delay(1000); // 1 second delay between requests
       }
 
-      console.log('Fetched albums:', allAlbums); // Check if albums are fetched
+      logger.info('Fetched albums:', allAlbums); // Check if albums are fetched
       setLoadingMessage('Grouping albums by artist genre...');
       return allAlbums;
     } catch (error) {
@@ -50,7 +54,7 @@ function App() {
 
     for (let i = 0; i < uniqueArtistIds.length; i += 50) {
       const batch = uniqueArtistIds.slice(i, i + 50);
-      console.log(`Requesting artist details for batch: ${batch}`);
+      logger.info(`Requesting artist details for batch: ${batch}`);
       setLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})...`);
       const artists = await spotifyApi.getArtists(batch);
 
@@ -68,7 +72,7 @@ function App() {
       await delay(1000); // 1 second delay between requests
     }
 
-    console.log('Genre Album Map:', genreAlbumMap); // Check the genre album map
+    logger.info('Genre Album Map:', genreAlbumMap); // Check the genre album map
 
     const combinedGenres = {};
 
@@ -88,7 +92,7 @@ function App() {
       grouped[genreKey] = albums;
     });
 
-    console.log('Grouped albums:', grouped); // Check the grouped albums
+    logger.info('Grouped albums:', grouped); // Check the grouped albums
     setGroupedAlbums(grouped);
     setLoadingMessage('');
   }, []);
@@ -110,7 +114,7 @@ function App() {
   }, [fetchAllSavedAlbums, groupAlbumsByArtistGenre]);
 
   useEffect(() => {
-    console.log('Grouped albums state updated:', groupedAlbums); // Check the state after update
+    logger.info('Grouped albums state updated:', groupedAlbums); // Check the state after update
   }, [groupedAlbums]);
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
