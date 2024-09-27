@@ -16,6 +16,14 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
 
+  const logMessage = (message) => {
+    if (process.env.REACT_APP_ENV === 'local') {
+      console.log(message);
+    } else {
+      logToCloudWatch(message);
+    }
+  };
+  
   const fetchAllSavedAlbums = useCallback(async () => {
     try {
       setLoadingMessage('Fetching saved albums...');
@@ -24,7 +32,7 @@ function App() {
       const limit = 50; // Maximum limit per request
 
       while (true) {
-        logToCloudWatch(`Requesting saved albums with offset: ${offset}, limit: ${limit}`);
+        logMessage(`Requesting saved albums with offset: ${offset}, limit: ${limit}`);
         setLoadingMessage(`Requesting saved albums (${offset} / ?)...`);
         const response = await spotifyApi.getMySavedAlbums({ limit, offset });
         const albums = response.items.map(item => item.album);
@@ -39,7 +47,7 @@ function App() {
         await delay(1000); // 1 second delay between requests
       }
 
-      logToCloudWatch('Fetched albums:', allAlbums); // Check if albums are fetched
+      logMessage(`Fetched albums: ${allAlbums}`); // Check if albums are fetched
       setLoadingMessage('Grouping albums by artist genre...');
       return allAlbums;
     } catch (error) {
@@ -55,7 +63,7 @@ function App() {
 
     for (let i = 0; i < uniqueArtistIds.length; i += 50) {
       const batch = uniqueArtistIds.slice(i, i + 50);
-      logToCloudWatch(`Requesting artist details for batch: ${batch}`);
+      logMessage(`Requesting artist details for batch: ${batch}`);
       setLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})...`);
       const artists = await spotifyApi.getArtists(batch);
 
@@ -73,7 +81,7 @@ function App() {
       await delay(1000); // 1 second delay between requests
     }
 
-    logToCloudWatch('Genre Album Map:', genreAlbumMap); // Check the genre album map
+    logMessage(`Genre Album Map: ${genreAlbumMap}`); // Check the genre album map
 
     const combinedGenres = {};
 
@@ -93,7 +101,7 @@ function App() {
       grouped[genreKey] = albums;
     });
 
-    logToCloudWatch('Grouped albums:', grouped); // Check the grouped albums
+    logMessage(`Grouped albums: ${grouped}`); // Check the grouped albums
     setGroupedAlbums(grouped);
     setLoadingMessage('');
   }, []);
@@ -115,7 +123,7 @@ function App() {
   }, [fetchAllSavedAlbums, groupAlbumsByArtistGenre]);
 
   useEffect(() => {
-    logToCloudWatch('Grouped albums state updated:', groupedAlbums); // Check the state after update
+    logMessage(`Grouped albums state updated: ${groupedAlbums}`); // Check the state after update
   }, [groupedAlbums]);
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
