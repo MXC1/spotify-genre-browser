@@ -23,11 +23,12 @@ function App() {
       logToCloudWatch(message);
     }
   };
-  
+
   const fetchAllSavedAlbums = useCallback(async () => {
     try {
       setLoadingMessage('Fetching saved albums...');
       let allAlbums = [];
+      let allAlbumIds = [];
       let offset = 0;
       const limit = 50; // Maximum limit per request
 
@@ -38,6 +39,9 @@ function App() {
         const albums = response.items.map(item => item.album);
         allAlbums = [...allAlbums, ...albums];
 
+        // Collect all album IDs
+        allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
+
         if (response.items.length < limit) {
           break;
         }
@@ -47,11 +51,11 @@ function App() {
         await delay(1000); // 1 second delay between requests
       }
 
-      logMessage(`Fetched albums: ${allAlbums}`); // Check if albums are fetched
+      logMessage(`Finished fetching album IDs: ${JSON.stringify(allAlbumIds)}`);
       setLoadingMessage('Grouping albums by artist genre...');
       return allAlbums;
     } catch (error) {
-      console.error('Error fetching albums:', error);
+      logMessage(`Error fetching saved albums: ${error}`);
       setLoadingMessage('Error fetching albums.');
     }
   }, []);
@@ -63,7 +67,7 @@ function App() {
 
     for (let i = 0; i < uniqueArtistIds.length; i += 50) {
       const batch = uniqueArtistIds.slice(i, i + 50);
-      logMessage(`Requesting artist details for batch: ${batch}`);
+      logMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})`);
       setLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})...`);
       const artists = await spotifyApi.getArtists(batch);
 
@@ -76,20 +80,18 @@ function App() {
           }
           genreAlbumMap['[Unknown Genre]'].push(...albums.filter(album => album.artists[0].id === artist.id));
         } else {
-        genres.forEach(genre => {
-          if (!genreAlbumMap[genre]) {
-            genreAlbumMap[genre] = [];
-          }
-          genreAlbumMap[genre].push(...albums.filter(album => album.artists[0].id === artist.id));
-        });
+          genres.forEach(genre => {
+            if (!genreAlbumMap[genre]) {
+              genreAlbumMap[genre] = [];
+            }
+            genreAlbumMap[genre].push(...albums.filter(album => album.artists[0].id === artist.id));
+          });
         }
       });
 
       // Add a delay to avoid hitting the rate limit
       await delay(1000); // 1 second delay between requests
     }
-
-    logMessage(`Genre Album Map: ${genreAlbumMap}`); // Check the genre album map
 
     const combinedGenres = {};
 
@@ -109,9 +111,15 @@ function App() {
       grouped[genreKey] = albums;
     });
 
-    logMessage(`Grouped albums: ${grouped}`); // Check the grouped albums
     setGroupedAlbums(grouped);
     setLoadingMessage('');
+
+    // Log the array of genre strings and their associated albums
+    const genreAlbumArray = Object.entries(grouped).map(([genre, albums]) => ({
+      genre,
+      albums: albums.map(album => album.id)
+    }));
+    console.log(`Finished assigning albums to genres: ${JSON.stringify(genreAlbumArray)}`); // Check the array in the console
   }, []);
 
   useEffect(() => {
@@ -130,9 +138,6 @@ function App() {
     }
   }, [fetchAllSavedAlbums, groupAlbumsByArtistGenre]);
 
-  useEffect(() => {
-    logMessage(`Grouped albums state updated: ${groupedAlbums}`); // Check the state after update
-  }, [groupedAlbums]);
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -169,8 +174,8 @@ function App() {
     <div className="App">
       {!token ? (
         <div className="login-container">
-        <a href={loginUrl} className="login-button">Login with Spotify</a>
-      </div>
+          <a href={loginUrl} className="login-button">Login with Spotify</a>
+        </div>
       ) : (
         <div className="albums-container">
           <h1 className="page-title">Your album library</h1>
