@@ -4,6 +4,8 @@ import './App.css'
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
 import logToCloudWatch from './loggingConfig';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 
 Amplify.configure(awsconfig);
 
@@ -122,6 +124,18 @@ function App() {
     return(grouped);
   }, []);
 
+  const handleRefresh = async () => {
+    setLoadingMessage('Refreshing data...');
+    const allAlbums = await fetchAllSavedAlbums();
+    setAlbums(allAlbums);
+    await set('albums', allAlbums);
+  
+    const grouped = await groupAlbumsByArtistGenre(allAlbums);
+    setGroupedAlbums(grouped);
+    await set('groupedAlbums', grouped);
+    setLoadingMessage('');
+  };
+
   useEffect(() => {
     setLoadingMessage('Loading...');
     const initialize = async () => {
@@ -212,7 +226,13 @@ function App() {
         </div>
       ) : (
         <div className="albums-container">
-          <h1 className="page-title">Your album library</h1>
+          <div className="header-container">
+          <div className="title-container">
+            <h1 className="page-title">Your album library</h1>
+            <button className="refresh-button" onClick={handleRefresh}>
+              <FontAwesomeIcon icon={faSyncAlt} />
+            </button>
+          </div>
           <div className="search-sort-container">
             <input
               type="text"
@@ -228,6 +248,7 @@ function App() {
               <option value="number-desc">Size (Desc)</option>
             </select>
           </div>
+        </div>
           {loadingMessage ? (
             <p className="loading-message">{loadingMessage}</p>
           ) : sortedGenres.length === 0 ? (
