@@ -125,7 +125,33 @@ function App() {
   }, []);
 
   const handleRefresh = async () => {
+
     setLoadingMessage('Refreshing data...');
+    logMessage('Refreshing data...');
+    
+    // Generate a new Spotify auth token
+      window.location.href = getLoginUrl();
+      const hash = getTokenFromUrl();
+      window.location.hash = '';
+      const _token = hash.access_token;
+      
+      if (_token) {
+        setToken(_token);
+        spotifyApi.setAccessToken(_token);
+        await set('token', _token);
+      } else {
+        const cachedToken = await get('token');
+        if (cachedToken) {
+          setToken(cachedToken);
+          spotifyApi.setAccessToken(cachedToken);
+        } else {
+          setLoadingMessage('Error: No valid Spotify token found.');
+          return;
+        }
+      }
+
+    logMessage(`New auth token: ${_token}`);
+
     const allAlbums = await fetchAllSavedAlbums();
     setAlbums(allAlbums);
     await set('albums', allAlbums);
@@ -222,7 +248,7 @@ function App() {
     <div className="App">
       {!token ? (
         <div className="login-container">
-          <a href={loginUrl} className="login-button">Login with Spotify</a>
+          <a href={getLoginUrl()} className="login-button">Login with Spotify</a>
         </div>
       ) : (
         <div className="albums-container">
