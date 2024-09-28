@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getTokenFromUrl, loginUrl } from './Spotify';
-import spotifyApi from './Spotify';
+import spotifyApi, { getTokenFromUrl, loginUrl, set, get } from './Spotify';
 import './App.css'
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
@@ -120,24 +119,59 @@ function App() {
       albums: albums.map(album => album.id)
     }));
     console.log(`Finished assigning albums to genres: ${JSON.stringify(genreAlbumArray)}`); // Check the array in the console
+    return(grouped);
   }, []);
 
   useEffect(() => {
-    const hash = getTokenFromUrl();
-    window.location.hash = '';
-    const _token = hash.access_token;
-
-    if (_token) {
-      setToken(_token);
-      spotifyApi.setAccessToken(_token);
-
-      fetchAllSavedAlbums().then((allAlbums) => {
+    setLoadingMessage('Loading...');
+    const initialize = async () => {
+      const hash = getTokenFromUrl();
+      window.location.hash = '';
+      const _token = hash.access_token;
+  
+      if (_token) {
+        setToken(_token);
+        spotifyApi.setAccessToken(_token);
+        await set('token', _token);
+  
+        const allAlbums = await fetchAllSavedAlbums();
         setAlbums(allAlbums);
-        groupAlbumsByArtistGenre(allAlbums);
-      });
-    }
+        await set('albums', allAlbums);
+  
+        const cachedGroupedAlbums = await get('groupedAlbums');
+        if (cachedGroupedAlbums) {
+          setGroupedAlbums(cachedGroupedAlbums);
+        } else {
+          const grouped = await groupAlbumsByArtistGenre(allAlbums);
+          setGroupedAlbums(grouped);
+          await set('groupedAlbums', grouped);
+        }
+      } else {
+        const cachedToken = await get('token');
+        if (cachedToken) {
+          setToken(cachedToken);
+          spotifyApi.setAccessToken(cachedToken);
+  
+          const cachedAlbums = await get('albums');
+          if (cachedAlbums) {
+            setAlbums(cachedAlbums);
+  
+            const cachedGroupedAlbums = await get('groupedAlbums');
+            if (cachedGroupedAlbums) {
+              setGroupedAlbums(cachedGroupedAlbums);
+            } else {
+              const grouped = await groupAlbumsByArtistGenre(cachedAlbums);
+              setGroupedAlbums(grouped);
+              await set('groupedAlbums', grouped);
+            }
+          }
+        }
+      }
+    setLoadingMessage('');
+    };
+  
+    initialize();
   }, [fetchAllSavedAlbums, groupAlbumsByArtistGenre]);
-
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
