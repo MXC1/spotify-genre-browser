@@ -69,12 +69,20 @@ function App() {
 
       artists.artists.forEach(artist => {
         const genres = artist.genres;
+        if (genres.length === 0) {
+          // If no genres are associated, add to 'Unknown Genre' category
+          if (!genreAlbumMap['[Unknown Genre]']) {
+            genreAlbumMap['[Unknown Genre]'] = [];
+          }
+          genreAlbumMap['[Unknown Genre]'].push(...albums.filter(album => album.artists[0].id === artist.id));
+        } else {
         genres.forEach(genre => {
           if (!genreAlbumMap[genre]) {
             genreAlbumMap[genre] = [];
           }
           genreAlbumMap[genre].push(...albums.filter(album => album.artists[0].id === artist.id));
         });
+        }
       });
 
       // Add a delay to avoid hitting the rate limit
