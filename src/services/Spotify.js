@@ -1,6 +1,5 @@
 //Spotify.js
 import SpotifyWebApi from 'spotify-web-api-js';
-import { openDB } from 'idb';
 
 const spotifyApi = new SpotifyWebApi();
 
@@ -29,22 +28,5 @@ export const getLoginUrl = () => {
   let loginUrl = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=${RESPONSE_TYPE}&scope=user-library-read`;
   return loginUrl;
 }
-
-// IndexedDB functions
-const dbPromise = openDB('spotify-db', 1, {
-  upgrade(db) {
-    db.createObjectStore('keyval');
-  },
-});
-
-export const set = async (key, val) => {
-  const db = await dbPromise;
-  return db.put('keyval', val, key);
-};
-
-export const get = async (key) => {
-  const db = await dbPromise;
-  return db.get('keyval', key);
-};
 
 export default spotifyApi;
