@@ -6,6 +6,7 @@ import awsconfig from './aws-exports';
 import logToCloudWatch from './loggingConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import LoginContainer from './containers/loginContainer/loginContainer';
 
 Amplify.configure(awsconfig);
 
@@ -222,9 +223,7 @@ function App() {
   return (
     <div className="App">
       {!token ? (
-        <div className="login-container">
-          <a href={getLoginUrl()} className="login-button">Login with Spotify</a>
-        </div>
+        <LoginContainer />
       ) : (
         <div className="albums-container">
           <div className="header-container">
