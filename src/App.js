@@ -4,9 +4,8 @@ import './App.css'
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
 import logToCloudWatch from './loggingConfig';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import LoginContainer from './containers/loginContainer/loginContainer';
+import HeaderContainer from './containers/headerContainer/headerContainer';
 
 Amplify.configure(awsconfig);
 
@@ -122,74 +121,74 @@ function App() {
       albums: albums.map(album => album.id)
     }));
     console.log(`Finished assigning albums to genres: ${JSON.stringify(genreAlbumArray)}`); // Check the array in the console
-    return(grouped);
+    return (grouped);
   }, []);
 
-  const handleRefresh = async () => {
-
-    setLoadingMessage('Refreshing data...');
-    logMessage('Refreshing data...');
-    
-      window.location.href = getLoginUrl();
-  };
-
-    const initialize = async () => {
+  const initialize = async () => {
     logMessage('Initializing...');
 
     // Token is only present if the user is coming back from a Spotify redirect.
     // This only happens if they have never visited the app before, or if they
     // press the Refresh button.
-      const hash = getTokenFromUrl();
-      window.location.hash = '';
-      const _token = hash.access_token;
-  
-      if (_token) {
-        setToken(_token);
-        spotifyApi.setAccessToken(_token);
-        await set('token', _token);
-  
-        const allAlbums = await fetchAllSavedAlbums();
-        setAlbums(allAlbums);
-        await set('albums', allAlbums);
-  
+    const hash = getTokenFromUrl();
+    window.location.hash = '';
+    const _token = hash.access_token;
+
+    if (_token) {
+      setToken(_token);
+      spotifyApi.setAccessToken(_token);
+      await set('token', _token);
+
+      const allAlbums = await fetchAllSavedAlbums();
+      setAlbums(allAlbums);
+      await set('albums', allAlbums);
+
       const grouped = await groupAlbumsByArtistGenre(allAlbums);
       if (grouped) {
         await setGroupedAlbums(grouped);
       } else {
         const cachedGroupedAlbums = await get('groupedAlbums');
-          setGroupedAlbums(cachedGroupedAlbums);
-        }
-      } else {
-        const cachedToken = await get('token');
-        if (cachedToken) {
-          setToken(cachedToken);
-          spotifyApi.setAccessToken(cachedToken);
-  
-          const cachedAlbums = await get('albums');
-          if (cachedAlbums) {
-            setAlbums(cachedAlbums);
-  
-            const cachedGroupedAlbums = await get('groupedAlbums');
-            if (cachedGroupedAlbums) {
-              setGroupedAlbums(cachedGroupedAlbums);
-            } else {
-              const grouped = await groupAlbumsByArtistGenre(cachedAlbums);
-              setGroupedAlbums(grouped);
-              await set('groupedAlbums', grouped);
-            }
+        setGroupedAlbums(cachedGroupedAlbums);
+      }
+    } else {
+      const cachedToken = await get('token');
+      if (cachedToken) {
+        setToken(cachedToken);
+        spotifyApi.setAccessToken(cachedToken);
+
+        const cachedAlbums = await get('albums');
+        if (cachedAlbums) {
+          setAlbums(cachedAlbums);
+
+          const cachedGroupedAlbums = await get('groupedAlbums');
+          if (cachedGroupedAlbums) {
+            setGroupedAlbums(cachedGroupedAlbums);
+          } else {
+            const grouped = await groupAlbumsByArtistGenre(cachedAlbums);
+            setGroupedAlbums(grouped);
+            await set('groupedAlbums', grouped);
           }
         }
       }
+    }
     setLoadingMessage('');
-    };
+  };
 
   useEffect(() => {
     setLoadingMessage('Loading...');
-  
+
     initialize();
   }, [fetchAllSavedAlbums, groupAlbumsByArtistGenre]);
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const handleRefresh = async () => {
+
+    setLoadingMessage('Refreshing data...');
+    logMessage('Refreshing data...');
+
+    window.location.href = getLoginUrl();
+  };
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value.toLowerCase());
@@ -226,29 +225,10 @@ function App() {
         <LoginContainer />
       ) : (
         <div className="albums-container">
-          <div className="header-container">
-          <div className="title-container">
-            <h1 className="page-title">Your album library</h1>
-            <button className="refresh-button" onClick={handleRefresh}>
-              <FontAwesomeIcon icon={faSyncAlt} />
-            </button>
-          </div>
-          <div className="search-sort-container">
-            <input
-              type="text"
-              placeholder="Search genres, albums, and artists..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="search-bar"
-            />
-            <select value={sortOption} onChange={handleSortChange} className="sort-dropdown">
-              <option value="alphabetical-asc">(A-Z)</option>
-              <option value="alphabetical-desc">(Z-A)</option>
-              <option value="number-asc">Size (Asc)</option>
-              <option value="number-desc">Size (Desc)</option>
-            </select>
-          </div>
-        </div>
+          <HeaderContainer
+          onRefresh={handleRefresh}
+          onSearch={handleSearch}
+          onSortChange={handleSortChange} />
           {loadingMessage ? (
             <p className="loading-message">{loadingMessage}</p>
           ) : sortedGenres.length === 0 ? (
