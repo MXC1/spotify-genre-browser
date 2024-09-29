@@ -1,12 +1,8 @@
-import { useState } from 'react';
 import './headerContainer.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 
 function HeaderContainer({ onRefresh, onSearch, onSortChange }) {
-    const [searchQuery] = useState('');
-    const [sortOption] = useState('number-desc');
-
     return (
         <div className="header-container">
             <div className="title-container">
