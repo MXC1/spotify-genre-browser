@@ -52,6 +52,7 @@ function App() {
         spotifyApi.setAccessToken(cachedToken);
       }
 
+<<<<<<< HEAD
       logMessage(`genreGridRef: ${JSON.stringify(genreGridRef.current)}`);
       if (genreGridRef.current) {
         genreGridRef.current.getCachedGenreAlbumMap();
