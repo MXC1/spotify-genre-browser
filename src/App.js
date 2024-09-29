@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import spotifyApi, { getTokenFromUrl, getLoginUrl } from './services/Spotify';
 import { set, get } from './utilities/indexedDB';
 import './App.css'

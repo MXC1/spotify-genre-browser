@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useImperativeHandle, forwardRef } from "react";
-import spotifyApi, { set, get } from "../../services/Spotify";
+import { set, get } from "../../utilities/indexedDB";
+import spotifyApi from "../../services/Spotify";
 import logToCloudWatch from "../../loggingConfig";
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
