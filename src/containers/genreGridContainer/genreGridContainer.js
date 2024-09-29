@@ -134,7 +134,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     }
   }))
 
-  const filteredGenres = Object.entries(groupedAlbums).filter(([genre, albums]) =>
+  logMessage(`groupedAlbums: ${JSON.stringify(groupedAlbums)}`);
+  const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
     genre.toLowerCase().includes(props.searchQuery) ||
     albums.some(album =>
       album.name.toLowerCase().includes(props.searchQuery) ||
