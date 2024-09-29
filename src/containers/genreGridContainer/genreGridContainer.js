@@ -107,11 +107,14 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     setLoadingMessage('');
 
     // Log the array of genre strings and their associated albums
-    const genreAlbumArray = Object.entries(grouped).map(([genre, albums]) => ({
-      genre,
-      albums: albums.map(album => album.id)
-    }));
-    logMessage(`Finished assigning albums to genres: ${JSON.stringify(genreAlbumArray)}`); // Check the array in the console
+    const genreAlbumArray = Object.entries(grouped).map(([genre, albums]) => {
+      const albumIds = albums.map(album => album.id);
+      console.log(`Genre: ${genre}, Albums: ${albumIds}`);
+      return {
+        genre,
+        albums: albumIds
+      };
+    });
     return (grouped);
   }, []);
 
@@ -134,7 +137,6 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     }
   }))
 
-  logMessage(`groupedAlbums: ${JSON.stringify(groupedAlbums)}`);
   const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
     genre.toLowerCase().includes(props.searchQuery) ||
     albums.some(album =>
