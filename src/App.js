@@ -134,6 +134,10 @@ function App() {
 
     const initialize = async () => {
     logMessage('Initializing...');
+
+    // Token is only present if the user is coming back from a Spotify redirect.
+    // This only happens if they have never visited the app before, or if they
+    // press the Refresh button.
       const hash = getTokenFromUrl();
       window.location.hash = '';
       const _token = hash.access_token;
