@@ -121,7 +121,7 @@ function App() {
       genre,
       albums: albums.map(album => album.id)
     }));
-    console.log(`Finished assigning albums to genres: ${JSON.stringify(genreAlbumArray)}`); // Check the array in the console
+    logMessage(`Finished assigning albums to genres: ${JSON.stringify(genreAlbumArray)}`); // Check the array in the console
     return (grouped);
   }, []);
 

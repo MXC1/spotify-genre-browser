@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function GenreGridContainer({ sortedGenres}) {
+function GenreGridContainer({ sortedGenres }) {
     return (
         <div className="genre-grid">
         {sortedGenres.map(([genre, albums], index) => (
