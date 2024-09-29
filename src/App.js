@@ -16,9 +16,8 @@ function App() {
   const [sortOption, setSortOption] = useState('number-desc');
 
   const logMessage = (message) => {
-    if (process.env.REACT_APP_ENV === 'local') {
-      console.log(message);
-    } else {
+    console.log(message);
+    if (process.env.REACT_APP_ENV === 'production') {
       logToCloudWatch(message);
     }
   };
