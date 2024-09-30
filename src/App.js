@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import spotifyApi, { getLoginUrl, getTokenFromUrl, get, set } from './services/Spotify';
+import spotifyApi, { getTokenFromUrl, getLoginUrl } from './services/Spotify';
+import { set, get } from './utilities/indexedDB';
 import './App.css'
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
