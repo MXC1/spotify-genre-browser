@@ -1,19 +1,11 @@
 import { useState, useCallback, useRef, useImperativeHandle, forwardRef } from "react";
 import { set, get } from "../../utilities/indexedDB";
 import spotifyApi from "../../services/Spotify";
-import logToCloudWatch from "../../loggingConfig";
+import logMessage from "../../utilities/loggingConfig";
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [loadingMessage, setLoadingMessage] = useState('');
   const [groupedAlbums, setGroupedAlbums] = useState({});
-
-  const logMessage = (message) => {
-    if (process.env.REACT_APP_ENV === 'local') {
-      console.log(message);
-    } else {
-      logToCloudWatch(message);
-    }
-  };
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
