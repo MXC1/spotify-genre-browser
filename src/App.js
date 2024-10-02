@@ -4,7 +4,7 @@ import { set, get } from './utilities/indexedDB';
 import './App.css'
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import logToCloudWatch from './loggingConfig';
+import logMessage from './utilities/loggingConfig';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
@@ -15,13 +15,6 @@ function App() {
   const [token, setToken] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
-
-  const logMessage = (message) => {
-    console.log(message);
-    if (process.env.REACT_APP_ENV === 'production') {
-      logToCloudWatch(message);
-    }
-  };
 
   const genreGridRef = useRef();
   const initialize = async () => {
