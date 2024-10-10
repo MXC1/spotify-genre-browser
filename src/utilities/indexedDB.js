@@ -2,6 +2,8 @@ import { openDB } from 'idb';
 
 const dbPromise = openDB('spotify-db', 2, {
   upgrade(db) {
+    db.deleteObjectStore('keyval');
+
     db.createObjectStore('auth');
     db.createObjectStore('data');
   },
