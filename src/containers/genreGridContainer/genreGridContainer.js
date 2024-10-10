@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useImperativeHandle, forwardRef } from "react";
+import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import { set, get } from "../../utilities/indexedDB";
 import spotifyApi from "../../services/Spotify";
 import logMessage from "../../utilities/loggingConfig";
@@ -8,36 +8,58 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const delayTimeMs = 500;
 
   const fetchAllSavedAlbums = useCallback(async () => {
     try {
-      setLoadingMessage('Fetching saved albums...');
+      logMessage('Fetching saved albums...')
+
       let allAlbums = [];
       let allAlbumIds = [];
       let offset = 0;
-      const limit = 50; // Maximum limit per request
+      const limit = 5; // Maximum items per request
 
-      while (true) {
-        logMessage(`Requesting saved albums with offset: ${offset}, limit: ${limit}`);
-        setLoadingMessage(`Requesting saved albums (${offset} / ?)...`);
-        const response = await spotifyApi.getMySavedAlbums({ limit, offset });
+      // Call the API once to get the total value
+
+      logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`)
+
+      const response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
+      const totalAlbums = response.total;
+
+      // Use the items to populate `allAlbumIds`
+
+      const albums = response.items.map(item => item.album);
+
+      allAlbums = [...allAlbums, ...albums];
+      allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
+
+      // Calculate the remaining batches
+
+      const albumsToProcess = totalAlbums - limit;
+      const batchesToProcess = Math.ceil(albumsToProcess / limit);
+
+      offset += limit;
+
+      // Add a delay to avoid hitting the rate limit
+      await delay(delayTimeMs);
+
+      // Collect the remaining batches
+
+      for (let i = 0; i < batchesToProcess; i++) {
+        logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ${totalAlbums})...`)
+
+        const response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
         const albums = response.items.map(item => item.album);
-        allAlbums = [...allAlbums, ...albums];
 
-        // Collect all album IDs
+        allAlbums = [...allAlbums, ...albums];
         allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
 
-        if (response.items.length < limit) {
-          break;
-        }
         offset += limit;
 
-        // Add a delay to avoid hitting the rate limit
-        await delay(1000); // 1 second delay between requests
+        await delay(delayTimeMs);
       }
 
       logMessage(`Finished fetching album IDs: ${JSON.stringify(allAlbumIds)}`);
-      setLoadingMessage('Grouping albums by artist genre...');
       return allAlbums;
     } catch (error) {
       logMessage(`Error fetching saved albums: ${error}`);
@@ -50,10 +72,12 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     const artistIds = albums.map(album => album.artists[0].id);
     const uniqueArtistIds = [...new Set(artistIds)];
 
+    logAndSetLoadingMessage('Grouping albums by artist genre...')
+
     for (let i = 0; i < uniqueArtistIds.length; i += 50) {
+      logAndSetLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})`)
+
       const batch = uniqueArtistIds.slice(i, i + 50);
-      logMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})`);
-      setLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})...`);
       const artists = await spotifyApi.getArtists(batch);
 
       artists.artists.forEach(artist => {
@@ -75,7 +99,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       });
 
       // Add a delay to avoid hitting the rate limit
-      await delay(1000); // 1 second delay between requests
+      await delay(delayTimeMs); // 1 second delay between requests
     }
 
     const combinedGenres = {};
@@ -150,6 +174,11 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     }
     return 0;
   });
+
+  function logAndSetLoadingMessage(message) {
+    logMessage(message);
+    setLoadingMessage(message);
+  }
 
   return (
     <div>
