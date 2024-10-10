@@ -99,7 +99,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       });
 
       // Add a delay to avoid hitting the rate limit
-      await delay(delayTimeMs); // 1 second delay between requests
+      await delay(delayTimeMs);
     }
 
     const combinedGenres = {};
