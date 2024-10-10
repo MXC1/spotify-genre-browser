@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import spotifyApi, { getTokenFromUrl, getLoginUrl } from './services/Spotify';
-import { set, get } from './utilities/indexedDB';
+import { setCachedEntry, getCachedEntry } from './utilities/indexedDB';
 import './App.css'
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
@@ -31,7 +31,7 @@ function App() {
       logMessage(`Token found in URL: ${_token}`);
       setToken(_token);
       spotifyApi.setAccessToken(_token);
-      await set('token', _token);
+      await setCachedEntry('auth', _token, 'token');
 
       if (genreGridRef.current) {
         genreGridRef.current.updateGenreAlbumMap();
@@ -39,7 +39,7 @@ function App() {
     } else {
       logMessage('No token found in URL. Checking for cached token in IndexedDB...');
 
-      const cachedToken = await get('token');
+      const cachedToken = await getCachedEntry('auth', 'token');
       if (cachedToken) {
         logMessage(`Cached token found: ${cachedToken}`);
         setToken(cachedToken);
