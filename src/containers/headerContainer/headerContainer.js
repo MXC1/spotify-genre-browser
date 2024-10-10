@@ -18,7 +18,7 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange }) {
                     onChange={onSearch}
                     className="search-bar"
                 />
-                <select onChange={onSortChange} className="sort-dropdown">
+                <select onChange={onSortChange} className="sort-dropdown" defaultValue="number-desc">
                     <option value="alphabetical-asc">(A-Z)</option>
                     <option value="alphabetical-desc">(Z-A)</option>
                     <option value="number-asc">Size (Asc)</option>

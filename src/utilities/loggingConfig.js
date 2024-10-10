@@ -27,4 +27,11 @@ const logToCloudWatch = (message) => {
   });
 };
 
-export default logToCloudWatch;
+const logMessage = (message) => {
+  console.log(message);
+  if (process.env.REACT_APP_ENV === 'production') {
+    logToCloudWatch(message);
+  }
+};
+
+export default logMessage;
