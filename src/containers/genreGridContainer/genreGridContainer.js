@@ -12,7 +12,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
   const fetchAllSavedAlbums = useCallback(async () => {
     try {
-      logMessage('Fetching saved albums...')
+      logMessage('Fetching saved albums...');
 
       let allAlbums = [];
       let allAlbumIds = [];
@@ -21,48 +21,53 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
       // Call the API once to get the total value
 
-      logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`)
-      const response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
+      logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`);
 
-      // Use the items to populate album IDs
-
-      const albums = response.items.map(item => item.album);
-
+      const [albums, numberOfAlbums] = await getSavedAlbumsWithRetries(limit, offset);
       allAlbums = [...allAlbums, ...albums];
       allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
 
       // Calculate the remaining batches
 
-      const totalAlbums = response.total;
-      const albumsToProcess = totalAlbums - limit;
+      const albumsToProcess = numberOfAlbums - limit;
       const batchesToProcess = Math.ceil(albumsToProcess / limit);
 
       offset += limit;
 
-      // Add a delay to avoid hitting the rate limit
-      await delay(delayTimeMs);
-
       // Collect the remaining batches
 
       for (offset; offset <= batchesToProcess * limit; offset += limit) {
-        logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ${totalAlbums})...`)
+        logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ${numberOfAlbums})...`);
 
-        const response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
-        const albums = response.items.map(item => item.album);
-
+        const [albums] = await getSavedAlbumsWithRetries(limit, offset);
         allAlbums = [...allAlbums, ...albums];
         allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
-
-        await delay(delayTimeMs);
       }
 
       logMessage(`Finished fetching album IDs: ${JSON.stringify(allAlbumIds)}`);
+
       return allAlbums;
     } catch (error) {
       logMessage(`Error fetching saved albums: ${error}`);
       setLoadingMessage('Error fetching albums.');
     }
   }, []);
+
+  async function getSavedAlbumsWithRetries(limit, offset) {
+    let response;
+
+    do {
+      response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
+
+      if (response.error && response.error.status === 429) {
+        const retryAfterSeconds = parseInt(response.headers.get('Retry-After'), 10);
+        logMessage(`Rate limited. Retrying after ${retryAfterSeconds} seconds`);
+        await delay(retryAfterSeconds * 1000);
+      }
+    } while (response.error && response.error.status === 429);
+
+    return [response.items.map(item => item.album), response.total];
+  }
 
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
     const genreAlbumMap = {};
