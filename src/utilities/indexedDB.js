@@ -1,19 +1,20 @@
-//indexedDB.js
 import { openDB } from 'idb';
 
-// IndexedDB functions
-const dbPromise = openDB('spotify-db', 1, {
+const dbPromise = openDB('spotify-db', 2, {
   upgrade(db) {
-    db.createObjectStore('keyval');
+    db.deleteObjectStore('keyval');
+
+    db.createObjectStore('auth');
+    db.createObjectStore('data');
   },
 });
 
-export const set = async (key, val) => {
+export const setCachedEntry = async (store, val, key) => {
   const db = await dbPromise;
-  return db.put('keyval', val, key);
+  return db.put(store, val, key);
 };
 
-export const get = async (key) => {
+export const getCachedEntry = async (store, key) => {
   const db = await dbPromise;
-  return db.get('keyval', key);
+  return db.get(store, key);
 };

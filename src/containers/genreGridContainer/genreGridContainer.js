@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useImperativeHandle, forwardRef } from "react";
-import { set, get } from "../../utilities/indexedDB";
+import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDB";
 import spotifyApi from "../../services/Spotify";
 import logMessage from "../../utilities/loggingConfig";
 
@@ -119,12 +119,12 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
       const grouped = await groupAlbumsByArtistGenre(allAlbums);
       setGroupedAlbums(grouped);
-      await set('groupedAlbums', grouped);
+      await setCachedEntry('data', grouped, 'groupedAlbums');
     },
     getCachedGenreAlbumMap: async () => {
       logMessage(`Fetching genre album map from cache...`);
       setLoadingMessage(`Loading saved albums...`);
-      const cachedGroupedAlbums = await get('groupedAlbums');
+      const cachedGroupedAlbums = await getCachedEntry('data', 'groupedAlbums');
       setGroupedAlbums(cachedGroupedAlbums);
       setLoadingMessage('');
     }
