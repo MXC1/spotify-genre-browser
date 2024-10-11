@@ -26,7 +26,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       const response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
       const totalAlbums = response.total;
 
-      // Use the items to populate `allAlbumIds`
+      // Use the items to populate album IDs
 
       const albums = response.items.map(item => item.album);
 
