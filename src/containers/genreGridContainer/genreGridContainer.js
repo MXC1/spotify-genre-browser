@@ -17,7 +17,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       let allAlbums = [];
       let allAlbumIds = [];
       let offset = 0;
-      const limit = 5; // Maximum items per request
+      const limit = 50; // Maximum items per request
 
       // Call the API once to get the total value
 
