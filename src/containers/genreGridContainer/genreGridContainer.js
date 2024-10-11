@@ -22,9 +22,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       // Call the API once to get the total value
 
       logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`)
-
       const response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
-      const totalAlbums = response.total;
 
       // Use the items to populate album IDs
 
@@ -35,7 +33,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
       // Calculate the remaining batches
 
-      const albumsToProcess = totalAlbums - limit;
+      const albumsToProcess = response - limit;
       const batchesToProcess = Math.ceil(albumsToProcess / limit);
 
       offset += limit;
