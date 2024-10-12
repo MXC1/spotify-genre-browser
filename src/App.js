@@ -4,7 +4,7 @@ import { set, get } from './utilities/indexedDB';
 import './App.css'
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import logMessage from './utilities/loggingConfig';
+import { logMessage, generateSessionID } from './utilities/loggingConfig';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
@@ -18,6 +18,7 @@ function App() {
 
   const genreGridRef = useRef();
   const initialize = async () => {
+    await generateSessionID();
     logMessage('Checking for token in URL...');
 
     // Token is only present if the user is coming back from a Spotify redirect.

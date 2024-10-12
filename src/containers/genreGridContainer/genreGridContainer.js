@@ -99,10 +99,12 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     setGroupedAlbums(grouped);
     setLoadingMessage('');
 
+    logMessage(`Finished grouping albums by artist genre:`);
+
     // Log the array of genre strings and their associated albums
     const genreAlbumArray = Object.entries(grouped).map(([genre, albums]) => {
       const albumIds = albums.map(album => album.id);
-      console.log(`Genre: ${genre}, Albums: ${albumIds}`);
+      logMessage(`Genre: ${genre}, Albums: ${albumIds}`);
       return {
         genre,
         albums: albumIds

@@ -1,5 +1,6 @@
 // loggingConfig.js
 import AWS from 'aws-sdk';
+import { set, get } from '../utilities/indexedDB';
 
 AWS.config.update({ region: 'eu-west-2',
     credentials: new AWS.CognitoIdentityCredentials({
@@ -8,6 +9,19 @@ AWS.config.update({ region: 'eu-west-2',
  });
 
 const cloudwatchlogs = new AWS.CloudWatchLogs();
+
+let sessionID;
+export async function generateSessionID() {
+  const cachedSessionID = await get('sessionID');
+  if (cachedSessionID) {
+    sessionID = cachedSessionID;
+    return cachedSessionID;
+  }
+  const timestamp = new Date().getTime();
+  const randomNumber = Math.floor(Math.random() * 1000000);
+  sessionID = `${timestamp}-${randomNumber}`;
+  set('sessionID', sessionID);
+}
 
 const logToCloudWatch = (message) => {
   const params = {
@@ -27,7 +41,8 @@ const logToCloudWatch = (message) => {
   });
 };
 
-const logMessage = (message) => {
+export const logMessage = (message) => {
+  message = `${message} - SessionID: ${sessionID}`;
   console.log(message);
   if (process.env.REACT_APP_ENV === 'production') {
     logToCloudWatch(message);
