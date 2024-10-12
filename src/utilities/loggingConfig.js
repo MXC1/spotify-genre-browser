@@ -21,9 +21,8 @@ const logToCloudWatch = (message) => {
     ],
   };
 
-  cloudwatchlogs.putLogEvents(params, (err, data) => {
+  cloudwatchlogs.putLogEvents(params, (err) => {
     if (err) console.log(err, err.stack);
-    else console.log(data);
   });
 };
 

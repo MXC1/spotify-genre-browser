@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef, useImperativeHandle, forwardRef } from "react";
-import { set, get } from "../../utilities/indexedDB";
+import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
+import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDB";
 import spotifyApi from "../../services/Spotify";
 import logMessage from "../../utilities/loggingConfig";
 
@@ -8,36 +8,44 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const delayTimeMs = 500;
 
   const fetchAllSavedAlbums = useCallback(async () => {
     try {
-      setLoadingMessage('Fetching saved albums...');
+      logMessage('Fetching saved albums...');
+
       let allAlbums = [];
       let allAlbumIds = [];
       let offset = 0;
-      const limit = 50; // Maximum limit per request
+      const limit = 50; // Maximum items per request
 
-      while (true) {
-        logMessage(`Requesting saved albums with offset: ${offset}, limit: ${limit}`);
-        setLoadingMessage(`Requesting saved albums (${offset} / ?)...`);
-        const response = await spotifyApi.getMySavedAlbums({ limit, offset });
-        const albums = response.items.map(item => item.album);
+      // Call the API once to get the total value
+
+      logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`);
+
+      const [albums, numberOfAlbums] = await getSavedAlbumsWithRetries(limit, offset);
+      allAlbums = [...allAlbums, ...albums];
+      allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
+
+      // Calculate the remaining batches
+
+      const albumsToProcess = numberOfAlbums - limit;
+      const batchesToProcess = Math.ceil(albumsToProcess / limit);
+
+      offset += limit;
+
+      // Collect the remaining batches
+
+      for (offset; offset <= batchesToProcess * limit; offset += limit) {
+        logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ${numberOfAlbums})...`);
+
+        const [albums] = await getSavedAlbumsWithRetries(limit, offset);
         allAlbums = [...allAlbums, ...albums];
-
-        // Collect all album IDs
         allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
-
-        if (response.items.length < limit) {
-          break;
-        }
-        offset += limit;
-
-        // Add a delay to avoid hitting the rate limit
-        await delay(1000); // 1 second delay between requests
       }
 
       logMessage(`Finished fetching album IDs: ${JSON.stringify(allAlbumIds)}`);
-      setLoadingMessage('Grouping albums by artist genre...');
+
       return allAlbums;
     } catch (error) {
       logMessage(`Error fetching saved albums: ${error}`);
@@ -45,15 +53,33 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     }
   }, []);
 
+  async function getSavedAlbumsWithRetries(limit, offset) {
+    let response;
+
+    do {
+      response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
+
+      if (response.error && response.error.status === 429) {
+        const retryAfterSeconds = parseInt(response.headers.get('Retry-After'), 10);
+        logMessage(`Rate limited. Retrying after ${retryAfterSeconds} seconds`);
+        await delay(retryAfterSeconds * 1000);
+      }
+    } while (response.error && response.error.status === 429);
+
+    return [response.items.map(item => item.album), response.total];
+  }
+
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
     const genreAlbumMap = {};
     const artistIds = albums.map(album => album.artists[0].id);
     const uniqueArtistIds = [...new Set(artistIds)];
 
+    logAndSetLoadingMessage('Grouping albums by artist genre...')
+
     for (let i = 0; i < uniqueArtistIds.length; i += 50) {
+      logAndSetLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})`)
+
       const batch = uniqueArtistIds.slice(i, i + 50);
-      logMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})`);
-      setLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})...`);
       const artists = await spotifyApi.getArtists(batch);
 
       artists.artists.forEach(artist => {
@@ -75,7 +101,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       });
 
       // Add a delay to avoid hitting the rate limit
-      await delay(1000); // 1 second delay between requests
+      await delay(delayTimeMs);
     }
 
     const combinedGenres = {};
@@ -119,23 +145,23 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
       const grouped = await groupAlbumsByArtistGenre(allAlbums);
       setGroupedAlbums(grouped);
-      await set('groupedAlbums', grouped);
+      await setCachedEntry('data', grouped, 'groupedAlbums');
     },
     getCachedGenreAlbumMap: async () => {
       logMessage(`Fetching genre album map from cache...`);
       setLoadingMessage(`Loading saved albums...`);
-      const cachedGroupedAlbums = await get('groupedAlbums');
+      const cachedGroupedAlbums = await getCachedEntry('data', 'groupedAlbums');
       setGroupedAlbums(cachedGroupedAlbums);
       setLoadingMessage('');
     }
   }))
 
   const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
-    genre.toLowerCase().includes(props.searchQuery) ||
-    albums.some(album =>
-      album.name.toLowerCase().includes(props.searchQuery) ||
-      album.artists.some(artist => artist.name.toLowerCase().includes(props.searchQuery))
-    )
+      genre.toLowerCase().includes(props.searchQuery) ||
+      albums.some(album =>
+          album.name.toLowerCase().includes(props.searchQuery) ||
+          album.artists.some(artist => artist.name.toLowerCase().includes(props.searchQuery))
+      )
   );
 
   const sortedGenres = filteredGenres.sort((a, b) => {
@@ -151,20 +177,25 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     return 0;
   });
 
+  function logAndSetLoadingMessage(message) {
+    logMessage(message);
+    setLoadingMessage(message);
+  }
+
   return (
-    <div>
-      {loadingMessage ? (
-        <p className="loading-message">{loadingMessage}</p>
-      ) : sortedGenres.length === 0 ? (
-        <p className="no-albums">No albums found</p>
-      ) : (
-        <div className="genre-grid">
-          {sortedGenres.map(([genre, albums], index) => (
-            <GenreCard key={genre} genre={genre} albums={albums} index={index} />
-          ))}
-        </div>
-      )}
-    </div>
+      <div>
+        {loadingMessage ? (
+            <p className="loading-message">{loadingMessage}</p>
+        ) : sortedGenres.length === 0 ? (
+            <p className="no-albums">No albums found</p>
+        ) : (
+            <div className="genre-grid">
+              {sortedGenres.map(([genre, albums], index) => (
+                  <GenreCard key={genre} genre={genre} albums={albums} index={index} />
+              ))}
+            </div>
+        )}
+      </div>
   );
 });
 
@@ -178,32 +209,32 @@ function GenreCard({ genre, albums, index }) {
   };
 
   return (
-    <div className={`genre-section ${isCollapsed ? 'collapsed' : 'expanded'}`} onClick={handleClick} >
-      <h2 className="genre-title">
-        {genre}
-      </h2>
-      {isCollapsed ? (
-        <div className="album-preview">
-          {albums.slice(0, albums.length).map((album) => (
-            <img key={album.id} src={album.images[0].url} alt={album.name} className="album-preview-image" />
-          ))}
-        </div>
-      ) : (
-        <div className="album-grid">
-          {albums.map((album) => (
-            <div key={album.id} className="album-item">
-              <a href={album.external_urls.spotify} target="_blank" rel="noopener noreferrer" className="album-link">
-                <img src={album.images[0].url} alt={album.name} className="album-image" />
-                <div className="album-info">
-                  <span className="album-name">{album.name}</span>
-                  <span className="album-artist">{album.artists[0].name}</span>
-                </div>
-              </a>
+      <div className={`genre-section ${isCollapsed ? 'collapsed' : 'expanded'}`} onClick={handleClick} >
+        <h2 className="genre-title">
+          {genre}
+        </h2>
+        {isCollapsed ? (
+            <div className="album-preview">
+              {albums.slice(0, albums.length).map((album) => (
+                  <img key={album.id} src={album.images[0].url} alt={album.name} className="album-preview-image" />
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+        ) : (
+            <div className="album-grid">
+              {albums.map((album) => (
+                  <div key={album.id} className="album-item">
+                    <a href={album.external_urls.spotify} target="_blank" rel="noopener noreferrer" className="album-link">
+                      <img src={album.images[0].url} alt={album.name} className="album-image" />
+                      <div className="album-info">
+                        <span className="album-name">{album.name}</span>
+                        <span className="album-artist">{album.artists[0].name}</span>
+                      </div>
+                    </a>
+                  </div>
+              ))}
+            </div>
+        )}
+      </div>
   );
 }
 
