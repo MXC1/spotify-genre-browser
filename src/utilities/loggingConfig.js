@@ -1,6 +1,7 @@
 // loggingConfig.js
 import AWS from 'aws-sdk';
 import { set, get } from '../utilities/indexedDB';
+import { v1 } from 'uuid';
 
 AWS.config.update({ region: 'eu-west-2',
     credentials: new AWS.CognitoIdentityCredentials({
@@ -10,18 +11,17 @@ AWS.config.update({ region: 'eu-west-2',
 
 const cloudwatchlogs = new AWS.CloudWatchLogs();
 
-let sessionID;
-export async function generateSessionID() {
-  const cachedSessionID = await get('sessionID');
-  if (cachedSessionID) {
-    sessionID = cachedSessionID;
-    return cachedSessionID;
-  }
-  const timestamp = new Date().getTime();
-  const randomNumber = Math.floor(Math.random() * 1000000);
-  sessionID = `${timestamp}-${randomNumber}`;
-  set('sessionID', sessionID);
-}
+let sessionID;  
+export async function fetchOrGenerateSessionID() {  
+  const cachedSessionID = await get('sessionID');  
+  if (cachedSessionID) {  
+    sessionID = cachedSessionID;  
+    return cachedSessionID;  
+  }  
+
+  sessionID = v1();
+  set('sessionID', sessionID);  
+}  
 
 const logToCloudWatch = (message) => {
   const params = {
