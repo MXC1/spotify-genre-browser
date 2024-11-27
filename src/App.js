@@ -42,6 +42,7 @@ function App() {
   };
 
   useEffect(() => {
+    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
     handleAuth();
   }, []);
 
