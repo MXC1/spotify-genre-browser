@@ -1,6 +1,6 @@
 import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDB";
-import { getMySavedAlbums, getArtists } from '../../services/spotifyPKCE';
+import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
 import logMessage from "../../utilities/loggingConfig";
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {

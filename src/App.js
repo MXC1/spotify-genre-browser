@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { authenticateUser } from './services/spotifyPKCE';
+import { authenticateUser } from './services/spotifyAuth';
 import { getCachedEntry } from './utilities/indexedDB';
 import './App.css';
 import { Amplify } from 'aws-amplify';

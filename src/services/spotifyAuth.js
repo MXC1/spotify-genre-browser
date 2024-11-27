@@ -12,7 +12,7 @@ const setAccessToken = async (newAccessToken) => {
   accessToken = newAccessToken;
 };
 
-const getAccessToken = async () => {
+export const getAccessToken = async () => {
   const accessToken = await getCachedEntry('auth', 'access_token');
   const expiresAt = await getCachedEntry('auth', 'expires_at');
 
@@ -193,49 +193,5 @@ export const refreshAccessToken = async () => {
   } catch (error) {
     logMessage(`Error refreshing access token: ${error.response ? JSON.stringify(error.response.data) : error.message}`);
     return null;
-  }
-};
-
-export const getMySavedAlbums = async (limit, offset) => {
-  const token = await getAccessToken();
-  if (!token) {
-    throw new Error('Access token not found');
-  }
-  try {
-    const response = await axios.get(`https://api.spotify.com/v1/me/albums`, {
-      params: {
-        limit,
-        offset,
-        album_type: 'album',
-      },
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching saved albums: ${error}`);
-    throw error;
-  }
-};
-
-export const getArtists = async (ids) => {
-  const token = await getAccessToken();
-  if (!token) {
-    throw new Error('Access token not found');
-  }
-  try {
-    const response = await axios.get(`https://api.spotify.com/v1/artists`, {
-      params: {
-        ids: ids.join(','),
-      },
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching artists: ${error}`);
-    throw error;
   }
 };

@@ -1,4 +1,4 @@
-import { redirectToAuthorizationUrl } from "../../services/spotifyPKCE";
+import { redirectToAuthorizationUrl } from "../../services/spotifyAuth";
 
 function LoginContainer() {
 
