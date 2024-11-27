@@ -4,7 +4,7 @@ import { setCachedEntry, getCachedEntry } from './utilities/indexedDB';
 import './App.css'
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import logMessage from './utilities/loggingConfig';
+import { logMessage, fetchOrGenerateSessionID } from './utilities/loggingConfig';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
@@ -17,7 +17,14 @@ function App() {
   const [sortOption, setSortOption] = useState('number-desc');
 
   const genreGridRef = useRef();
+/*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Called when the app is initialized. Checks the URL for a Spotify access
+   * token, and if one is found, uses it to authenticate the user and fetch
+   * their saved albums. If no token is found, looks for a cached token in
+/******  1edaaebd-330f-4c33-8b99-9221e99dd546  *******/  
   const initialize = async () => {
+    await fetchOrGenerateSessionID();
     logMessage('Checking for token in URL...');
 
     // Token is only present if the user is coming back from a Spotify redirect.
