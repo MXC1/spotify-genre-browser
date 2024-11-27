@@ -1,6 +1,6 @@
 // loggingConfig.js
 import AWS from 'aws-sdk';
-import { set, get } from '../utilities/indexedDB';
+import { getCachedEntry, setCachedEntry } from './indexedDB';
 import { v1 } from 'uuid';
 
 AWS.config.update({ region: 'eu-west-2',
@@ -13,14 +13,14 @@ const cloudwatchlogs = new AWS.CloudWatchLogs();
 
 let sessionID;  
 export async function fetchOrGenerateSessionID() {  
-  const cachedSessionID = await get('sessionID');  
+  const cachedSessionID = await getCachedEntry('auth','sessionID');  
   if (cachedSessionID) {  
     sessionID = cachedSessionID;  
     return cachedSessionID;  
-  }  
+  } 
 
   sessionID = v1();
-  set('sessionID', sessionID);  
+  setCachedEntry('auth', sessionID, 'sessionID');  
 }  
 
 const logToCloudWatch = (message) => {

@@ -15,12 +15,13 @@ function App() {
   const [tokenExists, setTokenExists] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
-
   const genreGridRef = useRef();
 
-  const initialize = async () => {
+  const initialise = async () => {
     await fetchOrGenerateSessionID();
-    logMessage('Checking for token in URL...');
+    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
+    handleAuth();
+  }
 
   const handleAuth = async () => {
     const tokenExists = await authenticateUser();
@@ -46,8 +47,7 @@ function App() {
   };
 
   useEffect(() => {
-    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
-    handleAuth();
+    initialise();
   }, []);
 
   const handleGenreAlbumMapRefresh = async () => {
