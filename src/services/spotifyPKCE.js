@@ -97,7 +97,6 @@ export const getAuthorizationURL = async () => {
   await setCachedEntry('auth', codeVerifier, 'spotify_code_verifier');
 
   logMessage(`Code verifier: ${codeVerifier}`);
-  // logMessage(`Code challenge: ${codeChallenge}`);
 
   const state = generateState();
   const params = new URLSearchParams({
@@ -194,7 +193,6 @@ export const refreshAccessToken = async () => {
   } catch (error) {
     logMessage(`Error refreshing access token: ${error.response ? JSON.stringify(error.response.data) : error.message}`);
     return null;
-    // throw error; // Optionally rethrow the error to handle it in the calling function
   }
 };
 
