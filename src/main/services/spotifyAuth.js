@@ -19,8 +19,7 @@ export const getAccessToken = async () => {
   if (expiresAt && Date.now() < expiresAt) {
     return accessToken;
   } else {
-    const newAccessToken = await refreshAccessToken();
-    return newAccessToken;
+    return await refreshAccessToken();
   }
 };
 
@@ -64,8 +63,7 @@ const generateState = () => {
 };
 
 const generateCodeVerifier = () => {
-  const codeVerifier = generateRandomString(64);
-  return codeVerifier;
+  return generateRandomString(64);
 };
 
 const sha256 = async (plain) => {
@@ -83,8 +81,7 @@ const base64encode = (input) => {
 
 const generateCodeChallenge = async (codeVerifier) => {
   const hashed = await sha256(codeVerifier)
-  const codeChallenge = base64encode(hashed);
-  return codeChallenge;
+  return base64encode(hashed);
 };
 
 export const getAuthorizationURL = async () => {
