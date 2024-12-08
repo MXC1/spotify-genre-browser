@@ -3,7 +3,7 @@ import { authenticateUser } from './services/spotifyAuth';
 import { getCachedEntry } from './utilities/indexedDB';
 import './App.css';
 import { Amplify } from 'aws-amplify';
-import awsconfig from './aws-exports';
+import awsconfig from '../infra/aws-exports';
 import { logMessage, fetchOrGenerateSessionID } from './utilities/loggingConfig';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
