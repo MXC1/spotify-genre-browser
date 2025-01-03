@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { authenticateUser } from './services/spotifyAuth';
-import { getCachedEntry } from './utilities/indexedDB';
-import './App.css';
+import spotifyApi, { getTokenFromUrl, getLoginUrl } from './services/Spotify';
+import { setCachedEntry, getCachedEntry } from './utilities/indexedDB';
+import './App.css'
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import { logMessage, fetchOrGenerateSessionID } from './utilities/loggingConfig';
+import logMessage from './utilities/loggingConfig';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
@@ -12,49 +12,56 @@ import GenreGridContainer from './containers/genreGridContainer/genreGridContain
 Amplify.configure(awsconfig);
 
 function App() {
-  const [tokenExists, setTokenExists] = useState(false);
+  const [token, setToken] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
+
   const genreGridRef = useRef();
+  const initialize = async () => {
+    logMessage('Checking for token in URL...');
 
-  const initialise = async () => {
-    await fetchOrGenerateSessionID();
-    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
-    handleAuth();
-  }
+    // Token is only present if the user is coming back from a Spotify redirect.
+    // This only happens if they have never visited the app before, or if they
+    // press the Refresh button.
+    const hash = getTokenFromUrl();
+    window.location.hash = '';
+    const _token = hash.access_token;
 
-  const handleAuth = async () => {
-    const tokenExists = await authenticateUser();
-    if (tokenExists) {
-      logMessage('Token exists after authentication');
-      setTokenExists(true);
-      fetchOrUpdateGenreAlbumMap();
+    if (_token) {
+      logMessage(`Token found in URL: ${_token}`);
+      setToken(_token);
+      spotifyApi.setAccessToken(_token);
+      await setCachedEntry('auth', _token, 'token');
+
+      if (genreGridRef.current) {
+        genreGridRef.current.updateGenreAlbumMap();
+      }
     } else {
-      logMessage('No token exists after authentication');
-      setTokenExists(false);
-    }
-  };
+      logMessage('No token found in URL. Checking for cached token in IndexedDB...');
 
-  const fetchOrUpdateGenreAlbumMap = async () => {
-    if (genreGridRef.current) {
-      const cachedGenreAlbumMap = await getCachedEntry('data', 'groupedAlbums');
-      if (cachedGenreAlbumMap) {
-        await genreGridRef.current.getCachedGenreAlbumMap();
-      } else {
-        await genreGridRef.current.updateGenreAlbumMap();
+      const cachedToken = await getCachedEntry('auth', 'token');
+      if (cachedToken) {
+        logMessage(`Cached token found: ${cachedToken}`);
+        setToken(cachedToken);
+        spotifyApi.setAccessToken(cachedToken);
+      }
+
+      logMessage(`genreGridRef: ${JSON.stringify(genreGridRef.current)}`);
+      if (genreGridRef.current) {
+        genreGridRef.current.getCachedGenreAlbumMap();
       }
     }
-  };
+  }
 
   useEffect(() => {
-    initialise();
+    initialize();
   }, []);
 
-  const handleGenreAlbumMapRefresh = async () => {
-    if (genreGridRef.current) {
-      await genreGridRef.current.updateGenreAlbumMap();
-    }
-  }
+  const handleRefresh = async () => {
+    logMessage('Refreshing data...');
+
+    window.location.href = getLoginUrl();
+  };
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value.toLowerCase());
@@ -66,12 +73,12 @@ function App() {
 
   return (
     <div className="App">
-      {!tokenExists ? (
+      {!token ? (
         <LoginContainer />
       ) : (
         <div className="albums-container">
           <HeaderContainer
-            onRefresh={handleGenreAlbumMapRefresh}
+            onRefresh={handleRefresh}
             onSearch={handleSearch}
             onSortChange={handleSortChange} />
           <GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />

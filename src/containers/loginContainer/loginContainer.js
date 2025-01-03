@@ -1,10 +1,10 @@
-import { redirectToAuthorizationUrl } from "../../services/spotifyAuth";
+import { getLoginUrl } from "../../services/Spotify";
 
 function LoginContainer() {
 
     return (
         <div className="login-container">
-          <a onClick={() => redirectToAuthorizationUrl()} className="login-button">Login with Spotify</a>
+          <a href={getLoginUrl()} className="login-button">Login with Spotify</a>
         </div>
     )
 }
