@@ -18,6 +18,7 @@ function App() {
   const [sortOption, setSortOption] = useState('number-desc');
   const genreGridRef = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalParams, setModalParams] = useState({});
 
   const initialise = async () => {
     await fetchOrGenerateSessionID();
@@ -66,7 +67,8 @@ function App() {
     setSortOption(event.target.value);
   };
 
-  const openDisconnectModal = () => {
+  const openModal = (params) => {
+    setModalParams(params);
     setIsModalOpen(true);
   };
 
@@ -90,17 +92,25 @@ function App() {
             onRefresh={handleGenreAlbumMapRefresh}
             onSearch={handleSearch}
             onSortChange={handleSortChange}
-            onOpenDisconnectModal={openDisconnectModal} />
+            onOpenDisconnectModal={() => openModal({
+              title: "Disconnect Spotify account",
+              description: "Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'.",
+              button1Text: "Cancel",
+              button1Action: closeModal,
+              button2Text: "Disconnect",
+              button2Action: handleDisconnect
+            })}
+          />
           <GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />
           <ModalContainer
             isOpen={isModalOpen}
             onClose={closeModal}
-            title="Disconnect Spotify account"
-            description="Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'."
-            button1Text="Cancel"
-            button1Action={closeModal}
-            button2Text="Disconnect"
-            button2Action={handleDisconnect}
+            title={modalParams.title}
+            description={modalParams.description}
+            button1Text={modalParams.button1Text}
+            button1Action={modalParams.button1Action}
+            button2Text={modalParams.button2Text}
+            button2Action={modalParams.button2Action}
           />
         </div>
       )}
