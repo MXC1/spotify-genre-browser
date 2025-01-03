@@ -16,3 +16,11 @@ export const getCachedEntry = async (store, key) => {
   const db = await dbPromise;
   return db.get(store, key);
 };
+
+export const clearAllData = async () => {
+  const db = await dbPromise;
+  const tx = db.transaction(['auth', 'data'], 'readwrite');
+  await tx.objectStore('auth').clear();
+  await tx.objectStore('data').clear();
+  await tx.done;
+};

@@ -1,11 +1,51 @@
-import './headerContainer.css'
+import React, { useState } from 'react';
+import './headerContainer.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSyncAlt, faBars } from '@fortawesome/free-solid-svg-icons';
+import OverlayMenu from './overlayMenu/overlayMenu';
+import ModalContainer from '../modalContainer/modalContainer';
+import { clearAllData } from '../../utilities/indexedDB';
 
 function HeaderContainer({ onRefresh, onSearch, onSortChange }) {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const openDisconnectModal = () => {
+        setIsMenuOpen(false);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleDisconnect = async () => {
+        await clearAllData();
+        closeModal();
+        window.location.reload();
+    };
+
     return (
         <div className="header-container">
+            <OverlayMenu isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={openDisconnectModal} />
+            <ModalContainer
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                title="Disconnect Spotify account"
+                description="Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'."
+                button1Text="Cancel"
+                button1Action={closeModal}
+                button2Text="Disconnect"
+                button2Action={handleDisconnect}
+            />
             <div className="title-container">
+                <button className="menu-button" onClick={toggleMenu}>
+                    <FontAwesomeIcon icon={faBars} />
+                </button>
                 <h1 className="page-title">Your album library</h1>
                 <button className="refresh-button" onClick={onRefresh}>
                     <FontAwesomeIcon icon={faSyncAlt} />
@@ -25,7 +65,8 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange }) {
                     <option value="number-desc">Size (Desc)</option>
                 </select>
             </div>
-        </div>    )
+        </div>
+    )
 }
 
 export default HeaderContainer;
