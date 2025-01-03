@@ -1,6 +1,6 @@
 import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDB";
-import spotifyApi from "../../services/Spotify";
+import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
 import logMessage from "../../utilities/loggingConfig";
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
@@ -57,7 +57,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     let response;
 
     do {
-      response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
+      response = await getMySavedAlbums(limit, offset);
 
       if (response.error && response.error.status === 429) {
         const retryAfterSeconds = parseInt(response.headers.get('Retry-After'), 10);
@@ -80,7 +80,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       logAndSetLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})`)
 
       const batch = uniqueArtistIds.slice(i, i + 50);
-      const artists = await spotifyApi.getArtists(batch);
+      const artists = await getArtists(batch);
 
       artists.artists.forEach(artist => {
         const genres = artist.genres;
@@ -125,10 +125,12 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     setGroupedAlbums(grouped);
     setLoadingMessage('');
 
+    logMessage(`Finished grouping albums by artist genre:`);
+
     // Log the array of genre strings and their associated albums
     const genreAlbumArray = Object.entries(grouped).map(([genre, albums]) => {
       const albumIds = albums.map(album => album.id);
-      console.log(`Genre: ${genre}, Albums: ${albumIds}`);
+      logMessage(`Genre: ${genre}, Albums: ${albumIds}`);
       return {
         genre,
         albums: albumIds
@@ -186,8 +188,6 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       <div>
         {loadingMessage ? (
             <p className="loading-message">{loadingMessage}</p>
-        ) : sortedGenres.length === 0 ? (
-            <p className="no-albums">No albums found</p>
         ) : (
             <div className="genre-grid">
               {sortedGenres.map(([genre, albums], index) => (
