@@ -3,12 +3,9 @@ import './headerContainer.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSyncAlt, faBars } from '@fortawesome/free-solid-svg-icons';
 import OverlayMenu from './overlayMenu/overlayMenu';
-import ModalContainer from '../modalContainer/modalContainer';
-import { clearAllData } from '../../utilities/indexedDB';
 
 function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectModal }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -17,16 +14,6 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
     const handleOpenDisconnectModal = () => {
         setIsMenuOpen(false);
         onOpenDisconnectModal();
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-
-    const handleDisconnect = async () => {
-        await clearAllData();
-        closeModal();
-        window.location.reload();
     };
 
     return (

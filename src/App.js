@@ -9,6 +9,7 @@ import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
 import ModalContainer from './containers/modalContainer/modalContainer';
+import useModal from './hooks/useModal';
 
 Amplify.configure(awsconfig);
 
@@ -17,8 +18,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
   const genreGridRef = useRef();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalParams, setModalParams] = useState({});
+  const { isModalOpen, modalParams, openModal, closeModal } = useModal();
 
   const initialise = async () => {
     await fetchOrGenerateSessionID();
@@ -65,15 +65,6 @@ function App() {
 
   const handleSortChange = (event) => {
     setSortOption(event.target.value);
-  };
-
-  const openModal = (params) => {
-    setModalParams(params);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
   };
 
   const handleDisconnect = async () => {
