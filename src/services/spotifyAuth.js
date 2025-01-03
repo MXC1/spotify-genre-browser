@@ -133,8 +133,11 @@ export const exchangeCodeForToken = async (code, codeVerifier) => {
     redirect_uri: REDIRECT_URI,
   };
 
+  const url = 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/' + process.env.REACT_APP_ENV + "/";
+  logMessage(`Token exchange URL: ${url}`);
+
   try {
-    const response = await axios.post('https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/' + process.env.REACT_APP_ENV + "/", payload, {
+    const response = await axios.post(url, payload, {
       headers: {
         'Content-Type': 'application/json'
       }
