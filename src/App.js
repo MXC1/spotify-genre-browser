@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { authenticateUser } from './services/spotifyAuth';
-import { getCachedEntry } from './utilities/indexedDB';
+import { getCachedEntry, clearAllData } from './utilities/indexedDB';
 import './App.css';
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
@@ -8,6 +8,7 @@ import { logMessage, fetchOrGenerateSessionID } from './utilities/loggingConfig'
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
+import ModalContainer from './containers/modalContainer/modalContainer';
 
 Amplify.configure(awsconfig);
 
@@ -16,6 +17,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
   const genreGridRef = useRef();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const initialise = async () => {
     await fetchOrGenerateSessionID();
@@ -64,6 +66,20 @@ function App() {
     setSortOption(event.target.value);
   };
 
+  const openDisconnectModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleDisconnect = async () => {
+    await clearAllData();
+    closeModal();
+    window.location.reload();
+  };
+
   return (
     <div className="App">
       {!tokenExists ? (
@@ -73,8 +89,19 @@ function App() {
           <HeaderContainer
             onRefresh={handleGenreAlbumMapRefresh}
             onSearch={handleSearch}
-            onSortChange={handleSortChange} />
+            onSortChange={handleSortChange}
+            onOpenDisconnectModal={openDisconnectModal} />
           <GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />
+          <ModalContainer
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            title="Disconnect Spotify account"
+            description="Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'."
+            button1Text="Cancel"
+            button1Action={closeModal}
+            button2Text="Disconnect"
+            button2Action={handleDisconnect}
+          />
         </div>
       )}
     </div>

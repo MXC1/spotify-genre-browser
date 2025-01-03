@@ -6,7 +6,7 @@ import OverlayMenu from './overlayMenu/overlayMenu';
 import ModalContainer from '../modalContainer/modalContainer';
 import { clearAllData } from '../../utilities/indexedDB';
 
-function HeaderContainer({ onRefresh, onSearch, onSortChange }) {
+function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectModal }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -14,9 +14,9 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange }) {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const openDisconnectModal = () => {
+    const handleOpenDisconnectModal = () => {
         setIsMenuOpen(false);
-        setIsModalOpen(true);
+        onOpenDisconnectModal();
     };
 
     const closeModal = () => {
@@ -31,17 +31,7 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange }) {
 
     return (
         <div className="header-container">
-            <OverlayMenu isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={openDisconnectModal} />
-            <ModalContainer
-                isOpen={isModalOpen}
-                onClose={closeModal}
-                title="Disconnect Spotify account"
-                description="Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'."
-                button1Text="Cancel"
-                button1Action={closeModal}
-                button2Text="Disconnect"
-                button2Action={handleDisconnect}
-            />
+            <OverlayMenu isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
             <div className="title-container">
                 <button className="menu-button" onClick={toggleMenu}>
                     <FontAwesomeIcon icon={faBars} />
