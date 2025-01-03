@@ -43,7 +43,7 @@ const logToCloudWatch = (message) => {
 export const logMessage = (message) => {
   message = `${message} - SessionID: ${sessionID}`;
   console.log(message);
-  if (process.env.REACT_APP_ENV === 'production') {
+  if (process.env.REACT_APP_ENV === 'prod') {
     logToCloudWatch(message);
   }
 };

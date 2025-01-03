@@ -134,7 +134,7 @@ export const exchangeCodeForToken = async (code, codeVerifier) => {
   };
 
   try {
-    const response = await axios.post('https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/prod/', payload, {
+    const response = await axios.post('https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/' + process.env.REACT_APP_ENV + "/", payload, {
       headers: {
         'Content-Type': 'application/json'
       }
