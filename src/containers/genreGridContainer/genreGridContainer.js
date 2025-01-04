@@ -70,6 +70,10 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   }
 
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
+    if (!albums || albums.length === 0) {
+      logMessage('No albums to group');
+      return;
+    }
     const genreAlbumMap = {};
     const artistIds = albums.map(album => album.artists[0].id);
     const uniqueArtistIds = [...new Set(artistIds)];
