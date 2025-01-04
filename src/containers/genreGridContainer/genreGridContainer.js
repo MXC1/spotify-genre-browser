@@ -204,11 +204,9 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
 function GenreCard({ genre, albums, index }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const handleClick = () => {
     setIsCollapsed(!isCollapsed);
-    setExpandedIndex(isCollapsed ? index : null);
   };
 
   return (
