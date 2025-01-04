@@ -13,14 +13,14 @@ const cloudwatchlogs = new AWS.CloudWatchLogs();
 
 let sessionID;  
 export async function fetchOrGenerateSessionID() {  
-  const cachedSessionID = await getCachedEntry('auth','sessionID');  
+  const cachedSessionID = await getCachedEntry('auth','session_id');  
   if (cachedSessionID) {  
     sessionID = cachedSessionID;  
     return cachedSessionID;  
   } 
 
   sessionID = v1();
-  setCachedEntry('auth', sessionID, 'sessionID');  
+  setCachedEntry('auth', sessionID, 'session_id');  
 }  
 
 const logToCloudWatch = (message) => {

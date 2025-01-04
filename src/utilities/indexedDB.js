@@ -20,11 +20,11 @@ export const getCachedEntry = async (store, key) => {
 export const clearAllData = async () => {
   const db = await dbPromise;
   const tx = db.transaction(['auth', 'data'], 'readwrite');
-  const sessionId = await tx.objectStore('auth').get('session_id');
+  const sessionID = await tx.objectStore('auth').get('session_id');
   await tx.objectStore('auth').clear();
   await tx.objectStore('data').clear();
-  if (sessionId) {
-    await tx.objectStore('auth').put(sessionId, 'session_id');
+  if (sessionID) {
+    await tx.objectStore('auth').put(sessionID, 'session_id');
   }
   await tx.done;
 };
