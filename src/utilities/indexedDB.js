@@ -1,4 +1,5 @@
 import { openDB } from 'idb';
+import logMessage from './loggingConfig';
 
 const dbPromise = openDB('spotify-db', 2, {
   upgrade(db) {
@@ -18,6 +19,7 @@ export const getCachedEntry = async (store, key) => {
 };
 
 export const clearAllData = async () => {
+  logMessage('Clearing all data from indexedDb...');
   const db = await dbPromise;
   const tx = db.transaction(['auth', 'data'], 'readwrite');
   const sessionID = await tx.objectStore('auth').get('session_id');

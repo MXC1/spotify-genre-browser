@@ -68,8 +68,10 @@ function App() {
   };
 
   const handleDisconnect = async () => {
+    logMessage('Disconnecting Spotify account...');
     await clearAllData();
     clearAccessToken();
+    setTokenExists(false);
     if (genreGridRef.current) {
       await genreGridRef.current.clearGenreAlbumMap();
     }
@@ -82,7 +84,6 @@ function App() {
       button2Text: "",
       button2Action: null
     });
-    setTokenExists(false);
   };
 
   return (
