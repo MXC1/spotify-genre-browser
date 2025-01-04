@@ -12,7 +12,7 @@ function ModalContainer({ isOpen, onClose, title, description, button1Text, butt
                 <p className="modal-description">{description}</p>
                 <div className="modal-buttons">
                     <button className="modal-button" onClick={button1Action}>{button1Text}</button>
-                    <button className="modal-button" onClick={button2Action}>{button2Text}</button>
+                    {button2Text && <button className="modal-button" onClick={button2Action}>{button2Text}</button>}
                 </div>
             </div>
         </div>
