@@ -155,6 +155,9 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       const cachedGroupedAlbums = await getCachedEntry('data', 'groupedAlbums');
       setGroupedAlbums(cachedGroupedAlbums);
       setLoadingMessage('');
+    },
+    clearGenreAlbumMap: async () => {
+      setGroupedAlbums(null);
     }
   }))
 

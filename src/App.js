@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { authenticateUser } from './services/spotifyAuth';
+import { authenticateUser, clearAccessToken } from './services/spotifyAuth';
 import { getCachedEntry, clearAllData } from './utilities/indexedDB';
 import './App.css';
 import { Amplify } from 'aws-amplify';
@@ -69,8 +69,20 @@ function App() {
 
   const handleDisconnect = async () => {
     await clearAllData();
+    clearAccessToken();
+    if (genreGridRef.current) {
+      await genreGridRef.current.clearGenreAlbumMap();
+    }
     closeModal();
-    window.location.reload();
+    openModal({
+      title: "Disconnect Spotify account",
+      description: "Your account has been successfully disconnected.",
+      button1Text: "Ok",
+      button1Action: closeModal,
+      button2Text: "",
+      button2Action: null
+    });
+    setTokenExists(false);
   };
 
   return (
@@ -93,18 +105,18 @@ function App() {
             })}
           />
           <GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />
-          <ModalContainer
-            isOpen={isModalOpen}
-            onClose={closeModal}
-            title={modalParams.title}
-            description={modalParams.description}
-            button1Text={modalParams.button1Text}
-            button1Action={modalParams.button1Action}
-            button2Text={modalParams.button2Text}
-            button2Action={modalParams.button2Action}
-          />
         </div>
       )}
+      <ModalContainer
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={modalParams.title}
+        description={modalParams.description}
+        button1Text={modalParams.button1Text}
+        button1Action={modalParams.button1Action}
+        button2Text={modalParams.button2Text}
+        button2Action={modalParams.button2Action}
+      />
     </div>
   );
 }
