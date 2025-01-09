@@ -4,7 +4,7 @@ import axios from 'axios';
 export const getMySavedAlbums = async (limit, offset) => {
     const token = await getAccessToken();
     if (!token) {
-      throw new Error('Access token not found');
+      return [];
     }
     try {
       const response = await axios.get(`https://api.spotify.com/v1/me/albums`, {
@@ -27,7 +27,7 @@ export const getMySavedAlbums = async (limit, offset) => {
   export const getArtists = async (ids) => {
     const token = await getAccessToken();
     if (!token) {
-      throw new Error('Access token not found');
+      return [];
     }
     try {
       const response = await axios.get(`https://api.spotify.com/v1/artists`, {

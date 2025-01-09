@@ -1,6 +1,6 @@
 import axios from 'axios';
 import logMessage from '../utilities/loggingConfig';
-import { setCachedEntry, getCachedEntry } from '../utilities/indexedDB';
+import { setCachedEntry, getCachedEntry, deleteCachedEntry } from '../utilities/indexedDB';
 
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = window.location.origin;
@@ -20,6 +20,11 @@ export const getAccessToken = async () => {
     return accessToken;
   } else {
     const newAccessToken = await refreshAccessToken();
+    if (!newAccessToken) {
+      deleteCachedEntry('data', 'grouped_albums');
+      await redirectToAuthorizationUrl();
+      return null;
+    }
     return newAccessToken;
   }
 };
