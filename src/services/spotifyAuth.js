@@ -1,6 +1,6 @@
 import axios from 'axios';
 import logMessage from '../utilities/loggingConfig';
-import { setCachedEntry, getCachedEntry, deleteCachedEntry } from '../utilities/indexedDB';
+import { setCachedEntry, getCachedEntry } from '../utilities/indexedDB';
 
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = window.location.origin;
@@ -16,19 +16,12 @@ export const getAccessToken = async () => {
   const accessToken = await getCachedEntry('auth', 'access_token');
   const expiresAt = await getCachedEntry('auth', 'expires_at');
 
-  if (expiresAt && Date.now() < expiresAt && accessToken) {
+  if (expiresAt && Date.now() < expiresAt) {
     return accessToken;
-  }
-
-  const newAccessToken = await refreshAccessToken();
-  if (newAccessToken) {
+  } else {
+    const newAccessToken = await refreshAccessToken();
     return newAccessToken;
   }
-
-  logMessage('Redirecting to authorization URL...');
-  await deleteCachedEntry('data', 'grouped_albums');
-  await redirectToAuthorizationUrl();
-  return null;
 };
 
 export const authenticateUser = async () => {
