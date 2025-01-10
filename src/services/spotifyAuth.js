@@ -16,12 +16,17 @@ export const getAccessToken = async () => {
   const accessToken = await getCachedEntry('auth', 'access_token');
   const expiresAt = await getCachedEntry('auth', 'expires_at');
 
-  if (expiresAt && Date.now() < expiresAt) {
+  if (expiresAt && Date.now() < expiresAt && accessToken) {
     return accessToken;
-  } else {
-    const newAccessToken = await refreshAccessToken();
+  }
+
+  const newAccessToken = await refreshAccessToken();
+  if (newAccessToken) {
     return newAccessToken;
   }
+
+  await redirectToAuthorizationUrl();
+  return null;
 };
 
 export const authenticateUser = async () => {
