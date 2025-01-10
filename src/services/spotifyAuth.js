@@ -25,6 +25,7 @@ export const getAccessToken = async () => {
     return newAccessToken;
   }
 
+  logMessage('Redirecting to authorization URL...');
   await deleteCachedEntry('data', 'grouped_albums');
   await redirectToAuthorizationUrl();
   return null;
