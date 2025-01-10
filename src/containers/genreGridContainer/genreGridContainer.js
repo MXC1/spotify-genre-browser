@@ -1,6 +1,6 @@
 import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDB";
-import spotifyApi from "../../services/Spotify";
+import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
 import logMessage from "../../utilities/loggingConfig";
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
@@ -57,7 +57,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     let response;
 
     do {
-      response = await spotifyApi.getMySavedAlbums({ limit: limit, offset });
+      response = await getMySavedAlbums(limit, offset);
 
       if (response.error && response.error.status === 429) {
         const retryAfterSeconds = parseInt(response.headers.get('Retry-After'), 10);
@@ -70,6 +70,10 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   }
 
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
+    if (!albums || albums.length === 0) {
+      logMessage('No albums to group');
+      return;
+    }
     const genreAlbumMap = {};
     const artistIds = albums.map(album => album.artists[0].id);
     const uniqueArtistIds = [...new Set(artistIds)];
@@ -80,7 +84,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       logAndSetLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})`)
 
       const batch = uniqueArtistIds.slice(i, i + 50);
-      const artists = await spotifyApi.getArtists(batch);
+      const artists = await getArtists(batch);
 
       artists.artists.forEach(artist => {
         const genres = artist.genres;
@@ -125,15 +129,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     setGroupedAlbums(grouped);
     setLoadingMessage('');
 
-    // Log the array of genre strings and their associated albums
-    const genreAlbumArray = Object.entries(grouped).map(([genre, albums]) => {
-      const albumIds = albums.map(album => album.id);
-      console.log(`Genre: ${genre}, Albums: ${albumIds}`);
-      return {
-        genre,
-        albums: albumIds
-      };
-    });
+    logMessage(`Finished grouping albums by artist genre`);
     return (grouped);
   }, []);
 
@@ -145,14 +141,17 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
       const grouped = await groupAlbumsByArtistGenre(allAlbums);
       setGroupedAlbums(grouped);
-      await setCachedEntry('data', grouped, 'groupedAlbums');
+      await setCachedEntry('data', grouped, 'grouped_albums');
     },
     getCachedGenreAlbumMap: async () => {
       logMessage(`Fetching genre album map from cache...`);
       setLoadingMessage(`Loading saved albums...`);
-      const cachedGroupedAlbums = await getCachedEntry('data', 'groupedAlbums');
+      const cachedGroupedAlbums = await getCachedEntry('data', 'grouped_albums');
       setGroupedAlbums(cachedGroupedAlbums);
       setLoadingMessage('');
+    },
+    clearGenreAlbumMap: async () => {
+      setGroupedAlbums(null);
     }
   }))
 
@@ -186,8 +185,6 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       <div>
         {loadingMessage ? (
             <p className="loading-message">{loadingMessage}</p>
-        ) : sortedGenres.length === 0 ? (
-            <p className="no-albums">No albums found</p>
         ) : (
             <div className="genre-grid">
               {sortedGenres.map(([genre, albums], index) => (
@@ -201,11 +198,9 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
 function GenreCard({ genre, albums, index }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const handleClick = () => {
     setIsCollapsed(!isCollapsed);
-    setExpandedIndex(isCollapsed ? index : null);
   };
 
   return (

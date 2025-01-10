@@ -1,11 +1,28 @@
-import './headerContainer.css'
+import React, { useState } from 'react';
+import './headerContainer.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSyncAlt, faBars } from '@fortawesome/free-solid-svg-icons';
+import OverlayMenu from './overlayMenu/overlayMenu';
 
-function HeaderContainer({ onRefresh, onSearch, onSortChange }) {
+function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectModal }) {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleOpenDisconnectModal = () => {
+        setIsMenuOpen(false);
+        onOpenDisconnectModal();
+    };
+
     return (
         <div className="header-container">
+            <OverlayMenu isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
             <div className="title-container">
+                <button className="menu-button" onClick={toggleMenu}>
+                    <FontAwesomeIcon icon={faBars} />
+                </button>
                 <h1 className="page-title">Your album library</h1>
                 <button className="refresh-button" onClick={onRefresh}>
                     <FontAwesomeIcon icon={faSyncAlt} />
@@ -25,7 +42,8 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange }) {
                     <option value="number-desc">Size (Desc)</option>
                 </select>
             </div>
-        </div>    )
+        </div>
+    )
 }
 
 export default HeaderContainer;

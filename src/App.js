@@ -1,67 +1,73 @@
 import React, { useEffect, useState, useRef } from 'react';
-import spotifyApi, { getTokenFromUrl, getLoginUrl } from './services/Spotify';
-import { setCachedEntry, getCachedEntry } from './utilities/indexedDB';
-import './App.css'
+import { authenticateUser, clearAccessToken } from './services/spotifyAuth';
+import { getCachedEntry, clearAllData } from './utilities/indexedDB';
+import './App.css';
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import logMessage from './utilities/loggingConfig';
+import { logMessage, fetchOrGenerateSessionID } from './utilities/loggingConfig';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
+import ModalContainer from './containers/modalContainer/modalContainer';
+import useModal from './hooks/useModal';
 
 Amplify.configure(awsconfig);
 
 function App() {
-  const [token, setToken] = useState(null);
+  const [tokenExists, setTokenExists] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
-
   const genreGridRef = useRef();
-  const initialize = async () => {
-    logMessage('Checking for token in URL...');
+  const { isModalOpen, modalParams, openModal, closeModal } = useModal();
 
-    // Token is only present if the user is coming back from a Spotify redirect.
-    // This only happens if they have never visited the app before, or if they
-    // press the Refresh button.
-    const hash = getTokenFromUrl();
-    window.location.hash = '';
-    const _token = hash.access_token;
+  const initialise = async () => {
+    await fetchOrGenerateSessionID();
+    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
+    handleAuth();
+  }
 
-    if (_token) {
-      logMessage(`Token found in URL: ${_token}`);
-      setToken(_token);
-      spotifyApi.setAccessToken(_token);
-      await setCachedEntry('auth', _token, 'token');
-
-      if (genreGridRef.current) {
-        genreGridRef.current.updateGenreAlbumMap();
-      }
+  const handleAuth = async () => {
+    const tokenExists = await authenticateUser();
+    if (tokenExists) {
+      logMessage('Token exists after authentication');
+      setTokenExists(true);
+      fetchOrUpdateGenreAlbumMap();
     } else {
-      logMessage('No token found in URL. Checking for cached token in IndexedDB...');
+      logMessage('No token exists after authentication');
+      setTokenExists(false);
+    }
+  };
 
-      const cachedToken = await getCachedEntry('auth', 'token');
-      if (cachedToken) {
-        logMessage(`Cached token found: ${cachedToken}`);
-        setToken(cachedToken);
-        spotifyApi.setAccessToken(cachedToken);
+  const fetchOrUpdateGenreAlbumMap = async () => {
+    if (genreGridRef.current) {
+      try {
+        const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
+        if (cachedGenreAlbumMap) {
+          await genreGridRef.current.getCachedGenreAlbumMap();
+        } else {
+          await genreGridRef.current.updateGenreAlbumMap();
+        }
+      } catch (error) {
+        logMessage(`Error updating genre album map: ${error}`);
+        // Ensure genreAlbumMap is not updated
       }
+    }
+  };
 
-      logMessage(`genreGridRef: ${JSON.stringify(genreGridRef.current)}`);
-      if (genreGridRef.current) {
-        genreGridRef.current.getCachedGenreAlbumMap();
+  useEffect(() => {
+    initialise();
+  }, []);
+
+  const handleGenreAlbumMapRefresh = async () => {
+    if (genreGridRef.current) {
+      try {
+        await genreGridRef.current.updateGenreAlbumMap();
+      } catch (error) {
+        logMessage(`Error refreshing genre album map: ${error}`);
+        // Ensure genreAlbumMap is not updated
       }
     }
   }
-
-  useEffect(() => {
-    initialize();
-  }, []);
-
-  const handleRefresh = async () => {
-    logMessage('Refreshing data...');
-
-    window.location.href = getLoginUrl();
-  };
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value.toLowerCase());
@@ -71,19 +77,57 @@ function App() {
     setSortOption(event.target.value);
   };
 
+  const handleDisconnect = async () => {
+    logMessage('Disconnecting Spotify account...');
+    await clearAllData();
+    clearAccessToken();
+    setTokenExists(false);
+    if (genreGridRef.current) {
+      await genreGridRef.current.clearGenreAlbumMap();
+    }
+    closeModal();
+    openModal({
+      title: "Disconnect Spotify account",
+      description: "Your account has been successfully disconnected.",
+      button1Text: "Ok",
+      button1Action: closeModal,
+      button2Text: "",
+      button2Action: null
+    });
+  };
+
   return (
     <div className="App">
-      {!token ? (
+      {!tokenExists ? (
         <LoginContainer />
       ) : (
         <div className="albums-container">
           <HeaderContainer
-            onRefresh={handleRefresh}
+            onRefresh={handleGenreAlbumMapRefresh}
             onSearch={handleSearch}
-            onSortChange={handleSortChange} />
+            onSortChange={handleSortChange}
+            onOpenDisconnectModal={() => openModal({
+              title: "Disconnect Spotify account",
+              description: "Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'.",
+              button1Text: "Cancel",
+              button1Action: closeModal,
+              button2Text: "Disconnect",
+              button2Action: handleDisconnect
+            })}
+          />
           <GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />
         </div>
       )}
+      <ModalContainer
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={modalParams.title}
+        description={modalParams.description}
+        button1Text={modalParams.button1Text}
+        button1Action={modalParams.button1Action}
+        button2Text={modalParams.button2Text}
+        button2Action={modalParams.button2Action}
+      />
     </div>
   );
 }
