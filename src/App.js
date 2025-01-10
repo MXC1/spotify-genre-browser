@@ -37,11 +37,16 @@ function App() {
 
   const fetchOrUpdateGenreAlbumMap = async () => {
     if (genreGridRef.current) {
-      const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
-      if (cachedGenreAlbumMap) {
-        await genreGridRef.current.getCachedGenreAlbumMap();
-      } else {
-        await genreGridRef.current.updateGenreAlbumMap();
+      try {
+        const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
+        if (cachedGenreAlbumMap) {
+          await genreGridRef.current.getCachedGenreAlbumMap();
+        } else {
+          await genreGridRef.current.updateGenreAlbumMap();
+        }
+      } catch (error) {
+        logMessage(`Error updating genre album map: ${error}`);
+        // Ensure genreAlbumMap is not updated
       }
     }
   };
@@ -52,7 +57,12 @@ function App() {
 
   const handleGenreAlbumMapRefresh = async () => {
     if (genreGridRef.current) {
-      await genreGridRef.current.updateGenreAlbumMap();
+      try {
+        await genreGridRef.current.updateGenreAlbumMap();
+      } catch (error) {
+        logMessage(`Error refreshing genre album map: ${error}`);
+        // Ensure genreAlbumMap is not updated
+      }
     }
   }
 

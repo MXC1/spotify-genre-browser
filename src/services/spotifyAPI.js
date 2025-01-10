@@ -1,5 +1,6 @@
 import { getAccessToken } from './spotifyAuth';
 import axios from 'axios';
+import { logMessage } from '../utilities/loggingConfig';
 
 export const getMySavedAlbums = async (limit, offset) => {
     const token = await getAccessToken();
@@ -19,7 +20,7 @@ export const getMySavedAlbums = async (limit, offset) => {
       });
       return response.data;
     } catch (error) {
-      console.error(`Error fetching saved albums: ${error}`);
+      logMessage(`Error fetching saved albums: ${error}`);
       throw error;
     }
   };
@@ -40,7 +41,7 @@ export const getMySavedAlbums = async (limit, offset) => {
       });
       return response.data;
     } catch (error) {
-      console.error(`Error fetching artists: ${error}`);
+    logMessage(`Error fetching artists: ${error}`);
       throw error;
     }
   };
