@@ -59,19 +59,12 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     do {
       response = await getMySavedAlbums(limit, offset);
 
-
       if (response.error && response.error.status === 429) {
         const retryAfterSeconds = parseInt(response.headers.get('Retry-After'), 10);
         logMessage(`Rate limited. Retrying after ${retryAfterSeconds} seconds`);
         await delay(retryAfterSeconds * 1000);
       }
     } while (response.error && response.error.status === 429);
-
-    // Validate response structure
-    if (!response || !response.items || !Array.isArray(response.items)) {
-      logMessage(`Invalid response structure: ${JSON.stringify(response)}`);
-      return [[], 0]; // Return empty data to avoid breaking the caller
-    }
 
     return [response.items.map(item => item.album), response.total];
   }
@@ -154,13 +147,12 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
       const grouped = await groupAlbumsByArtistGenre(allAlbums);
       setGroupedAlbums(grouped);
-      logMessage(`Setting grouped albums in cache...`);
-      await setCachedEntry('data', grouped, 'grouped_albums');
+      await setCachedEntry('data', grouped, 'groupedAlbums');
     },
     getCachedGenreAlbumMap: async () => {
       logMessage(`Fetching genre album map from cache...`);
       setLoadingMessage(`Loading saved albums...`);
-      const cachedGroupedAlbums = await getCachedEntry('data', 'grouped_albums');
+      const cachedGroupedAlbums = await getCachedEntry('data', 'groupedAlbums');
       setGroupedAlbums(cachedGroupedAlbums);
       setLoadingMessage('');
     }
