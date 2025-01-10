@@ -43,3 +43,10 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
+
+# Cypress screenshots and videos
+cypress/screenshots/
+cypress/videos/
+
+# Cypress cache
+.cypress_cache/
