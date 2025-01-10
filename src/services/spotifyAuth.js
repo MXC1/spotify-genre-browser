@@ -58,6 +58,10 @@ export const authenticateUser = async () => {
   return !!accessToken;
 };
 
+export const clearAccessToken = () => {
+  accessToken = null;
+};
+
 const generateRandomString = (length) => {
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const values = crypto.getRandomValues(new Uint8Array(length));
