@@ -37,7 +37,7 @@ function App() {
 
   const fetchOrUpdateGenreAlbumMap = async () => {
     if (genreGridRef.current) {
-      const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
+      const cachedGenreAlbumMap = await getCachedEntry('data', 'groupedAlbums');
       if (cachedGenreAlbumMap) {
         await genreGridRef.current.getCachedGenreAlbumMap();
       } else {
