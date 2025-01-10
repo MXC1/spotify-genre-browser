@@ -21,7 +21,7 @@ export const getAccessToken = async () => {
   } else {
     const newAccessToken = await refreshAccessToken();
     if (!newAccessToken) {
-      deleteCachedEntry('data', 'grouped_albums');
+      await deleteCachedEntry('data', 'grouped_albums');
       await redirectToAuthorizationUrl();
       return null;
     }
