@@ -1,6 +1,6 @@
 import axios from 'axios';
 import logMessage from '../utilities/loggingConfig';
-import { setCachedEntry, getCachedEntry } from '../utilities/indexedDB';
+import {getCachedEntry, setCachedEntry} from '../utilities/indexedDB';
 
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = window.location.origin;
@@ -73,8 +73,7 @@ const generateState = () => {
 };
 
 const generateCodeVerifier = () => {
-  const codeVerifier = generateRandomString(64);
-  return codeVerifier;
+  return generateRandomString(64);
 };
 
 const sha256 = async (plain) => {
@@ -92,8 +91,7 @@ const base64encode = (input) => {
 
 const generateCodeChallenge = async (codeVerifier) => {
   const hashed = await sha256(codeVerifier)
-  const codeChallenge = base64encode(hashed);
-  return codeChallenge;
+  return base64encode(hashed);
 };
 
 export const getAuthorizationURL = async () => {
