@@ -196,7 +196,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   );
 });
 
-function GenreCard({ genre, albums, index }) {
+function GenreCard({ genre, albums }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const handleClick = () => {

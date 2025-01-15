@@ -23,7 +23,7 @@ function App() {
   const initialise = async () => {
     await fetchOrGenerateSessionID();
     logMessage('Environment is: ' + process.env.REACT_APP_ENV);
-    handleAuth();
+    await handleAuth();
   }
 
   const handleAuth = async () => {
@@ -31,7 +31,7 @@ function App() {
     if (tokenExists) {
       logMessage('Token exists after authentication');
       setTokenExists(true);
-      fetchOrUpdateGenreAlbumMap();
+      await fetchOrUpdateGenreAlbumMap();
     } else {
       logMessage('No token exists after authentication');
       setTokenExists(false);
@@ -49,7 +49,6 @@ function App() {
         }
       } catch (error) {
         logMessage(`Error updating genre album map: ${error}`);
-        // Ensure genreAlbumMap is not updated
       }
     }
   };
@@ -64,7 +63,6 @@ function App() {
         await genreGridRef.current.updateGenreAlbumMap();
       } catch (error) {
         logMessage(`Error refreshing genre album map: ${error}`);
-        // Ensure genreAlbumMap is not updated
       }
     }
   }
