@@ -45,8 +45,9 @@ amplifytools.xcconfig
 #amplify-do-not-edit-end
 
 # Cypress screenshots and videos
-cypress/screenshots/
-cypress/videos/
+src/test/cypress/videos/
+src/test/cypress/screenshots/
+src/test/cypress/downloads/
 
 # Cypress cache
 .cypress_cache/
