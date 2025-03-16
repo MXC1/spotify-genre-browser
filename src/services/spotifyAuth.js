@@ -25,9 +25,15 @@ export const getAccessToken = async () => {
     return newAccessToken;
   }
 
-  await redirectToAuthorizationUrl();
+  await setAuthUrl();
   return null;
 };
+
+export const setAuthUrl = async () => {
+  logMessage(`Redirecting to authorization URL...`);
+  const authUrlToNavigateTo = (await getAuthorizationURL()).authorizationURL;
+  window.location.href = authUrlToNavigateTo;
+}
 
 export const authenticateUser = async () => {
   logMessage('Authenticating user...');
@@ -123,10 +129,6 @@ export const getAuthorizationURL = async () => {
   return { authorizationURL };
 };
 
-export const redirectToAuthorizationUrl = async () => {
-  logMessage(`Redirecting to authorization URL...`);
-  window.location.href = (await getAuthorizationURL()).authorizationURL;
-}
 
 export const exchangeCodeForToken = async (code, codeVerifier) => {
   logMessage(`Exchanging code for token...`);
