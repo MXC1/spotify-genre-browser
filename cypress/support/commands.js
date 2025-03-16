@@ -1,3 +1,5 @@
+import { openDB } from 'idb';
+
 Cypress.Commands.add("getIndexedDBData", (dbName, storeName, key) => {
     return cy.window().then((win) => {
         return new Cypress.Promise((resolve, reject) => {
@@ -35,3 +37,13 @@ Cypress.Commands.add("setIndexedDBData", (dbName, storeName, key, value) => {
         });
     });
 });
+
+Cypress.Commands.add('resetIndexedDB', () => {
+    indexedDB.deleteDatabase('spotify-db');
+    return openDB('spotify-db', 2, {
+      upgrade(db) {
+        db.createObjectStore('auth');
+        db.createObjectStore('data');
+      },
+    });
+  });
