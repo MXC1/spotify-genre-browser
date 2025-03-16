@@ -1,25 +1,37 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+Cypress.Commands.add("getIndexedDBData", (dbName, storeName, key) => {
+    return cy.window().then((win) => {
+        return new Cypress.Promise((resolve, reject) => {
+            const request = win.indexedDB.open(dbName);
+
+            request.onerror = (event) => reject(event.target.error);
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction(storeName, "readonly");
+                const store = transaction.objectStore(storeName);
+                const getRequest = store.get(key);
+
+                getRequest.onsuccess = () => resolve(getRequest.result);
+                getRequest.onerror = (event) => reject(event.target.error);
+            };
+        });
+    });
+});
+
+Cypress.Commands.add("setIndexedDBData", (dbName, storeName, key, value) => {
+    return cy.window().then((win) => {
+        return new Cypress.Promise((resolve, reject) => {
+            const request = win.indexedDB.open(dbName);
+
+            request.onerror = (event) => reject(event.target.error);
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction(storeName, "readwrite");
+                const store = transaction.objectStore(storeName);
+                const putRequest = store.put(value, key);
+
+                putRequest.onsuccess = () => resolve();
+                putRequest.onerror = (event) => reject(event.target.error);
+            };
+        });
+    });
+});

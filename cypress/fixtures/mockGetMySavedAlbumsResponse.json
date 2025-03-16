@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "album": {
+        "id": "5jMbGYYNDo0lTyUnKtcm8J",
+        "images": [
+          {
+            "url": "https://i.scdn.co/image/ab67616d0000b273c9ac1ea80b4c74c09733bcd3"
+          }
+        ],
+        "name": "As Days Get Dark",
+        "artists": [
+          {
+            "id": "6g8Jqb5JMfv92eB2r0awTN",
+            "name": "Arab Strap"
+          }
+        ]
+      }
+    }
+  ],
+  "total": 26
+}
