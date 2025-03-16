@@ -2,6 +2,9 @@
   "items": [
     {
       "album": {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/5jMbGYYNDo0lTyUnKtcm8J"
+        },
         "id": "5jMbGYYNDo0lTyUnKtcm8J",
         "images": [
           {
