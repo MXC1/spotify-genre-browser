@@ -49,7 +49,7 @@ body {
   justify-content: space-between; 
 }
 
-.refresh-button {
+.refresh-button, .home-button {
   background: none;
   border: none;
   cursor: pointer;
