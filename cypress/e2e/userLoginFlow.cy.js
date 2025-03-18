@@ -8,6 +8,10 @@ describe('GIVEN I visit the app \
     cy.visit('/');
   })
 
+  before(() => {
+    cy.resetIndexedDB();
+  });
+
   it('THEN the login container should load', () => {
     cy.contains('Login with Spotify');
   });
