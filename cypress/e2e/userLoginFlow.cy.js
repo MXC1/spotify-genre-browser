@@ -1,3 +1,5 @@
+import '../support/commands.js';
+
 describe('GIVEN I visit the app \
   WHEN I click the login button', () => {
   
@@ -5,6 +7,10 @@ describe('GIVEN I visit the app \
     cy.resetIndexedDb();
     cy.visit('/');
   })
+
+  before(() => {
+    cy.resetIndexedDB();
+  });
 
   it('THEN the login container should load', () => {
     cy.contains('Login with Spotify');
