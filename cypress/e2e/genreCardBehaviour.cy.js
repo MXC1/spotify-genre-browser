@@ -20,6 +20,8 @@ describe('GIVEN I visit the app', () => {
 
         cy.get('.genre-grid .genre-section').eq(0).click();
         cy.get('.genre-grid .genre-section').eq(0).should('have.class', 'expanded');
+        cy.get('.genre-grid .genre-section').eq(1).should('have.class', 'collapsed');
+
 
         cy.get('.genre-grid .genre-section').eq(0).click();
         cy.get('.genre-grid .genre-section').eq(0).should('have.class', 'collapsed');
