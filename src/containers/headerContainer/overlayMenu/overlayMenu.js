@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import './overlayMenu.css';
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-function OverlayMenu({ isOpen, toggleMenu, onDisconnect, onDisplayPrivacyPolicy }) {
+const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayPrivacyPolicy }, ref) => {
 
     const navigate = useNavigate();
 
@@ -14,7 +14,7 @@ function OverlayMenu({ isOpen, toggleMenu, onDisconnect, onDisplayPrivacyPolicy 
     };
 
     return (
-        <div className={`overlay-menu ${isOpen ? 'open' : ''}`}>
+        <div ref={ref} className={`overlay-menu ${isOpen ? 'open' : ''}`}>
             <button className="close-menu-button" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faArrowLeft} />
             </button>
@@ -37,6 +37,6 @@ function OverlayMenu({ isOpen, toggleMenu, onDisconnect, onDisplayPrivacyPolicy 
             </ul>
         </div>
     );
-}
+});
 
 export default OverlayMenu;
