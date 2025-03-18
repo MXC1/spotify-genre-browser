@@ -52,7 +52,7 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
                         <FontAwesomeIcon icon={faBars} />
                     </button>
                     <h1 className="page-title">Privacy policy</h1>
-                    <button className="refresh-button" onClick={() => handleNavigation("/genre-album-map")}>
+                    <button className="home-button" onClick={() => handleNavigation("/genre-album-map")}>
                         <FontAwesomeIcon icon={faHouse} />
                     </button>
                 </div>
