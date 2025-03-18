@@ -8,8 +8,11 @@ import { logMessage, fetchOrGenerateSessionID } from './utilities/loggingConfig'
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
+import PrivacyPolicyContainer from './containers/privacyPolicyContainer/privacyPolicyContainer';
 import ModalContainer from './containers/modalContainer/modalContainer';
 import useModal from './hooks/useModal';
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
+
 
 Amplify.configure(awsconfig);
 
@@ -19,11 +22,14 @@ function App() {
   const [sortOption, setSortOption] = useState('number-desc');
   const genreGridRef = useRef();
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const initialise = async () => {
     await fetchOrGenerateSessionID();
     logMessage('Environment is: ' + process.env.REACT_APP_ENV);
     handleAuth();
+    // navigate('/genre-album-map');
   }
 
   const handleAuth = async () => {
@@ -58,13 +64,18 @@ function App() {
     initialise();
   }, []);
 
+  useEffect(() => {
+    if (tokenExists && location.pathname === '/genre-album-map') {
+      fetchOrUpdateGenreAlbumMap();
+    }
+  }, [location.pathname, tokenExists]);
+
   const handleGenreAlbumMapRefresh = async () => {
     if (genreGridRef.current) {
       try {
         await genreGridRef.current.updateGenreAlbumMap();
       } catch (error) {
         logMessage(`Error refreshing genre album map: ${error}`);
-        // Ensure genreAlbumMap is not updated
       }
     }
   }
@@ -115,7 +126,10 @@ function App() {
               button2Action: handleDisconnect
             })}
           />
-          <GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />
+          <Routes>
+            <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
+          </Routes>
         </div>
       )}
       <ModalContainer
