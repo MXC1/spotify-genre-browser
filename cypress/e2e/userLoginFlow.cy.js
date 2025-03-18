@@ -2,7 +2,7 @@ describe('GIVEN I visit the app \
   WHEN I click the login button', () => {
   
   beforeEach(() => {
-    cy.initialiseIndexedDb();
+    cy.resetIndexedDb();
     cy.visit('/');
   })
 

@@ -1,6 +1,6 @@
 import '@this-dot/cypress-indexeddb';
 
-Cypress.Commands.add('initialiseIndexedDb', () => {
+Cypress.Commands.add('resetIndexedDb', () => {
     cy.clearIndexedDb('spotify-db');
     cy.openIndexedDb('spotify-db').as('spotify-db');
     cy.getIndexedDb('@spotify-db').createObjectStore('auth').as('auth');

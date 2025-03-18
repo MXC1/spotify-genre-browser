@@ -4,7 +4,7 @@ describe('GIVEN I have authenticated', () => {
         cy.intercept('GET', 'https://api.spotify.com/v1/artists*', { fixture: "mockGetArtistsResponse.json" });
         cy.intercept('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', { fixture: "mockAuthTokenResponse.json" });
         
-        cy.initialiseIndexedDb();
+        cy.resetIndexedDb();
         cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
         
         cy.visit('/?code=valid_token&state=valid_state');
