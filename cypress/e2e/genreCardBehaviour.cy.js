@@ -6,7 +6,7 @@ describe('GIVEN I visit the app', () => {
 
         cy.resetIndexedDb();
         cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
-        cy.visit('/?code=valid_token&state=valid_state');
+        cy.visit('/genre-album-map?code=valid_token&state=valid_state');
     });
 
     it('WHEN I click a genre card \
