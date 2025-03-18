@@ -41,6 +41,7 @@ body {
   width: 100%;
   max-width: 600px;
   align-self: center;
+  margin: 0 auto; 
 }
 
 .title-container {
