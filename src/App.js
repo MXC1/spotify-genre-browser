@@ -28,21 +28,27 @@ function App() {
   const initialise = async () => {
     await fetchOrGenerateSessionID();
     logMessage('Environment is: ' + process.env.REACT_APP_ENV);
-    handleAuth();
-    // navigate('/genre-album-map');
   }
 
-  const handleAuth = async () => {
-    const tokenExists = await authenticateUser();
-    if (tokenExists) {
-      logMessage('Token exists after authentication');
-      setTokenExists(true);
-      fetchOrUpdateGenreAlbumMap();
-    } else {
-      logMessage('No token exists after authentication');
-      setTokenExists(false);
-    }
-  };
+  useEffect(() => {
+    initialise();
+  }, []);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (location.pathname === "/privacy-policy") return;
+
+      const token = await authenticateUser();
+      if (!token) {
+        navigate("/authenticate");
+      } else {
+        await fetchOrUpdateGenreAlbumMap();
+        navigate("/genre-album-map");
+      }
+    };
+
+    checkAuth();
+  }, [navigate, location.pathname]);
 
   const fetchOrUpdateGenreAlbumMap = async () => {
     if (genreGridRef.current) {
@@ -55,20 +61,9 @@ function App() {
         }
       } catch (error) {
         logMessage(`Error updating genre album map: ${error}`);
-        // Ensure genreAlbumMap is not updated
       }
     }
   };
-
-  useEffect(() => {
-    initialise();
-  }, []);
-
-  useEffect(() => {
-    if (tokenExists && location.pathname === '/genre-album-map') {
-      fetchOrUpdateGenreAlbumMap();
-    }
-  }, [location.pathname, tokenExists]);
 
   const handleGenreAlbumMapRefresh = async () => {
     if (genreGridRef.current) {
@@ -97,6 +92,7 @@ function App() {
       await genreGridRef.current.clearGenreAlbumMap();
     }
     closeModal();
+    navigate('/authenticate');
     openModal({
       title: "Disconnect Spotify account",
       description: "Your account has been successfully disconnected.",
@@ -109,29 +105,27 @@ function App() {
 
   return (
     <div className="App">
-      {!tokenExists ? (
-        <LoginContainer />
-      ) : (
-        <div className="albums-container">
-          <HeaderContainer
-            onRefresh={handleGenreAlbumMapRefresh}
-            onSearch={handleSearch}
-            onSortChange={handleSortChange}
-            onOpenDisconnectModal={() => openModal({
-              title: "Disconnect Spotify account",
-              description: "Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'.",
-              button1Text: "Cancel",
-              button1Action: closeModal,
-              button2Text: "Disconnect",
-              button2Action: handleDisconnect
-            })}
-          />
-          <Routes>
-            <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
-          </Routes>
-        </div>
-      )}
+      <HeaderContainer
+        onRefresh={handleGenreAlbumMapRefresh}
+        onSearch={handleSearch}
+        onSortChange={handleSortChange}
+        onOpenDisconnectModal={() => openModal({
+          title: "Disconnect Spotify account",
+          description: "Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'.",
+          button1Text: "Cancel",
+          button1Action: closeModal,
+          button2Text: "Disconnect",
+          button2Action: handleDisconnect
+        })}
+      />
+
+      <Routes>
+        <Route path="*" element={<LoginContainer />} />
+        <Route path="/authenticate" element={<LoginContainer />} />
+        <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
+      </Routes>
+
       <ModalContainer
         isOpen={isModalOpen}
         onClose={closeModal}
