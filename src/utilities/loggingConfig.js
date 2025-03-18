@@ -1,6 +1,6 @@
 // loggingConfig.js
 import AWS from 'aws-sdk';
-import { getCachedEntry, setCachedEntry } from './indexedDB';
+import { getCachedEntry, setCachedEntry } from './indexedDb'
 import { v1 } from 'uuid';
 
 AWS.config.update({ region: 'eu-west-2',

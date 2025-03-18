@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { authenticateUser, clearAccessToken } from './services/spotifyAuth';
-import { getCachedEntry, clearAllData } from './utilities/indexedDB';
+import { getCachedEntry, clearAllData } from './utilities/indexedDb';
 import './App.css';
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
