@@ -1,16 +1,15 @@
 import React, { forwardRef } from 'react';
 import './overlayMenu.css';
-import { useNavigate } from "react-router-dom";
+import { useNavigationHelpers } from '../../../utilities/navigationHelpers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayPrivacyPolicy }, ref) => {
-
-    const navigate = useNavigate();
+    const { goTo } = useNavigationHelpers();
 
     const handleNavigation = (path) => {
-        navigate(path);
-        toggleMenu(); // Close the menu after navigation
+        toggleMenu();
+        goTo(path);
     };
 
     return (

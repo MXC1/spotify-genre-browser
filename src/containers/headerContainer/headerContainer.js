@@ -3,12 +3,14 @@ import './headerContainer.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSyncAlt, faBars, faHouse, faBackward } from '@fortawesome/free-solid-svg-icons';
 import OverlayMenu from './overlayMenu/overlayMenu';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 
 function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectModal }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
     const menuRef = useRef(null);
+    const { goTo } = useNavigationHelpers();
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -37,12 +39,6 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
         onOpenDisconnectModal();
     };
 
-    const navigate = useNavigate();
-
-    const handleNavigation = (path) => {
-      navigate(path);
-    };
-
     if (location.pathname === '/privacy-policy') {
         return (
             <div className="header-container">
@@ -52,7 +48,7 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
                         <FontAwesomeIcon icon={faBars} />
                     </button>
                     <h1 className="page-title">Privacy policy</h1>
-                    <button className="home-button" onClick={() => handleNavigation("/genre-album-map")}>
+                    <button className="home-button" onClick={() => goTo("/genre-album-map")}>
                         <FontAwesomeIcon icon={faHouse} />
                     </button>
                 </div>
