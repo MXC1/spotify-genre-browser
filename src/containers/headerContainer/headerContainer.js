@@ -1,48 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './headerContainer.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSyncAlt, faBars, faHouse, faBackward } from '@fortawesome/free-solid-svg-icons';
-import OverlayMenu from './overlayMenu/overlayMenu';
+import { faSyncAlt, faBars, faHouse } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from "react-router-dom";
 import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 
-function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectModal }) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectModal, toggleMenu }) {
     const location = useLocation();
-    const menuRef = useRef(null);
     const { goTo } = useNavigationHelpers();
 
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
-
-    const handleClickOutside = (event) => {
-        if (menuRef.current && !menuRef.current.contains(event.target)) {
-            setIsMenuOpen(false);
-            event.stopImmediatePropagation();
-        }
-    };
-
-    useEffect(() => {
-        if (isMenuOpen) {
-            document.addEventListener('mousedown', handleClickOutside, true);
-        } else {
-            document.removeEventListener('mousedown', handleClickOutside, true);
-        }
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside, true);
-        };
-    }, [isMenuOpen]);
-
     const handleOpenDisconnectModal = () => {
-        setIsMenuOpen(false);
         onOpenDisconnectModal();
     };
 
     if (location.pathname === '/privacy-policy') {
         return (
             <div className="header-container">
-                <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
                 <div className="title-container">
                     <button className="menu-button" onClick={toggleMenu}>
                         <FontAwesomeIcon icon={faBars} />
@@ -58,7 +31,6 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
     else if (location.pathname === '/genre-album-map') {
         return (
             <div className="header-container">
-                <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
                 <div className="title-container">
                     <button className="menu-button" onClick={toggleMenu}>
                         <FontAwesomeIcon icon={faBars} />
