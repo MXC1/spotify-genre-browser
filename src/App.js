@@ -12,6 +12,7 @@ import PrivacyPolicyContainer from './containers/privacyPolicyContainer/privacyP
 import ModalContainer from './containers/modalContainer/modalContainer';
 import useModal from './hooks/useModal';
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
+import { useNavigationHelpers } from './utilities/navigationHelpers';
 
 
 Amplify.configure(awsconfig);
@@ -24,6 +25,7 @@ function App() {
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
   const location = useLocation();
   const navigate = useNavigate();
+  const { goTo } = useNavigationHelpers();
 
   const initialise = async () => {
     await fetchOrGenerateSessionID();
@@ -40,10 +42,10 @@ function App() {
 
       const token = await authenticateUser();
       if (!token) {
-        navigate("/authenticate");
+        goTo("/authenticate");
       } else {
         await fetchOrUpdateGenreAlbumMap();
-        navigate("/genre-album-map");
+        goTo("/genre-album-map");
       }
     };
 
@@ -92,7 +94,7 @@ function App() {
       await genreGridRef.current.clearGenreAlbumMap();
     }
     closeModal();
-    navigate('/authenticate');
+    goTo('/authenticate');
     openModal({
       title: "Disconnect Spotify account",
       description: "Your account has been successfully disconnected.",
