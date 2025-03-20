@@ -1,9 +1,3 @@
-const authenticateAndVisitPrivacyPolicy = () => {
-    authenticate();
-    cy.get('.menu-button').click();
-    cy.get('.menu-item-button').contains('Privacy Policy').click();
-};
-
 const authenticate = () => {
     cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
     cy.visit('/genre-album-map?code=valid_token&state=valid_state');
@@ -48,7 +42,8 @@ describe('GIVEN I have authenticated', () => {
 
     describe('AND I am on the privacy policy page', () => {
         beforeEach(() => {
-            authenticateAndVisitPrivacyPolicy();
+            authenticate();
+            clickPrivacyPolicyLink();
         });
 
         describe('WHEN I open the hamburger menu AND I click the home link', () => {
