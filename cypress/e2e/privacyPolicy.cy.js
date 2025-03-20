@@ -54,8 +54,11 @@ describe('GIVEN I have authenticated', () => {
         });
 
         describe('WHEN I click the home button', () => {
-            it('THEN the genre grid should be shown', () => {
+            beforeEach(() => {
                 cy.get('.home-button').click();
+            });
+            
+            it('THEN the genre grid should be shown', () => {
                 cy.get('.genre-grid').should('exist');
             });
 
