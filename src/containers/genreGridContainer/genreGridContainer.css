@@ -1,0 +1,136 @@
+.genre-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  justify-content: center;
+  gap: 10px;
+  padding: 0 5px;
+  max-width: calc(150px * 9);
+  margin: 0 auto; 
+}
+
+.genre-section {
+  background-color: #181818;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.genre-section.expanded {
+  grid-column: 1 / -1;
+  z-index: 1;
+  margin-bottom: 20px;
+}
+
+.genre-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: #ffffff;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #1db954;
+  padding-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin: 0px;
+  padding: 5px;
+  line-height: 1em;
+  height: 2em;
+}
+
+.album-preview {
+  display: flex;
+  justify-content: center;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  padding: 0 10px;
+}
+
+.album-preview-image {
+  width: 65px !important;
+  height: 65px !important;
+  border-radius: 2px;
+  margin-left: -10px;
+}
+
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 100px));
+  grid-gap: 20px;
+  justify-items: center;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.album-item {
+  width: 100px;
+  height: auto;
+  font-size: 18px;
+  color: #b3b3b3;
+  border: 1px solid #333;
+  border-radius: 10px;
+  background-color: #181818;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  padding: 6px;
+}
+
+.album-item:hover {
+  transform: scale(1.05);
+}
+
+.album-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+.album-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 2px;
+  margin-bottom: 5px;
+}
+
+.album-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 300;
+  height: 100%;
+}
+
+.album-artist {
+  display: flex;
+}
+
+.album-name {
+  font-style: italic;
+  color: #1db954;
+}
+
+.album-artist, .album-name {
+  max-height: 2.6em; 
+  line-height: 1.2em; 
+  font-size: 15px;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}

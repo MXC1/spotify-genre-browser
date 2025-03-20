@@ -2,6 +2,7 @@ import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDb";
 import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
 import logMessage from "../../utilities/loggingConfig";
+import './genreGridContainer.css';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [loadingMessage, setLoadingMessage] = useState('');
@@ -37,7 +38,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       // Collect the remaining batches
 
       for (offset; offset <= batchesToProcess * limit; offset += limit) {
-        logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ${numberOfAlbums})...`);
+        logAndSetLoadingMessage(`Requesting saved albums (${Math.min(offset + limit, numberOfAlbums)} / ${numberOfAlbums})...`);
 
         const [albums] = await getSavedAlbumsWithRetries(limit, offset);
         allAlbums = [...allAlbums, ...albums];
