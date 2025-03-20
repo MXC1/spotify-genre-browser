@@ -36,18 +36,27 @@ Nb. You will not be able to run the app without .env variables, which are not de
 ## Deployment and Release
 
 AWS Amplify watches the `main` branch for changes and automatically deploys.
-Do not commit or merge directly to main.
 
-### Release Process
+Branch rules:
+* Do not commit or merge directly to `main`.
+* Do not commit directly to `staging`.
+* `staging` should only be updated by PRs.
+* `main` should only be updated when running the deployment process below.
 
-1. Create feature branches based from `main` (branch name should be the same as the URL of the Trello ticket)
-2. When features are complete, create a pull request to merge your branch into `staging`
-3. Assert that the build has deployed successfully to the `staging` environment in AWS Amplify and conduct any necessary testing on `staging`.
-4. Create a new tag and a new release based from `staging`.
-5. In git, run:
+### Branching Process
+
+1. Create feature branches based from `main` (branch name should be the same as the URL of the Trello ticket e.g. `7-write-privacy-policy`).
+2. When features are complete, create a pull request to merge your branch into `staging`.
+3. Assert that the latest build has deployed successfully to the `staging` environment in AWS Amplify.
+
+### Deployment Process 
+
+1. Conduct any necessary testing on `staging`.
+2. Create a new tag and a new release based from `staging`.
+3. In git, run:
     1. `git fetch origin`
     2. `git checkout main`
     3. `git merge --ff-only <tag_name>` (replace `<tag_name>` with the tag you created in step 4)
     4. `git push`
-6. This will push all commit history to main without creating a new commit. AWS Amplify will pick up changes and deploy to the `main` environment.
-7. Verify that deployment has been successful in AWS Amplify.
+4. This will push all commit history to main without creating a new commit. AWS Amplify will pick up changes and deploy to the `main` environment.
+5. Verify that deployment has been successful in AWS Amplify.
