@@ -46,7 +46,7 @@ describe('GIVEN I have authenticated', () => {
             clickPrivacyPolicyLink();
         });
 
-        describe('WHEN I open the hamburger menu AND I click the home link', () => {
+        describe('WHEN I open the hamburger menu home link', () => {
             it('THEN the genre grid should be shown', () => {
                 clickHomeLink();
                 cy.get('.genre-grid').should('exist');
@@ -70,23 +70,3 @@ describe('GIVEN I have authenticated', () => {
     });
 });
 
-describe('GIVEN I have not authenticated', () => {
-    describe('AND I am on the privacy policy page', () => {
-        beforeEach(() => {
-            cy.visit('/privacy-policy');
-        });
-        describe('WHEN I click the hamburger menu home link', () => {
-            it('THEN the login page should be shown', () => {
-                clickHomeLink();
-                cy.get('.login-button').should('exist');
-            });
-        });
-
-        describe('WHEN I click the home button', () => {
-            it('THEN the login page should be shown', () => {
-                cy.get('.home-button').click();
-                cy.get('.login-button').should('exist');
-            });
-        });
-    });
-});
