@@ -116,9 +116,6 @@ function App() {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsMenuOpen(false);
-        event.stopImmediatePropagation();
-        event.stopPropagation();
-        event.preventDefault();
       }
     };
 
@@ -142,7 +139,6 @@ function App() {
 
   return (
     <div className="App">
-      <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
       <HeaderContainer
         onRefresh={handleGenreAlbumMapRefresh}
         onSearch={handleSearch}
@@ -157,6 +153,8 @@ function App() {
         <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
       </Routes>
+      
+      <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
 
       <ModalContainer
         isOpen={isModalOpen}
