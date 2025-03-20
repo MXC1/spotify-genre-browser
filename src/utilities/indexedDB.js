@@ -1,7 +1,7 @@
 import { openDB } from 'idb';
 import logMessage from './loggingConfig';
 
-const dbPromise = openDB('spotify-db', 2, {
+const dbPromise = openDB('spotify-db', undefined, {
   upgrade(db) {
     db.createObjectStore('auth');
     db.createObjectStore('data');
