@@ -41,6 +41,7 @@ body {
   width: 100%;
   max-width: 600px;
   align-self: center;
+  margin: 10px auto 20px auto; 
 }
 
 .title-container {
@@ -49,7 +50,7 @@ body {
   justify-content: space-between; 
 }
 
-.refresh-button {
+.refresh-button, .home-button {
   background: none;
   border: none;
   cursor: pointer;
