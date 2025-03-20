@@ -1,5 +1,5 @@
 import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
-import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDB";
+import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDb";
 import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
 import logMessage from "../../utilities/loggingConfig";
 

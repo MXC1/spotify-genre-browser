@@ -1,6 +1,6 @@
 import axios from 'axios';
 import logMessage from '../utilities/loggingConfig';
-import { setCachedEntry, getCachedEntry } from '../utilities/indexedDB';
+import { setCachedEntry, getCachedEntry } from '../utilities/indexedDb';
 
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = window.location.origin;
@@ -38,14 +38,14 @@ export const setAuthUrl = async () => {
 export const authenticateUser = async () => {
   logMessage('Authenticating user...');
 
-  // Check if a token exists in IndexedDB
+  // Check if a token exists in indexedDb
   const cachedToken = await getCachedEntry('auth', 'access_token');
   if (cachedToken) {
     logMessage(`Cached token found: ${cachedToken}`);
     setAccessToken(cachedToken);
   }
 
-  // Check if there’s already a codeVerifier saved in IndexedDB
+  // Check if there’s already a codeVerifier saved in indexedDb
   const existingCodeVerifier = await getCachedEntry('auth', 'spotify_code_verifier');
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
@@ -57,7 +57,6 @@ export const authenticateUser = async () => {
     logMessage(`Token: ${token}`);
     setAccessToken(token);
 
-    // Optionally, clear the codeVerifier from IndexedDB after successful exchange
     await setCachedEntry('auth', null, 'spotify_code_verifier');
   }
 
@@ -108,7 +107,6 @@ export const getAuthorizationURL = async () => {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
-  // Save the codeVerifier in IndexedDB
   await setCachedEntry('auth', codeVerifier, 'spotify_code_verifier');
 
   logMessage(`Code verifier: ${codeVerifier}`);

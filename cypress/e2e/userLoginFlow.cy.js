@@ -1,3 +1,5 @@
+import '../support/commands.js';
+
 describe('GIVEN I visit the app \
   WHEN I click the login button', () => {
   
