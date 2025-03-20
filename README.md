@@ -45,7 +45,7 @@ Branch rules:
 
 ### Branching Process
 
-1. Create feature branches based from `main` (branch name should be the same as the URL of the Trello ticket e.g. `7-write-privacy-policy`).
+1. Create feature branches based from `staging` (branch name should be the same as the URL of the Trello ticket e.g. `7-write-privacy-policy`).
 2. When features are complete, create a pull request to merge your branch into `staging`.
 3. Assert that the latest build has deployed successfully to the `staging` environment in AWS Amplify.
 
