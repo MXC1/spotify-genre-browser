@@ -24,6 +24,17 @@ describe('GIVEN I am on the homepage', () => {
         });
     });
 
+    describe('WHEN I click outside the hamburger menu', () => {
+        beforeEach(() => {
+            cy.get('.menu-button').click();
+            cy.get('.overlay-background').click();
+        });
+        
+        it('THEN the hamburger menu should close', () => {
+            cy.get('.overlay-background').should('not.be.visible');
+            cy.get('.menu-button').click();
+        });
+    });
 });
 
 describe('GIVEN I am on the privacy policy page', () => {
