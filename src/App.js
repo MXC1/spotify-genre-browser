@@ -13,7 +13,7 @@ import ModalContainer from './containers/modalContainer/modalContainer';
 import useModal from './hooks/useModal';
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import { useNavigationHelpers } from './utilities/navigationHelpers';
-
+import OverlayMenu from './containers/overlayMenu/overlayMenu';
 
 Amplify.configure(awsconfig);
 
@@ -26,6 +26,8 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const { goTo } = useNavigationHelpers();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   const initialise = async () => {
     await fetchOrGenerateSessionID();
@@ -105,20 +107,30 @@ function App() {
     });
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleOpenDisconnectModal = () => {
+    setIsMenuOpen(false);
+    openModal({
+      title: "Disconnect Spotify account",
+      description: "Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'.",
+      button1Text: "Cancel",
+      button1Action: closeModal,
+      button2Text: "Disconnect",
+      button2Action: handleDisconnect
+    });
+  };
+
   return (
     <div className="App">
       <HeaderContainer
         onRefresh={handleGenreAlbumMapRefresh}
         onSearch={handleSearch}
         onSortChange={handleSortChange}
-        onOpenDisconnectModal={() => openModal({
-          title: "Disconnect Spotify account",
-          description: "Disconnecting your Spotify account will delete your data. To use the application again, you can just press 'Login to Spotify'.",
-          button1Text: "Cancel",
-          button1Action: closeModal,
-          button2Text: "Disconnect",
-          button2Action: handleDisconnect
-        })}
+        onOpenDisconnectModal={handleOpenDisconnectModal}
+        toggleMenu={toggleMenu}
       />
 
       <Routes>
@@ -127,6 +139,8 @@ function App() {
         <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
       </Routes>
+      
+      <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
 
       <ModalContainer
         isOpen={isModalOpen}

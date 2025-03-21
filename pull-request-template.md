@@ -16,4 +16,5 @@
 <!---e.g 'corresponding tests added', 'no TODOs in the code'--->
 
 - [ ] Appropriate logging has been added
+- [ ] Appropriate tests have been written 
 - [ ] There are no TODOs in the code without a very good reason
