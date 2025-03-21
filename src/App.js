@@ -111,20 +111,6 @@ function App() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside, true);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside, true);
-    };
-  }, []);
-
   const handleOpenDisconnectModal = () => {
     setIsMenuOpen(false);
     openModal({

@@ -13,8 +13,8 @@ const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayPri
     };
 
     return (
-        <div class={`overlay-background ${isOpen ? 'open' : ''}`}>
-            <div ref={ref} className={`overlay-menu ${isOpen ? 'open' : ''}`}>
+        <div className={`overlay-background ${isOpen ? 'open' : ''}`} onClick={toggleMenu}        >
+            <div ref={ref} className={`overlay-menu ${isOpen ? 'open' : ''}`} onClick={(e) => e.stopPropagation()}>
                 <button className="close-menu-button" onClick={toggleMenu}>
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </button>
