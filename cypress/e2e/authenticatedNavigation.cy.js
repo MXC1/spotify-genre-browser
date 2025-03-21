@@ -1,71 +1,60 @@
-const authenticate = () => {
-    cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
-    cy.visit('/genre-album-map?code=valid_token&state=valid_state');
-};
-
-const clickHomeLink = () => {
-    cy.get('.menu-button').click();
-    cy.get('.menu-item-button').contains('Home').click();
-};
-
-const clickPrivacyPolicyLink = () => {
-    cy.get('.menu-button').click();
-    cy.get('.menu-item-button').contains('Privacy Policy').click();
-};  
-
 beforeEach(() => {
     cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { fixture: "mockGetMySavedAlbumsResponse.json" });
     cy.intercept('GET', 'https://api.spotify.com/v1/artists*', { fixture: "mockGetArtistsResponse.json" });
     cy.intercept('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', { fixture: "mockAuthTokenResponse.json" });
     cy.resetIndexedDb();
+    cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
 });
 
-describe('GIVEN I have authenticated', () => {
+describe('GIVEN I am on the homepage', () => {
     beforeEach(() => {
-        authenticate();
+        cy.visit('/genre-album-map?code=valid_token&state=valid_state');
     });
 
-    describe('WHEN I open the hamburger menu and click the privacy policy link', () => {
+    describe('WHEN I open the hamburger menu privacy policy link', () => {
         beforeEach(() => {
-            clickPrivacyPolicyLink();
-        });
-
-        it('THEN the header should be updated', () => {
-            cy.get('.page-title').should('contain', 'Privacy policy');
-            cy.get('.home-button').should('exist');
+            cy.get('.menu-button').click();
+            cy.get('.menu-item-button').contains('Privacy Policy').click();
         });
 
         it('THEN the privacy policy should be displayed', () => {
+            cy.get('.page-title').should('contain', 'Privacy policy');
+            cy.get('.home-button').should('exist');
             cy.get('.privacy-policy-container').should('exist');
         });
     });
 
-    describe('AND I am on the privacy policy page', () => {
+});
+
+describe('GIVEN I am on the privacy policy page', () => {
+    beforeEach(() => {
+        cy.visit('/genre-album-map?code=valid_token&state=valid_state');
+        cy.get('.menu-button').click();
+        cy.get('.menu-item-button').contains('Privacy Policy').click();
+    });
+
+    describe('WHEN I click the hamburger menu home link', () => {
         beforeEach(() => {
-            authenticate();
-            clickPrivacyPolicyLink();
+            cy.get('.menu-button').click();
+            cy.get('.menu-item-button').contains('Home').click();
         });
 
-        describe('WHEN I open the hamburger menu home link', () => {
-            it('THEN the genre grid should be shown', () => {
-                clickHomeLink();
-                cy.get('.genre-grid').should('exist');
-            });
+        it('THEN the genre grid should be shown', () => {
+            cy.get('.page-title').should('contain', 'Your album library');
+            cy.get('.refresh-button').should('exist');
+            cy.get('.genre-grid').should('exist');
+        });
+    });
+
+    describe('WHEN I click the home button', () => {
+        beforeEach(() => {
+            cy.get('.home-button').click();
         });
 
-        describe('WHEN I click the home button', () => {
-            beforeEach(() => {
-                cy.get('.home-button').click();
-            });
-            
-            it('THEN the genre grid should be shown', () => {
-                cy.get('.genre-grid').should('exist');
-            });
-
-            it('THEN the header should be updated', () => {
-                cy.get('.page-title').should('contain', 'Your album library');
-                cy.get('.refresh-button').should('exist');
-            });
+        it('THEN the genre grid should be shown', () => {
+            cy.get('.page-title').should('contain', 'Your album library');
+            cy.get('.refresh-button').should('exist');
+            cy.get('.genre-grid').should('exist');
         });
     });
 });
