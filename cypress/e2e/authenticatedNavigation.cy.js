@@ -35,6 +35,33 @@ describe('GIVEN I am on the homepage', () => {
             cy.get('.menu-button').click();
         });
     });
+    
+    
+    describe('WHEN I click the close menu button', () => {
+        beforeEach(() => {
+            cy.get('.menu-button').click();
+            cy.get('.close-menu-button').click();
+        });
+        
+        it('THEN the hamburger menu should close', () => {
+            cy.get('.overlay-background').should('not.be.visible');
+            cy.get('.menu-button').click();
+        });
+    });
+    
+    describe('WHEN I click the menu itself', () => {
+        beforeEach(() => {
+            cy.get('.menu-button').click();
+            cy.get('.overlay-menu').click();
+        });
+        
+        it('THEN the hamburger menu should stay open', () => {
+            cy.get('.overlay-menu').should('be.visible');
+            cy.get('.overlay-background').should('be.visible');
+            cy.get('.close-menu-button').click();
+        });
+    });
+
 });
 
 describe('GIVEN I am on the privacy policy page', () => {
