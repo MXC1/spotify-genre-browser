@@ -1,4 +1,4 @@
-describe('GIVEN I visit the app', () => {
+describe('GIVEN I am on the genre grid page', () => {
     beforeEach(() => {
         cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { fixture: "mockGetMySavedAlbumsResponse.json" });
         cy.intercept('GET', 'https://api.spotify.com/v1/artists*', { fixture: "mockGetArtistsResponse.json" });
