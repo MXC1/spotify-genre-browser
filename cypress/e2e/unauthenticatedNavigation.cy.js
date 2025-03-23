@@ -7,6 +7,12 @@ describe('GIVEN I am on the privacy policy page', () => {
         cy.visit('/privacy-policy');
     });
 
+    it('THEN the privacy policy should be displayed', () => {
+        cy.get('.page-title').should('contain', 'Privacy policy');
+        cy.get('.home-button').should('exist');
+        cy.get('.privacy-policy-container').should('exist');
+    });
+
     describe('WHEN I click the hamburger menu home link', () => {
         beforeEach(() => {
             cy.get('.menu-button').click();
