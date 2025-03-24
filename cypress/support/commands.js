@@ -10,3 +10,7 @@ Cypress.Commands.add('resetIndexedDb', () => {
 Cypress.Commands.add('setIndexedDbData', (store,key,value) => {
     cy.getStore(`@${store}`).createItem(`${key}`, `${value}`);
 });
+
+Cypress.Commands.add('getIndexedDbData', (store,key) => {
+    cy.getStore(`@${store}`).readItem(`${key}`);
+});
