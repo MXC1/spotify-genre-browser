@@ -1,4 +1,3 @@
-// loggingConfig.js
 import AWS from 'aws-sdk';
 import { getCachedEntry, setCachedEntry } from './indexedDb'
 import { v1 } from 'uuid';

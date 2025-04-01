@@ -35,10 +35,7 @@ describe("GIVEN I have authenticated with Spotify", () => {
             cy.getIndexedDbData('auth', 'session_id').should('exist');
         });
 
-        // TODO: Figure out why this test fails when using `npx cypress run`
         it("THEN my saved albums are removed", () => {
-            // cy.debug();
-            // cy.pause();
             cy.getIndexedDbData('data', 'grouped_albums').should('be.undefined');
         }); 
     });
