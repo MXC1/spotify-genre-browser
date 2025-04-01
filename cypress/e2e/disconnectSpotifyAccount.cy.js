@@ -7,9 +7,10 @@ describe("GIVEN I have authenticated with Spotify", () => {
         cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
         cy.visit('/genre-album-map?code=valid_token&state=valid_state');
 
-        cy.wait('@getMySavedAlbums');
-        cy.wait('@getArtists');
-        cy.wait('@authToken');
+        cy.wait(['@getMySavedAlbums', '@getArtists', '@authToken']);
+
+        // Wait for genre grid to load
+        cy.get('.genre-grid').children().its('length').should('eq', 2);
     });
 
     describe("WHEN I click the disconnect Spotify account link", () => {
@@ -27,13 +28,17 @@ describe("GIVEN I have authenticated with Spotify", () => {
             cy.getIndexedDbData('auth', 'access_token').should('be.undefined');
             cy.getIndexedDbData('auth', 'refresh_token').should('be.undefined');
             cy.getIndexedDbData('auth', 'spotify_code_verifier').should('be.undefined');
+
         });
         
         it("THEN my session_id is not removed", () => {
             cy.getIndexedDbData('auth', 'session_id').should('exist');
         });
 
+        // TODO: Figure out why this test fails when using `npx cypress run`
         it("THEN my saved albums are removed", () => {
+            // cy.debug();
+            // cy.pause();
             cy.getIndexedDbData('data', 'grouped_albums').should('be.undefined');
         }); 
     });
