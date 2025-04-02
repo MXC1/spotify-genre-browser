@@ -43,4 +43,37 @@ describe('GIVEN I am on the genre grid page', () => {
                 .should('have.attr', 'href', 'https://open.spotify.com/album/5jMbGYYNDo0lTyUnKtcm8J');
         });
     });
+
+    it('THEN there should be a sorting dropdown', () => {
+        cy.get('.sort-dropdown').should('exist');
+        cy.get('.sort-dropdown').should('have.value', 'number-desc');
+    });
+
+    describe('WHEN I sort alphabetically', () => {
+        beforeEach(() => {
+            cy.get('.sort-dropdown').select('alphabetical-asc');
+        });
+
+        it('THEN the genre grid should be sorted alphabetically', () => {
+            cy.get('.genre-grid').children().its('length').should('eq', 2);
+
+            cy.get('.genre-grid .genre-section').first()
+                .find('.genre-title')
+                .should('have.text', 'art rock, alternative rock');
+        });
+    });
+
+    describe('WHEN I sort reverse alphabetically', () => {
+        beforeEach(() => {
+            cy.get('.sort-dropdown').select('alphabetical-desc');
+        });
+
+        it('THEN the genre grid should be sorted reverse alphabetically', () => {
+            cy.get('.genre-grid').children().its('length').should('eq', 2);
+
+            cy.get('.genre-grid .genre-section').first()
+                .find('.genre-title')
+                .should('have.text', 'slowcore, spoken word');
+        });
+    });
 });
