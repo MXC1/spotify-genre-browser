@@ -35,8 +35,6 @@ describe('GIVEN I am on the genre grid page', () => {
         });
 
         it('THEN the genre grid should be reset', () => {
-            cy.get('.genre-grid').should('exist');
-
             cy.get('.genre-grid').children().its('length').should('eq', 2);
 
             cy.get('.genre-grid .genre-section').eq(0).click();
