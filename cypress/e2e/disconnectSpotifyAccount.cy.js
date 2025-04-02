@@ -1,16 +1,6 @@
 describe("GIVEN I have authenticated with Spotify", () => {
     beforeEach(() => {
-        cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { fixture: "mockGetMySavedAlbumsResponse.json" }).as('getMySavedAlbums');
-        cy.intercept('GET', 'https://api.spotify.com/v1/artists*', { fixture: "mockGetArtistsResponse.json" }).as('getArtists');
-        cy.intercept('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
-        cy.resetIndexedDb();
-        cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
-        cy.visit('/genre-album-map?code=valid_token&state=valid_state');
-
-        cy.wait(['@getMySavedAlbums', '@getArtists', '@authToken']);
-
-        // Wait for genre grid to load
-        cy.get('.genre-grid').should('exist').and('be.visible');
+        cy.mockAPIResponsesAndInitialiseAuthenticatedState();
     });
 
     describe("WHEN I click the disconnect Spotify account link", () => {
