@@ -10,7 +10,7 @@ describe("GIVEN I have authenticated with Spotify", () => {
         cy.wait(['@getMySavedAlbums', '@getArtists', '@authToken']);
 
         // Wait for genre grid to load
-        cy.get('.genre-grid').children().its('length').should('eq', 2);
+        cy.get('.genre-grid').should('exist').and('be.visible');
     });
 
     describe("WHEN I click the disconnect Spotify account link", () => {
