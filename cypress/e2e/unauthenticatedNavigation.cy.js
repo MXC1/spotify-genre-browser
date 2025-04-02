@@ -50,6 +50,21 @@ paths.forEach((path) => {
         it('THEN the login page should be shown', () => {
             cy.get('.login-button').should('exist');
         });
+    });
+});
 
+describe('GIVEN I am on the login page', () => {
+    beforeEach(() => {
+        cy.visit('/');
+    });
+
+    describe('WHEN I click the browser refresh button', () => {
+        beforeEach(() => {
+            cy.reload();
+        });
+
+        it('THEN the login page should be shown', () => {
+            cy.get('.login-button').should('exist');
+        });
     });
 });
