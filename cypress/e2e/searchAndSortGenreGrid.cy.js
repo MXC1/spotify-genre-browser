@@ -49,17 +49,31 @@ describe('GIVEN I am on the genre grid page', () => {
         cy.get('.sort-dropdown').should('have.value', 'number-desc');
     });
 
-    describe('WHEN I change the sorting dropdown', () => {
+    describe('WHEN I sort alphabetically', () => {
         beforeEach(() => {
             cy.get('.sort-dropdown').select('alphabetical-asc');
         });
 
-        it('THEN the genre grid should be sorted', () => {
+        it('THEN the genre grid should be sorted alphabetically', () => {
             cy.get('.genre-grid').children().its('length').should('eq', 2);
 
             cy.get('.genre-grid .genre-section').first()
                 .find('.genre-title')
                 .should('have.text', 'art rock, alternative rock');
+        });
+    });
+
+    describe('WHEN I sort reverse alphabetically', () => {
+        beforeEach(() => {
+            cy.get('.sort-dropdown').select('alphabetical-desc');
+        });
+
+        it('THEN the genre grid should be sorted reverse alphabetically', () => {
+            cy.get('.genre-grid').children().its('length').should('eq', 2);
+
+            cy.get('.genre-grid .genre-section').first()
+                .find('.genre-title')
+                .should('have.text', 'slowcore, spoken word');
         });
     });
 });
