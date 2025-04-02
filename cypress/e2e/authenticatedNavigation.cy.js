@@ -58,6 +58,17 @@ describe('GIVEN I am on the homepage', () => {
         });
     });
 
+    describe('WHEN I click the browser refresh button', () => {
+        beforeEach(() => {
+            cy.reload();
+        });
+
+        it('THEN the genre grid is still shown', () => {
+            cy.get('.page-title').should('contain', 'Your album library');
+            cy.get('.refresh-button').should('exist');
+            cy.get('.genre-grid').should('exist');
+        });
+    });
 });
 
 describe('GIVEN I am on the privacy policy page', () => {
@@ -89,6 +100,18 @@ describe('GIVEN I am on the privacy policy page', () => {
             cy.get('.page-title').should('contain', 'Your album library');
             cy.get('.refresh-button').should('exist');
             cy.get('.genre-grid').should('exist');
+        });
+    });
+
+    describe('WHEN I click the browser refresh button', () => {
+        beforeEach(() => {
+            cy.reload();
+        });
+
+        it('THEN the privacy policy is still shown', () => {
+            cy.get('.page-title').should('contain', 'Privacy policy');
+            cy.get('.home-button').should('exist');
+            cy.get('.privacy-policy-container').should('exist');
         });
     });
 });
