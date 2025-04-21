@@ -53,9 +53,13 @@ export const authenticateUser = async () => {
   if (existingCodeVerifier && code) {
     // If a codeVerifier and code exist, proceed with token exchange
     logMessage(`Using existing codeVerifier for token exchange.`);
+    try {
     const token = await exchangeCodeForToken(code, existingCodeVerifier);
     logMessage(`Token: ${token}`);
     setAccessToken(token);
+    } catch(error) {
+      throw error;
+    }
 
     await setCachedEntry('auth', null, 'spotify_code_verifier');
   }
