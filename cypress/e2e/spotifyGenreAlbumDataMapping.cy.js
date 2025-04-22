@@ -44,85 +44,73 @@ describe('GIVEN I authenticate successfully', () => {
     });
 });
 
-describe('GIVEN the token exchange proxy returns an error', () => {
-    beforeEach(() => {
-        Cypress.on('uncaught:exception', () => false);
-        interceptWithError('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', 'authTokenError');
-        cy.resetIndexedDb();
-        cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
-        cy.visit('/genre-album-map?code=valid_token&state=valid_state');
-        cy.wait(["@authTokenError"]);
-    });
-    
-    it('THEN the error message should load', () => {
-        assertErrorMessage();
-    });
-    
-    describe('WHEN I try again unsuccessfully', () => {
+[
+    { 
+        name: 'token exchange proxy', 
+        method: 'POST', 
+        url: 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', 
+        alias: 'authTokenError', 
+        setup: () => interceptWithError('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', 'authTokenError') 
+    },
+    { 
+        name: 'albums', 
+        method: 'GET', 
+        url: 'https://api.spotify.com/v1/me/albums*', 
+        alias: 'albumsError', 
+        setup: () => {
+            cy.intercept('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
+            interceptWithError('GET', 'https://api.spotify.com/v1/me/albums*', 'albumsError') 
+        }
+    },
+    { 
+        name: 'artists', 
+        method: 'GET', 
+        url: 'https://api.spotify.com/v1/artists*', 
+        alias: 'artistsError', 
+        setup: () => {
+            cy.intercept('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
+            cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { fixture: "mockGetMySavedAlbumsResponse.json" }).as('getMySavedAlbums');
+            interceptWithError('GET', 'https://api.spotify.com/v1/artists*', 'artistsError');
+        } 
+    }
+].forEach(({ name, method, url, alias, setup }) => {
+    describe(`GIVEN the Spotify ${name} endpoint returns an error`, () => {
         beforeEach(() => {
-            cy.get('.error-button').click();
-            cy.wait(["@authTokenError"]);
+            Cypress.on('uncaught:exception', () => false);
+            setup();
+            cy.resetIndexedDb();
+            cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
+            cy.visit('/genre-album-map?code=valid_token&state=valid_state');
+            cy.wait([`@${alias}`]);
         });
         
         it('THEN the error message should load', () => {
             assertErrorMessage();
         });
-    });
-    
-    describe('WHEN I try again successfully', () => {
-        beforeEach(() => {
-            interceptSuccessfulAuth();
-            cy.get('.error-button').click();
-            cy.wait(["@authToken", "@getMySavedAlbums", "@getArtists"]);
-        });
-        
-        it('THEN the genre grid should load', () => {
-            cy.get('.page-title').should('contain', 'Your album library');
-            cy.get('.refresh-button').should('exist');
-            cy.get('.genre-grid').should('exist');
-        });
-    });
-});
 
-describe('GIVEN the Spotify API returns an error', () => {
-    beforeEach(() => {
-        Cypress.on('uncaught:exception', () => false);
-        cy.intercept('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
-        interceptWithError('GET', 'https://api.spotify.com/v1/me/albums*', 'albumsError');
-        
-        cy.resetIndexedDb();
-        cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
-        cy.visit('/genre-album-map?code=valid_token&state=valid_state');
-        
-        cy.wait(["@albumsError"]);
-    });
-    
-    it('THEN the error message should load', () => {
-        assertErrorMessage();
-    });
-
-    describe('WHEN I try again unsuccessfully', () => {
-        beforeEach(() => {
-            cy.get('.error-button').click();
-            cy.wait(["@albumsError"]);
+        describe('WHEN I try again unsuccessfully', () => {
+            beforeEach(() => {
+                cy.get('.error-button').click();
+                cy.wait([`@${alias}`]);
+            });
+            
+            it('THEN the error message should load', () => {
+                assertErrorMessage();
+            });
         });
         
-        it('THEN the error message should load', () => {
-            assertErrorMessage();
-        });
-    });
-    
-    describe('WHEN I try again successfully', () => {
-        beforeEach(() => {
-            interceptSuccessfulAuth();
-            cy.get('.error-button').click();
-            cy.wait(["@authToken", "@getMySavedAlbums", "@getArtists"]);
-        });
-        
-        it('THEN the genre grid should load', () => {
-            cy.get('.page-title').should('contain', 'Your album library');
-            cy.get('.refresh-button').should('exist');
-            cy.get('.genre-grid').should('exist');
+        describe('WHEN I try again successfully', () => {
+            beforeEach(() => {
+                interceptSuccessfulAuth();
+                cy.get('.error-button').click();
+                cy.wait(["@authToken", "@getMySavedAlbums", "@getArtists"]);
+            });
+            
+            it('THEN the genre grid should load', () => {
+                cy.get('.page-title').should('contain', 'Your album library');
+                cy.get('.refresh-button').should('exist');
+                cy.get('.genre-grid').should('exist');
+            });
         });
     });
 });
