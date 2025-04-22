@@ -53,7 +53,7 @@ function Root() {
 
   return (
     <React.StrictMode>
-      <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError()}>
+      <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
         <Router>
           <App />
         </Router>
