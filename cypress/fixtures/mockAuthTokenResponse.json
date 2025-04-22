@@ -1,7 +1,5 @@
 {
-  "body": {
-    "access_token": "valid_access_token",
-    "expires_in": 3600,
-    "refresh_token": "valid_refresh_token"
-  }
+  "access_token": "valid_access_token",
+  "expires_in": 3600,
+  "refresh_token": "valid_refresh_token"
 }
