@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useErrorBoundary } from "react-error-boundary";
-import { authenticateUser, clearAccessToken } from './services/spotifyAuth';
+import { ErrorBoundary, useErrorBoundary } from "react-error-boundary";
+import { ErrorFallback, handleError } from './utilities/errorHandling';
+import { clearAccessToken } from './services/spotifyAuth';
 import { getCachedEntry, clearAllData } from './utilities/indexedDb';
 import './App.css';
 import { Amplify } from 'aws-amplify';
@@ -12,7 +13,7 @@ import GenreGridContainer from './containers/genreGridContainer/genreGridContain
 import PrivacyPolicyContainer from './containers/privacyPolicyContainer/privacyPolicyContainer';
 import ModalContainer from './containers/modalContainer/modalContainer';
 import useModal from './hooks/useModal';
-import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { useNavigationHelpers } from './utilities/navigationHelpers';
 import OverlayMenu from './containers/overlayMenu/overlayMenu';
 
@@ -20,62 +21,22 @@ Amplify.configure(awsconfig);
 
 function App() {
   const { showBoundary } = useErrorBoundary()
-  const [tokenExists, setTokenExists] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
   const genreGridRef = useRef();
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
-  const location = useLocation();
-  const navigate = useNavigate();
   const { goTo } = useNavigationHelpers();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-
-
   const initialise = async () => {
     await fetchOrGenerateSessionID();
     logMessage('Environment is: ' + process.env.REACT_APP_ENV);
-  }
+  };
 
   useEffect(() => {
     initialise();
   }, []);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (location.pathname === "/privacy-policy") return;
-      try {
-        const token = await authenticateUser();
-        if (!token) {
-          goTo("/authenticate");
-        } else {
-          await fetchOrUpdateGenreAlbumMap();
-          goTo("/genre-album-map");
-        }
-      } catch (error) {
-        showBoundary(error);
-      }
-    };
-
-    checkAuth();
-  }, [navigate, location.pathname]);
-
-  const fetchOrUpdateGenreAlbumMap = async () => {
-    if (genreGridRef.current) {
-      try {
-        const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
-        if (cachedGenreAlbumMap) {
-          await genreGridRef.current.getCachedGenreAlbumMap();
-        } else {
-          await genreGridRef.current.updateGenreAlbumMap();
-        }
-      } catch (error) {
-        logMessage(`Error updating genre album map: ${error}`);
-        showBoundary(error);
-      }
-    }
-  };
 
   const handleGenreAlbumMapRefresh = async () => {
     if (genreGridRef.current) {
@@ -100,7 +61,6 @@ function App() {
     logMessage('Disconnecting Spotify account...');
     await clearAllData();
     clearAccessToken();
-    setTokenExists(false);
     if (genreGridRef.current) {
       await genreGridRef.current.clearGenreAlbumMap();
     }
@@ -133,7 +93,8 @@ function App() {
   };
 
   return (
-      <div className="App">
+    <div className="App">
+      <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
         <HeaderContainer
           onRefresh={handleGenreAlbumMapRefresh}
           onSearch={handleSearch}
@@ -141,16 +102,22 @@ function App() {
           onOpenDisconnectModal={handleOpenDisconnectModal}
           toggleMenu={toggleMenu}
         />
+      </ErrorBoundary>
 
+      <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
         <Routes>
           <Route path="*" element={<LoginContainer />} />
           <Route path="/authenticate" element={<LoginContainer />} />
           <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
         </Routes>
+      </ErrorBoundary>
 
+      <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
         <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
+      </ErrorBoundary>
 
+      <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
         <ModalContainer
           isOpen={isModalOpen}
           onClose={closeModal}
@@ -161,7 +128,8 @@ function App() {
           button2Text={modalParams.button2Text}
           button2Action={modalParams.button2Action}
         />
-      </div>
+      </ErrorBoundary>
+    </div>
   );
 }
 
