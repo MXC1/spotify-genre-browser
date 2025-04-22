@@ -23,7 +23,10 @@ function Root() {
         <h1 className="error-title">
           Something went wrong. <br />
           This has been reported to the developers.</h1>
-        <p className="error-message">{error.message}</p>
+        <p className="error-message">
+          {error?.message || ''} <br/>
+          {error?.response?.data?.message || ''}
+        </p>
         <button 
           className="error-button" 
           onClick={async () => {
