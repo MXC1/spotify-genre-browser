@@ -1,15 +1,53 @@
-import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
+import { useState, useCallback, useImperativeHandle, forwardRef, useEffect } from "react";
+import { useErrorBoundary } from "react-error-boundary";
 import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDb";
 import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
+import { authenticateUser } from "../../services/spotifyAuth";
 import logMessage from "../../utilities/loggingConfig";
+import { useNavigate } from "react-router-dom";
 import './genreGridContainer.css';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [loadingMessage, setLoadingMessage] = useState('');
   const [groupedAlbums, setGroupedAlbums] = useState({});
+  const { showBoundary } = useErrorBoundary();
+  const navigate = useNavigate();
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   const delayTimeMs = 500;
+
+  useEffect(() => {
+    const checkAuthAndFetchData = async () => {
+      try {
+        const token = await authenticateUser();
+        if (!token) {
+          navigate("/authenticate");
+          return;
+        }
+        await fetchOrUpdateGenreAlbumMap();
+      } catch (error) {
+        showBoundary(error);
+      }
+    };
+
+    checkAuthAndFetchData();
+  }, [navigate]);
+
+  const fetchOrUpdateGenreAlbumMap = async () => {
+    if (genreGridRef.current) {
+      try {
+        const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
+        if (cachedGenreAlbumMap) {
+          await genreGridRef.current.getCachedGenreAlbumMap();
+        } else {
+          await genreGridRef.current.updateGenreAlbumMap();
+        }
+      } catch (error) {
+        logMessage(`Error updating genre album map: ${error}`);
+        showBoundary(error);
+      }
+    }
+  };
 
   const fetchAllSavedAlbums = useCallback(async () => {
     try {
@@ -51,6 +89,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     } catch (error) {
       logMessage(`Error fetching saved albums: ${error}`);
       setLoadingMessage('Error fetching albums.');
+      showBoundary(error);
     }
   }, []);
 
