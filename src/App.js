@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useErrorBoundary } from "react-error-boundary";
 import { authenticateUser, clearAccessToken } from './services/spotifyAuth';
 import { getCachedEntry, clearAllData } from './utilities/indexedDb';
 import './App.css';
@@ -18,6 +19,7 @@ import OverlayMenu from './containers/overlayMenu/overlayMenu';
 Amplify.configure(awsconfig);
 
 function App() {
+  const { showBoundary } = useErrorBoundary()
   const [tokenExists, setTokenExists] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
@@ -28,6 +30,8 @@ function App() {
   const { goTo } = useNavigationHelpers();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+
 
   const initialise = async () => {
     await fetchOrGenerateSessionID();
@@ -41,13 +45,16 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       if (location.pathname === "/privacy-policy") return;
-
-      const token = await authenticateUser();
-      if (!token) {
-        goTo("/authenticate");
-      } else {
-        await fetchOrUpdateGenreAlbumMap();
-        goTo("/genre-album-map");
+      try {
+        const token = await authenticateUser();
+        if (!token) {
+          goTo("/authenticate");
+        } else {
+          await fetchOrUpdateGenreAlbumMap();
+          goTo("/genre-album-map");
+        }
+      } catch (error) {
+        showBoundary(error);
       }
     };
 
@@ -65,6 +72,7 @@ function App() {
         }
       } catch (error) {
         logMessage(`Error updating genre album map: ${error}`);
+        showBoundary(error);
       }
     }
   };
@@ -75,6 +83,7 @@ function App() {
         await genreGridRef.current.updateGenreAlbumMap();
       } catch (error) {
         logMessage(`Error refreshing genre album map: ${error}`);
+        showBoundary(error);
       }
     }
   }
@@ -124,35 +133,35 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <HeaderContainer
-        onRefresh={handleGenreAlbumMapRefresh}
-        onSearch={handleSearch}
-        onSortChange={handleSortChange}
-        onOpenDisconnectModal={handleOpenDisconnectModal}
-        toggleMenu={toggleMenu}
-      />
+      <div className="App">
+        <HeaderContainer
+          onRefresh={handleGenreAlbumMapRefresh}
+          onSearch={handleSearch}
+          onSortChange={handleSortChange}
+          onOpenDisconnectModal={handleOpenDisconnectModal}
+          toggleMenu={toggleMenu}
+        />
 
-      <Routes>
-        <Route path="*" element={<LoginContainer />} />
-        <Route path="/authenticate" element={<LoginContainer />} />
-        <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
-      </Routes>
-      
-      <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
+        <Routes>
+          <Route path="*" element={<LoginContainer />} />
+          <Route path="/authenticate" element={<LoginContainer />} />
+          <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
+        </Routes>
 
-      <ModalContainer
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        title={modalParams.title}
-        description={modalParams.description}
-        button1Text={modalParams.button1Text}
-        button1Action={modalParams.button1Action}
-        button2Text={modalParams.button2Text}
-        button2Action={modalParams.button2Action}
-      />
-    </div>
+        <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
+
+        <ModalContainer
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          title={modalParams.title}
+          description={modalParams.description}
+          button1Text={modalParams.button1Text}
+          button1Action={modalParams.button1Action}
+          button2Text={modalParams.button2Text}
+          button2Action={modalParams.button2Action}
+        />
+      </div>
   );
 }
 

@@ -53,10 +53,14 @@ export const authenticateUser = async () => {
   if (existingCodeVerifier && code) {
     // If a codeVerifier and code exist, proceed with token exchange
     logMessage(`Using existing codeVerifier for token exchange.`);
-    const token = await exchangeCodeForToken(code, existingCodeVerifier);
-    logMessage(`Token: ${token}`);
-    setAccessToken(token);
-
+    try {
+      const token = await exchangeCodeForToken(code, existingCodeVerifier);
+      logMessage(`Token: ${token}`);
+      setAccessToken(token);
+    } catch(error) {
+      throw error;
+    }
+      
     await setCachedEntry('auth', null, 'spotify_code_verifier');
   }
 
@@ -153,9 +157,9 @@ export const exchangeCodeForToken = async (code, codeVerifier) => {
     });
 
     logMessage(`Token response: ${JSON.stringify(response.data)}`);
-    const accessToken = response.data.body.access_token;
-    const refreshToken = response.data.body.refresh_token;
-    const expiresAt = Date.now() + response.data.body.expires_in * 1000;
+    const accessToken = response.data.access_token;
+    const refreshToken = response.data.refresh_token;
+    const expiresAt = Date.now() + response.data.expires_in * 1000;
     await setAccessToken(accessToken);
     await setCachedEntry('auth', refreshToken, 'refresh_token');
     await setCachedEntry('auth', expiresAt, 'expires_at');
@@ -163,7 +167,7 @@ export const exchangeCodeForToken = async (code, codeVerifier) => {
 
   } catch (error) {
     logMessage(`Error exchanging code for token: ${error.response ? JSON.stringify(error.response.data) : error.message}`);
-    throw error; // Optionally rethrow the error to handle it in the calling function
+    throw error; 
   }
 };
 
