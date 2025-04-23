@@ -116,3 +116,14 @@ describe('GIVEN I am on the privacy policy page', () => {
     });
 });
 
+describe('GIVEN my location is empty', () => {
+    beforeEach(() => {
+        cy.visit('/?code=valid_token&state=valid_state');
+    });
+
+    it('THEN the genre grid should be shown', () => {
+        cy.get('.page-title').should('contain', 'Your album library');
+        cy.get('.refresh-button').should('exist');
+        cy.get('.genre-grid').should('exist');
+    });
+});
