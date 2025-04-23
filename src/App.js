@@ -35,7 +35,15 @@ function App() {
   };
 
   useEffect(() => {
-    initialise();
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+
+    if (code && state) {
+      goTo(`/genre-album-map?code=${code}&state=${state}`);
+    } else {
+      initialise();
+    }
   }, []);
 
   const handleGenreAlbumMapRefresh = async () => {
