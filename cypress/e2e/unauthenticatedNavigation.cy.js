@@ -35,6 +35,18 @@ describe('GIVEN I am on the privacy policy page', () => {
     });
 });
 
+describe('GIVEN I am on the about page', () => {
+    beforeEach(() => {
+        cy.visit('/about');
+    });
+
+    it('THEN the about page should be displayed', () => {    
+        cy.get('.page-title').should('contain', 'About');
+        cy.get('.home-button').should('exist');
+        cy.get('.about-container').should('exist');
+    });
+});
+
 const paths = [
     '/',
     '/genre-album-map',

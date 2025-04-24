@@ -19,6 +19,18 @@ describe('GIVEN I am on the homepage', () => {
             cy.get('.privacy-policy-container').should('exist');
         });
     });
+    describe('WHEN I open the hamburger menu about link', () => {
+        beforeEach(() => {
+            cy.get('.menu-button').click();
+            cy.get('.menu-item-button').contains('About').click();
+        });
+
+        it('THEN the about page should be displayed', () => {
+            cy.get('.page-title').should('contain', 'About');
+            cy.get('.home-button').should('exist');
+            cy.get('.about-container').should('exist');
+        });
+    });
 
     describe('WHEN I click outside the hamburger menu', () => {
         beforeEach(() => {
@@ -31,7 +43,6 @@ describe('GIVEN I am on the homepage', () => {
             cy.get('.menu-button').click();
         });
     });
-    
     
     describe('WHEN I click the close menu button', () => {
         beforeEach(() => {
