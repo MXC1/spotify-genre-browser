@@ -7,7 +7,7 @@ import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 
 function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectModal, toggleMenu }) {
     const location = useLocation();
-    const { goTo } = useNavigationHelpers();
+    const { goTo, checkAuthAndNavigate } = useNavigationHelpers();
 
     const handleOpenDisconnectModal = () => {
         onOpenDisconnectModal();
@@ -21,7 +21,7 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
                         <FontAwesomeIcon icon={faBars} />
                     </button>
                     <h1 className="page-title">Privacy policy</h1>
-                    <button className="home-button" onClick={() => goTo("/genre-album-map")}>
+                    <button className="home-button" onClick={() => checkAuthAndNavigate()}>
                         <FontAwesomeIcon icon={faHouse} />
                     </button>
                 </div>
