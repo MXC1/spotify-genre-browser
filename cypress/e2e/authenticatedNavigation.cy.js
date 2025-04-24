@@ -127,3 +127,15 @@ describe('GIVEN my location is empty', () => {
         cy.get('.genre-grid').should('exist');
     });
 });
+
+describe('GIVEN I navigate to /authenticate', () => {
+    beforeEach(() => {
+        cy.visit('/authenticate');
+    });
+
+    it('THEN the genre grid should be shown', () => {
+        cy.get('.page-title').should('contain', 'Your album library');
+        cy.get('.refresh-button').should('exist');
+        cy.get('.genre-grid').should('exist');
+    });
+});
