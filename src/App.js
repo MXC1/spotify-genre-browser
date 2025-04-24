@@ -29,20 +29,15 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  const initialise = async () => {
-    await fetchOrGenerateSessionID();
-    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
-  };
-
   useEffect(() => {
+    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
+
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     const state = params.get('state');
 
     if (code && state) {
       goTo(`/genre-album-map?code=${code}&state=${state}`);
-    } else {
-      initialise();
     }
   }, []);
 
