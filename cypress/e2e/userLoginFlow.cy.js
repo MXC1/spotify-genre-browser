@@ -1,5 +1,4 @@
 import '../support/commands.js';
-import { setupConsoleLogSpy } from '../support/commands.js';
 
 describe('GIVEN I visit the app', () => {
 
