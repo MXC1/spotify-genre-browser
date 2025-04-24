@@ -1,8 +1,8 @@
 ## Environment URLs
 
-[Spotify Genre Browser (main)](https://main.dgutam4ouh3e7.amplifyapp.com/)
+[Genre Browser for Spotify (main)](https://main.dgutam4ouh3e7.amplifyapp.com/)
 
-[Spotify Genre Browser (staging)](https://staging.dgutam4ouh3e7.amplifyapp.com/)
+[Genre Browser for Spotify (staging)](https://staging.dgutam4ouh3e7.amplifyapp.com/)
 
 
 ## Cypress Testing

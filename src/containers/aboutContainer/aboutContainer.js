@@ -1,9 +1,9 @@
 const AboutContainer = () => {
     return (
         <div className="about-container">
-            <h1>About Spotify Genre Browser</h1>
+            <h1>About Genre Browser for Spotify</h1>
             <p>
-                Spotify Genre Browser is a web application that helps you explore your saved albums on Spotify by grouping them into genres. 
+                Genre Browser for Spotify is a web application that helps you explore your saved albums on Spotify by grouping them into genres. 
                 It provides an intuitive interface to navigate through your music library and discover patterns in your listening habits.
             </p>
             <h2>Features</h2>
