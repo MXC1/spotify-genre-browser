@@ -21,7 +21,7 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
                         <FontAwesomeIcon icon={faBars} />
                     </button>
                     <h1 className="page-title">Privacy policy</h1>
-                    <button className="home-button" onClick={() => checkAuthAndNavigate()}>
+                    <button className="home-button" onClick={async () => await checkAuthAndNavigate()}>
                         <FontAwesomeIcon icon={faHouse} />
                     </button>
                 </div>

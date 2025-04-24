@@ -14,10 +14,14 @@ function LoginContainer() {
   }, []);
 
   useEffect(() => {
-    const token = getCachedEntry('auth', 'access_token');
-    if (token) {
-      goTo('/genre-album-map');
+    async function checkAuthAndRedirect() {
+      const token = await getCachedEntry('auth', 'access_token');
+      if (token) {
+        goTo('/genre-album-map');
+      }
     }
+
+    checkAuthAndRedirect();
   }, []);
 
   return (

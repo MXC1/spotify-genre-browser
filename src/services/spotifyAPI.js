@@ -1,9 +1,9 @@
-import { getAccessToken } from './spotifyAuth';
+import { getOrGenerateNewAccessToken } from './spotifyAuth';
 import axios from 'axios';
 import { logMessage } from '../utilities/loggingConfig';
 
 export const getMySavedAlbums = async (limit, offset) => {
-    const token = await getAccessToken();
+    const token = await getOrGenerateNewAccessToken();
     if (!token) {
       throw new Error('Access token not found.');
     }
@@ -26,7 +26,7 @@ export const getMySavedAlbums = async (limit, offset) => {
   };
   
   export const getArtists = async (ids) => {
-    const token = await getAccessToken();
+    const token = await getOrGenerateNewAccessToken();
     if (!token) {
       throw new Error('Access token not found.');
     }
