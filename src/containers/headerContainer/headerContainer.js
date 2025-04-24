@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './headerContainer.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSyncAlt, faBars, faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faSyncAlt, faBars, faHouse, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from "react-router-dom";
 import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 
@@ -53,6 +53,36 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
                         <option value="number-asc">Size (Asc)</option>
                         <option value="number-desc">Size (Desc)</option>
                     </select>
+                </div>
+            </div>
+        );
+    }
+    else if (location.pathname === '/about') {
+        return (
+            <div className="header-container">
+                <div className="title-container">
+                    <button className="menu-button" onClick={toggleMenu}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <h1 className="page-title">About</h1>
+                    <button className="home-button" onClick={() => checkAuthAndNavigate()}>
+                        <FontAwesomeIcon icon={faHouse} />
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    else if (location.pathname) {
+        return (
+            <div className="header-container">
+                <div className="title-container">
+                    <button className="menu-button" onClick={toggleMenu}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <h1 className="page-title">Authentication</h1>
+                    <button className="refresh-button" onClick={() => goTo("/about")}>
+                        <FontAwesomeIcon icon={faCircleInfo} />
+                    </button>
                 </div>
             </div>
         );
