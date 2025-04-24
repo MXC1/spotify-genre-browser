@@ -39,7 +39,9 @@ const logToCloudWatch = (message) => {
   });
 };
 
-export const logMessage = (message) => {
+export const logMessage = async (message) => {
+  if (!sessionID) await fetchOrGenerateSessionID();
+  
   message = `${message} - SessionID: ${sessionID}`;
   console.log(message);
   if (process.env.REACT_APP_ENV === 'prod') {

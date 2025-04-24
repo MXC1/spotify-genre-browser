@@ -13,11 +13,11 @@ describe('GIVEN I visit the app', () => {
     });
   })
 
-  it.skip('THEN the login container should load', () => {
+  it('THEN the login container should load', () => {
     cy.contains('Login with Spotify');
   });
 
-  it.skip('AND it sets auth url', () => {
+  it('AND it sets auth url', () => {
     cy.window().should('have.property', 'redirectToSpotifyAuth')
 
     cy.window().then(win => {

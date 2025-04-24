@@ -29,13 +29,8 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  const initialise = async () => {
-    await fetchOrGenerateSessionID();
-    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
-  };
-
   useEffect(() => {
-    initialise();
+    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
