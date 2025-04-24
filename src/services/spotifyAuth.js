@@ -25,9 +25,18 @@ export const getAccessToken = async () => {
     return newAccessToken;
   }
 
-  await setAuthUrl();
   return null;
 };
+
+export const getOrGenerateNewAccessToken = async () => {
+  const accessToken = await getAccessToken();
+
+  if (!accessToken) {
+    await setAuthUrl();
+  }
+
+  return accessToken;
+}
 
 export const setAuthUrl = async () => {
   logMessage(`Redirecting to authorization URL...`);

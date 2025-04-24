@@ -27,6 +27,11 @@ const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayPri
                         </button>
                     </li>
                     <li className="menu-item">
+                        <button className="menu-item-button" onClick={() => handleNavigation("/about")}>
+                            About
+                        </button>
+                    </li>
+                    <li className="menu-item">
                         <button className="menu-item-button" onClick={() => handleNavigation("/privacy-policy")}>
                             Privacy Policy
                         </button>

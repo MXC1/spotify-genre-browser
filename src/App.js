@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ErrorBoundary, useErrorBoundary } from "react-error-boundary";
 import { ErrorFallback, handleError } from './utilities/errorHandling';
 import { clearAccessToken } from './services/spotifyAuth';
-import { getCachedEntry, clearAllData } from './utilities/indexedDb';
+import { clearAllData } from './utilities/indexedDb';
 import './App.css';
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
@@ -11,6 +11,7 @@ import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
 import PrivacyPolicyContainer from './containers/privacyPolicyContainer/privacyPolicyContainer';
+import AboutContainer from './containers/aboutContainer/aboutContainer';
 import ModalContainer from './containers/modalContainer/modalContainer';
 import useModal from './hooks/useModal';
 import { Route, Routes } from "react-router-dom";
@@ -113,6 +114,7 @@ function App() {
           <Route path="/authenticate" element={<LoginContainer />} />
           <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
+          <Route path="/about" element={<AboutContainer />} />
         </Routes>
       </ErrorBoundary>
 
