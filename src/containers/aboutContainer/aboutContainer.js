@@ -1,5 +1,3 @@
-import './aboutContainer.css';
-
 const AboutContainer = () => {
     return (
         <div className="about-container">
