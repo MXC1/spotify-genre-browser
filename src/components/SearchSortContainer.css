@@ -1,8 +1,6 @@
 .search-sort-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 5px;
-  margin: 0px -5px 15px -5px;
+  align-self: center;
+  margin: 0px auto 15px auto; 
 }
 
 .search-bar {

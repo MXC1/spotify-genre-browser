@@ -136,10 +136,13 @@
 }
 
 .search-sort-container {
+  width: 100%;
+  max-width: 650px;
+  align-self: center;
   display: flex;
   justify-content: space-between;
   gap: 5px;
-  margin: 0px -5px 15px -5px;
+  margin: 0 auto 15px auto; 
 }
 
 .search-bar {
