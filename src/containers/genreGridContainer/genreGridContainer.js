@@ -162,12 +162,34 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         });
       });
 
-      await delay(delayTimeMs); // Avoid hitting rate limits
+      await delay(delayTimeMs); 
     }
+
+    // Combine genres with identical albums
+    const combinedGenreAlbumMap = new Map();
+
+    Object.entries(genreAlbumMap).forEach(([genre, albums]) => {
+      const albumIds = albums.map(album => album.id).sort().join(',');
+      if (combinedGenreAlbumMap.has(albumIds)) {
+        combinedGenreAlbumMap.set(
+          albumIds,
+          `${combinedGenreAlbumMap.get(albumIds)}, ${genre}`
+        );
+      } else {
+        combinedGenreAlbumMap.set(albumIds, genre);
+      }
+    });
+
+    const finalGenreAlbumMap = {};
+    combinedGenreAlbumMap.forEach((genres, albumIds) => {
+      finalGenreAlbumMap[genres] = Object.values(genreAlbumMap).find(
+        albums => albums.map(album => album.id).sort().join(',') === albumIds
+      );
+    });
 
     setLoadingMessage('');
     logMessage('Finished grouping albums by artist genre.');
-    return genreAlbumMap;
+    return finalGenreAlbumMap;
   }, []);
 
   // Allow these methods to be called from the parent element
