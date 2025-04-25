@@ -30,7 +30,7 @@
   background-color: transparent; 
   box-shadow: none; 
   transition: transform 0.2s ease, box-shadow 0.2s ease; 
-  margin: 0 auto; /* Center the album item horizontally */
+  margin: 0 auto; 
 }
 
 .album-item:hover {
@@ -41,7 +41,7 @@
 .album-link {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center the content of the album link horizontally */
+  align-items: center; 
   text-decoration: none;
   color: inherit;
   height: 100%;
