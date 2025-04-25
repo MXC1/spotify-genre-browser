@@ -25,6 +25,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     const url = new URL(window.location.href);
     if (url.pathname === '/genre-album-map') {
       setSelectedGenre(null);
+      setSortOption('number-desc'); 
+      setSearchQuery(''); 
     }
   }, [navigate]);
 
@@ -235,23 +237,20 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
   const handleBackToGrid = () => {
     setSelectedGenre(null);
+    setSortOption('number-desc');
+    setSearchQuery('');
     navigate('/genre-album-map');
   };
 
+  const sortOptions = [
+    { value: "alphabetical-asc", label: "A-Z (Genre)" },
+    { value: "alphabetical-desc", label: "Z-A (Genre)" },
+    { value: "number-asc", label: "Size (Asc)" },
+    { value: "number-desc", label: "Size (Desc)" },
+  ];
+
   return (
     <div>
-      <SearchSortContainer
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        sortOption={sortOption}
-        setSortOption={setSortOption}
-        disableSizeOptions={selectedGenre !== null}
-        placeholderText={
-          selectedGenre
-            ? "Search albums and artists..."
-            : "Search genres, albums, and artists..."
-        }
-      />
       {loadingMessage ? (
         <p className="loading-message">{loadingMessage}</p>
       ) : selectedGenre ? (
@@ -263,16 +262,29 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
           sortOption={sortOption}
         />
       ) : (
-        <div className="genre-grid">
-          {sortedGenres.map(([genre, albums], index) => (
-            <GenreCard
-              key={genre}
-              genre={genre}
-              albums={albums}
-              index={index}
-              onClick={() => handleGenreClick(genre, albums)}
-            />
-          ))}
+        <div>
+          <SearchSortContainer
+            onSearchQueryChange={setSearchQuery}
+            onSortOptionChange={setSortOption}
+            selectedSortOption={sortOption}
+            placeholderText={
+              selectedGenre
+                ? "Search albums and artists..."
+                : "Search genres, albums, and artists..."
+            }
+            sortOptions={selectedGenre ? sortOptions.slice(0, 2) : sortOptions}
+          />
+          <div className="genre-grid">
+            {sortedGenres.map(([genre, albums], index) => (
+              <GenreCard
+                key={genre}
+                genre={genre}
+                albums={albums}
+                index={index}
+                onClick={() => handleGenreClick(genre, albums)}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
