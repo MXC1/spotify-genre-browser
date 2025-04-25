@@ -7,7 +7,7 @@
   font-size: 28px; 
   font-weight: bold;
   margin: 0px;
-  padding: 8px 0px;
+  padding: 8px 40px; 
   text-align: center;
 }
 
@@ -85,4 +85,27 @@
   -webkit-box-orient: vertical;
   align-items: center;
   justify-content: center;
+}
+
+.big-genre-title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  text-decoration: underline;
+  display: flex;
+  align-items: center;
+}
+
+.back-button:hover {
+  text-decoration: none;
 }

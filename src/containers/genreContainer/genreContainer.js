@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import SearchSortContainer from "../../components/SearchSortContainer";
 import "./genreContainer.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 function GenreContainer({ genre, albums, onBack }) {
     const [searchQuery, setSearchQuery] = useState("");
@@ -43,7 +45,12 @@ function GenreContainer({ genre, albums, onBack }) {
                 placeholderText="Search albums or artists..."
                 sortOptions={sortOptions}
             />
-            <h1 className="big-genre-title" onClick={onBack}>{genre}</h1>
+            <div className="big-genre-title-container" onClick={onBack}>
+                <button className="back-button">
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+                <h1 className="big-genre-title">{genre}</h1>
+            </div>
             <hr className="horizontal-line" onClick={onBack} />
             <div className="album-grid">
                 {sortedAlbums.map((album) => (
