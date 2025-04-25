@@ -14,13 +14,15 @@
 
 .album-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
-  gap: 0px 10px; 
-  justify-content: center;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  max-width: calc(120px * 8);
+  margin: 0 auto; 
+  justify-content: center; 
+  gap: 15px; 
 }
 
 .album-item {
-  width: 120px; 
+  width: 110px; 
   height: 205px;
   max-height: 205px;
   padding: 3px 6px; 
@@ -28,6 +30,7 @@
   background-color: transparent; 
   box-shadow: none; 
   transition: transform 0.2s ease, box-shadow 0.2s ease; 
+  margin: 0 auto; /* Center the album item horizontally */
 }
 
 .album-item:hover {
@@ -38,7 +41,7 @@
 .album-link {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; 
+  align-items: center; /* Center the content of the album link horizontally */
   text-decoration: none;
   color: inherit;
   height: 100%;
