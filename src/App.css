@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Helvetica Neue';
+  font-family: sans-serif, 'Helvetica Neue', 'Helvetica', 'Arial';
   background-color: #121212;
   color: #ffffff;
 }
@@ -17,7 +17,7 @@ body {
   height: 40vh; 
 }
 
-/* Login Button Styles */
+
 .login-button {
   display: inline-block;
   padding: 12px 24px;
@@ -45,11 +45,11 @@ body {
 
 .title-container {
   display: flex;
-  /* align-items: center; */
+  
   justify-content: space-between; 
 }
 
-.refresh-button, .home-button {
+.refresh-button, .home-button, .back-button {
   background: none;
   border: none;
   cursor: pointer;

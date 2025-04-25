@@ -4,7 +4,7 @@
   justify-content: center;
   gap: 10px;
   padding: 0 5px;
-  max-width: calc(150px * 9);
+  max-width: calc(150px * 8);
   margin: 0 auto; 
 }
 
@@ -114,26 +114,6 @@
   display: flex;
 }
 
-.album-name {
-  font-style: italic;
-  color: #1db954;
-}
-
-.album-artist, .album-name {
-  max-height: 2.6em; 
-  line-height: 1.2em; 
-  font-size: 15px;
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-word;
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
 
 .search-sort-container {
   width: 100%;
