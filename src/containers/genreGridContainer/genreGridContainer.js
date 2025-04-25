@@ -1,4 +1,4 @@
-import { useState, useCallback, useImperativeHandle, forwardRef, useEffect } from "react";
+import React, { useState, useCallback, useImperativeHandle, forwardRef, useEffect } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDb";
 import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
   const [loadingMessage, setLoadingMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState('number-desc');
   const { showBoundary } = useErrorBoundary();
   const [selectedGenre, setSelectedGenre] = useState(null);
   const navigate = useNavigate();
@@ -190,22 +192,30 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     }
   }))
 
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value.toLowerCase());
+  };
+
+  const handleSortChange = (event) => {
+    setSortOption(event.target.value);
+  };
+
   const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
-    genre.toLowerCase().includes(props.searchQuery) ||
+    genre.toLowerCase().includes(searchQuery) ||
     albums.some(album =>
-      album.name.toLowerCase().includes(props.searchQuery) ||
-      album.artists.some(artist => artist.name.toLowerCase().includes(props.searchQuery))
+      album.name.toLowerCase().includes(searchQuery) ||
+      album.artists.some(artist => artist.name.toLowerCase().includes(searchQuery))
     )
   );
 
   const sortedGenres = filteredGenres.sort((a, b) => {
-    if (props.sortOption === 'alphabetical-asc') {
+    if (sortOption === 'alphabetical-asc') {
       return a[0].localeCompare(b[0]);
-    } else if (props.sortOption === 'alphabetical-desc') {
+    } else if (sortOption === 'alphabetical-desc') {
       return b[0].localeCompare(a[0]);
-    } else if (props.sortOption === 'number-asc') {
+    } else if (sortOption === 'number-asc') {
       return a[1].length - b[1].length;
-    } else if (props.sortOption === 'number-desc') {
+    } else if (sortOption === 'number-desc') {
       return b[1].length - a[1].length;
     }
     return 0;
@@ -237,17 +247,33 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
           onBack={handleBackToGrid}
         />
       ) : (
-        <div className="genre-grid">
-          {sortedGenres.map(([genre, albums], index) => (
-            <GenreCard
-              key={genre}
-              genre={genre}
-              albums={albums}
-              index={index}
-              onClick={() => handleGenreClick(genre, albums)}
+        <>
+          <div className="search-sort-container">
+            <input
+              type="text"
+              placeholder="Search genres, albums, and artists..."
+              onChange={handleSearch}
+              className="search-bar"
             />
-          ))}
-        </div>
+            <select onChange={handleSortChange} className="sort-dropdown" defaultValue="number-desc">
+              <option value="alphabetical-asc">(A-Z)</option>
+              <option value="alphabetical-desc">(Z-A)</option>
+              <option value="number-asc">Size (Asc)</option>
+              <option value="number-desc">Size (Desc)</option>
+            </select>
+          </div>
+          <div className="genre-grid">
+            {sortedGenres.map(([genre, albums], index) => (
+              <GenreCard
+                key={genre}
+                genre={genre}
+                albums={albums}
+                index={index}
+                onClick={() => handleGenreClick(genre, albums)}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

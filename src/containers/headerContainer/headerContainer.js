@@ -5,7 +5,7 @@ import { faSyncAlt, faBars, faHouse, faCircleInfo } from '@fortawesome/free-soli
 import { useLocation } from "react-router-dom";
 import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 
-function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectModal, toggleMenu }) {
+function HeaderContainer({ onRefresh, onOpenDisconnectModal, toggleMenu }) {
     const location = useLocation();
     const { goTo, checkAuthAndNavigate } = useNavigationHelpers();
 
@@ -40,20 +40,6 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
                         <FontAwesomeIcon icon={faSyncAlt} />
                     </button>
                 </div>
-                <div className="search-sort-container">
-                    <input
-                        type="text"
-                        placeholder="Search genres, albums, and artists..."
-                        onChange={onSearch}
-                        className="search-bar"
-                    />
-                    <select onChange={onSortChange} className="sort-dropdown" defaultValue="number-desc">
-                        <option value="alphabetical-asc">(A-Z)</option>
-                        <option value="alphabetical-desc">(Z-A)</option>
-                        <option value="number-asc">Size (Asc)</option>
-                        <option value="number-desc">Size (Desc)</option>
-                    </select>
-                </div>
             </div>
         );
     }
@@ -68,20 +54,6 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
                     <button className="home-button" onClick={async () => await checkAuthAndNavigate()}>
                         <FontAwesomeIcon icon={faHouse} />
                     </button>
-                </div>
-                <div className="search-sort-container">
-                    <input
-                        type="text"
-                        placeholder="Search albums and artists..."
-                        onChange={onSearch}
-                        className="search-bar"
-                    />
-                    <select onChange={onSortChange} className="sort-dropdown" defaultValue="number-desc">
-                        <option value="alphabetical-asc">(A-Z)</option>
-                        <option value="alphabetical-desc">(Z-A)</option>
-                        <option value="number-asc">Size (Asc)</option>
-                        <option value="number-desc">Size (Desc)</option>
-                    </select>
                 </div>
             </div>
         );

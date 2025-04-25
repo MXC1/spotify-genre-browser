@@ -22,8 +22,6 @@ Amplify.configure(awsconfig);
 
 function App() {
   const { showBoundary } = useErrorBoundary()
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortOption, setSortOption] = useState('number-desc');
   const genreGridRef = useRef();
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
   const { goTo } = useNavigationHelpers();
@@ -52,14 +50,6 @@ function App() {
       }
     }
   }
-
-  const handleSearch = (event) => {
-    setSearchQuery(event.target.value.toLowerCase());
-  };
-
-  const handleSortChange = (event) => {
-    setSortOption(event.target.value);
-  };
 
   const handleDisconnect = async () => {
     logMessage('Disconnecting Spotify account...');
@@ -101,8 +91,6 @@ function App() {
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
         <HeaderContainer
           onRefresh={handleGenreAlbumMapRefresh}
-          onSearch={handleSearch}
-          onSortChange={handleSortChange}
           onOpenDisconnectModal={handleOpenDisconnectModal}
           toggleMenu={toggleMenu}
         />
@@ -112,8 +100,8 @@ function App() {
         <Routes>
           <Route path="*" element={<LoginContainer />} />
           <Route path="/authenticate" element={<LoginContainer />} />
-          <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
-          <Route path="/genre" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
+          <Route path="/genre-album-map" element={<GenreGridContainer ref={genreGridRef} />} />
+          <Route path="/genre" element={<GenreGridContainer ref={genreGridRef} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
           <Route path="/about" element={<AboutContainer />} />
         </Routes>
