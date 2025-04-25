@@ -8,8 +8,8 @@ import { useNavigate } from "react-router-dom";
 import './genreGridContainer.css';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
-  const [loadingMessage, setLoadingMessage] = useState('');
   const [groupedAlbums, setGroupedAlbums] = useState({});
+  const [loadingMessage, setLoadingMessage] = useState('');
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
 
@@ -17,35 +17,49 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const delayTimeMs = 500;
 
   useEffect(() => {
-    const checkAuthAndFetchData = async () => {
-      try {
-        const token = await authenticateUser();
-        if (!token) {
-          navigate("/authenticate");
-          return;
+    const initializeData = async () => {
+        try {
+          if (Object.keys(groupedAlbums).length > 0) {
+            logMessage(`Using cached genre album map: ${JSON.stringify(groupedAlbums)}`);
+            return;
+          }
+            const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
+            if (cachedGenreAlbumMap) {
+                logMessage('Using cached genre album map.');
+                setGroupedAlbums(cachedGenreAlbumMap);
+            } else {
+                logMessage('No cached data found. Fetching from scratch...');
+                await fetchOrUpdateGenreAlbumMap();
+            }
+        } catch (error) {
+            logMessage(`Error initializing data: ${error}`);
+            showBoundary(error);
         }
-        await fetchOrUpdateGenreAlbumMap();
-      } catch (error) {
-        showBoundary(error);
-      }
     };
 
-    checkAuthAndFetchData();
-  }, [navigate]);
+    initializeData();
+}, []);
 
   const fetchOrUpdateGenreAlbumMap = async () => {
-    if (genreGridRef.current) {
-      try {
-        const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
-        if (cachedGenreAlbumMap) {
-          await genreGridRef.current.getCachedGenreAlbumMap();
-        } else {
-          await genreGridRef.current.updateGenreAlbumMap();
-        }
-      } catch (error) {
-        logMessage(`Error updating genre album map: ${error}`);
-        showBoundary(error);
+    try {
+      const token = await authenticateUser();
+      if (!token) {
+        navigate("/authenticate");
+        return;
       }
+
+      const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
+      if (cachedGenreAlbumMap) {
+        setGroupedAlbums(cachedGenreAlbumMap);
+      } else {
+        const allAlbums = await fetchAllSavedAlbums();
+        const grouped = await groupAlbumsByArtistGenre(allAlbums);
+        setGroupedAlbums(grouped);
+        await setCachedEntry('data', grouped, 'grouped_albums');
+      }
+    } catch (error) {
+      logMessage(`Error updating genre album map: ${error}`);
+      showBoundary(error);
     }
   };
 
@@ -82,7 +96,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         allAlbums = [...allAlbums, ...albums];
         allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
       }
-
+      
       logMessage(`Finished fetching album IDs: ${JSON.stringify(allAlbumIds)}`);
 
       return allAlbums;
@@ -92,7 +106,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       showBoundary(error);
     }
   }, []);
-
+  
   async function getSavedAlbumsWithRetries(limit, offset) {
     let response;
 
@@ -108,73 +122,45 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
     return [response.items.map(item => item.album), response.total];
   }
-
+  
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
     if (!albums || albums.length === 0) {
       logMessage('No albums to group');
-      return;
+      return {};
     }
+
     const genreAlbumMap = {};
-    const artistIds = albums.map(album => album.artists[0].id);
-    const uniqueArtistIds = [...new Set(artistIds)];
+    const artistIds = [...new Set(albums.map(album => album.artists[0].id))];
 
-    logAndSetLoadingMessage('Grouping albums by artist genre...')
+    logAndSetLoadingMessage('Grouping albums by artist genre...');
 
-    for (let i = 0; i < uniqueArtistIds.length; i += 50) {
-      logAndSetLoadingMessage(`Requesting artist details (${i} / ${uniqueArtistIds.length})`)
-
-      const batch = uniqueArtistIds.slice(i, i + 50);
+    for (let i = 0; i < artistIds.length; i += 50) {
+      const batch = artistIds.slice(i, i + 50);
       const artists = await getArtists(batch);
 
       artists.artists.forEach(artist => {
-        const genres = artist.genres;
-        if (genres.length === 0) {
-          // If no genres are associated, add to 'Unknown Genre' category
-          if (!genreAlbumMap['[Unknown Genre]']) {
-            genreAlbumMap['[Unknown Genre]'] = [];
+        const genres = artist.genres.length > 0 ? artist.genres : ['[Unknown Genre]'];
+        genres.forEach(genre => {
+          if (!genreAlbumMap[genre]) {
+            genreAlbumMap[genre] = [];
           }
-          genreAlbumMap['[Unknown Genre]'].push(...albums.filter(album => album.artists[0].id === artist.id));
-        } else {
-          genres.forEach(genre => {
-            if (!genreAlbumMap[genre]) {
-              genreAlbumMap[genre] = [];
-            }
-            genreAlbumMap[genre].push(...albums.filter(album => album.artists[0].id === artist.id));
-          });
-        }
+          genreAlbumMap[genre].push(...albums.filter(album => album.artists[0].id === artist.id));
+        });
       });
 
-      // Add a delay to avoid hitting the rate limit
-      await delay(delayTimeMs);
+      await delay(delayTimeMs); // Avoid hitting rate limits
     }
 
-    const combinedGenres = {};
-
-    Object.keys(genreAlbumMap).forEach((genre) => {
-      const albums = genreAlbumMap[genre];
-      const key = JSON.stringify(albums.map(album => album.id).sort());
-
-      if (!combinedGenres[key]) {
-        combinedGenres[key] = { genres: [], albums: albums };
-      }
-      combinedGenres[key].genres.push(genre);
-    });
-
-    const grouped = {};
-    Object.values(combinedGenres).forEach(({ genres, albums }) => {
-      const genreKey = genres.join(', ');
-      grouped[genreKey] = albums;
-    });
-
-    setGroupedAlbums(grouped);
-    setLoadingMessage('');
-
-    logMessage(`Finished grouping albums by artist genre`);
-    return (grouped);
+    logMessage('Finished grouping albums by artist genre.');
+    return genreAlbumMap;
   }, []);
 
   // Allow these methods to be called from the parent element
   useImperativeHandle(genreGridRef, () => ({
+    getGroupedAlbums: () => {
+      return groupedAlbums;
+    },
+
     updateGenreAlbumMap: async () => {
       logMessage(`Updating genre album map from scratch...`);
       const allAlbums = await fetchAllSavedAlbums();
@@ -238,13 +224,14 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
 function GenreCard({ genre, albums, index }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const navigate = useNavigate();
 
   const handleClick = () => {
-    setIsCollapsed(!isCollapsed);
+    navigate(`/genre?g=${encodeURIComponent(genre)}`, { state: { genre, albums } });
   };
 
   return (
-      <div className={`genre-section ${isCollapsed ? 'collapsed' : 'expanded'}`} onClick={handleClick} >
+      <div className={`genre-section ${isCollapsed ? 'collapsed' : 'expanded'}`} onClick={handleClick}>
         <h2 className="genre-title">
           {genre}
         </h2>
