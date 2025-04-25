@@ -7,6 +7,7 @@ import logMessage from "../../utilities/loggingConfig";
 import './genreGridContainer.css';
 import GenreContainer from '../genreContainer/genreContainer';
 import { useNavigate } from "react-router-dom";
+import SearchSortContainer from '../../components/SearchSortContainer';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
@@ -31,7 +32,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     const initializeData = async () => {
       try {
         if (Object.keys(groupedAlbums).length > 0) {
-          logMessage(`Using cached genre album map: ${JSON.stringify(groupedAlbums)}`);
+          logMessage(`Using cached genre album map`);
           return;
         }
         const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
@@ -227,6 +228,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   }
 
   const handleGenreClick = (genre, albums) => {
+    setSortOption('alphabetical-asc');
     setSelectedGenre({ genre, albums });
     navigate(`/genre?g=${encodeURIComponent(genre)}`);
   };
@@ -238,6 +240,18 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
   return (
     <div>
+      <SearchSortContainer
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        sortOption={sortOption}
+        setSortOption={setSortOption}
+        disableSizeOptions={selectedGenre !== null}
+        placeholderText={
+          selectedGenre
+            ? "Search albums and artists..."
+            : "Search genres, albums, and artists..."
+        }
+      />
       {loadingMessage ? (
         <p className="loading-message">{loadingMessage}</p>
       ) : selectedGenre ? (
@@ -245,35 +259,21 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
           genre={selectedGenre.genre}
           albums={selectedGenre.albums}
           onBack={handleBackToGrid}
+          searchQuery={searchQuery}
+          sortOption={sortOption}
         />
       ) : (
-        <>
-          <div className="search-sort-container">
-            <input
-              type="text"
-              placeholder="Search genres, albums, and artists..."
-              onChange={handleSearch}
-              className="search-bar"
+        <div className="genre-grid">
+          {sortedGenres.map(([genre, albums], index) => (
+            <GenreCard
+              key={genre}
+              genre={genre}
+              albums={albums}
+              index={index}
+              onClick={() => handleGenreClick(genre, albums)}
             />
-            <select onChange={handleSortChange} className="sort-dropdown" defaultValue="number-desc">
-              <option value="alphabetical-asc">(A-Z)</option>
-              <option value="alphabetical-desc">(Z-A)</option>
-              <option value="number-asc">Size (Asc)</option>
-              <option value="number-desc">Size (Desc)</option>
-            </select>
-          </div>
-          <div className="genre-grid">
-            {sortedGenres.map(([genre, albums], index) => (
-              <GenreCard
-                key={genre}
-                genre={genre}
-                albums={albums}
-                index={index}
-                onClick={() => handleGenreClick(genre, albums)}
-              />
-            ))}
-          </div>
-        </>
+          ))}
+        </div>
       )}
     </div>
   );
