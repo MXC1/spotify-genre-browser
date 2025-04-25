@@ -35,7 +35,7 @@ function GenreContainer({ genre, albums, onBack }) {
     });
 
     return (
-        <div>
+        <div className="genre-container">
             <SearchSortContainer
                 onSearchQueryChange={setSearchQuery}
                 onSortOptionChange={setSortOption}
