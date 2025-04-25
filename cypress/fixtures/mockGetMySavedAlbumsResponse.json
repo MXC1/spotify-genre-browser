@@ -3,19 +3,19 @@
     {
       "album": {
         "external_urls": {
-          "spotify": "https://open.spotify.com/album/5jMbGYYNDo0lTyUnKtcm8J"
+          "spotify": "https://open.spotify.com/album/test-album-1"
         },
-        "id": "5jMbGYYNDo0lTyUnKtcm8J",
+        "id": "test-album-1",
         "images": [
           {
-            "url": "https://i.scdn.co/image/ab67616d0000b273c9ac1ea80b4c74c09733bcd3"
+            "url": "https://i.scdn.co/image/test-album-1"
           }
         ],
-        "name": "As Days Get Dark",
+        "name": "Test Album One",
         "artists": [
           {
-            "id": "6g8Jqb5JMfv92eB2r0awTN",
-            "name": "Arab Strap"
+            "id": "test-artist-1",
+            "name": "Test Artist One"
           }
         ]
       }
@@ -23,23 +23,43 @@
     {
       "album": {
         "external_urls": {
-          "spotify": "https://open.spotify.com/album/35UJLpClj5EDrhpNIi4DFg"
+          "spotify": "https://open.spotify.com/album/test-album-2"
         },
-        "id": "35UJLpClj5EDrhpNIi4DFg",
+        "id": "test-album-2",
         "images": [
           {
-            "url": "https://i.scdn.co/image/ab67616d0000b2739293c743fa542094336c5e12"
+            "url": "https://i.scdn.co/image/test-album-2"
           }
         ],
-        "name": "The Bends",
+        "name": "Test Album Two",
         "artists": [
           {
-            "id": "4Z8W4fKeB5YxbusRsdQVPb",
-            "name": "Radiohead"
+            "id": "test-artist-2",
+            "name": "Test Artist Two"
+          }
+        ]
+      }
+    },
+    {
+      "album": {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/test-album-3"
+        },
+        "id": "test-album-3",
+        "images": [
+          {
+            "url": "https://i.scdn.co/image/test-album-3"
+          }
+        ],
+        "name": "Test Album Three",
+        "artists": [
+          {
+            "id": "test-artist-3",
+            "name": "Test Artist Three"
           }
         ]
       }
     }
   ],
-  "total": 2
+  "total": 3
 }

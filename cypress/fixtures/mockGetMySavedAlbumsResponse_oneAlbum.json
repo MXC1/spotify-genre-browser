@@ -3,19 +3,19 @@
     {
       "album": {
         "external_urls": {
-          "spotify": "https://open.spotify.com/album/5jMbGYYNDo0lTyUnKtcm8J"
+          "spotify": "https://open.spotify.com/album/test-album-1"
         },
-        "id": "5jMbGYYNDo0lTyUnKtcm8J",
+        "id": "test-album-1",
         "images": [
           {
-            "url": "https://i.scdn.co/image/ab67616d0000b273c9ac1ea80b4c74c09733bcd3"
+            "url": "https://i.scdn.co/image/test-album-1"
           }
         ],
-        "name": "As Days Get Dark",
+        "name": "Test Album One",
         "artists": [
           {
-            "id": "6g8Jqb5JMfv92eB2r0awTN",
-            "name": "Arab Strap"
+            "id": "test-artist-two",
+            "name": "Test Artist Two"
           }
         ]
       }
