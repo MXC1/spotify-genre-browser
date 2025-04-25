@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Helvetica Neue';
+  font-family: sans-serif, 'Helvetica Neue', 'Helvetica', 'Arial';
   background-color: #121212;
   color: #ffffff;
 }
