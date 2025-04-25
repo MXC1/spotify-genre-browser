@@ -4,41 +4,50 @@ import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDb";
 import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
 import { authenticateUser } from "../../services/spotifyAuth";
 import logMessage from "../../utilities/loggingConfig";
-import { useNavigate } from "react-router-dom";
 import './genreGridContainer.css';
+import GenreContainer from '../genreContainer/genreContainer';
+import { useNavigate } from "react-router-dom";
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
   const [loadingMessage, setLoadingMessage] = useState('');
   const { showBoundary } = useErrorBoundary();
+  const [selectedGenre, setSelectedGenre] = useState(null);
   const navigate = useNavigate();
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   const delayTimeMs = 500;
 
   useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.pathname === '/genre-album-map') {
+      setSelectedGenre(null);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     const initializeData = async () => {
-        try {
-          if (Object.keys(groupedAlbums).length > 0) {
-            logMessage(`Using cached genre album map: ${JSON.stringify(groupedAlbums)}`);
-            return;
-          }
-            const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
-            if (cachedGenreAlbumMap) {
-                logMessage('Using cached genre album map.');
-                setGroupedAlbums(cachedGenreAlbumMap);
-            } else {
-                logMessage('No cached data found. Fetching from scratch...');
-                await fetchOrUpdateGenreAlbumMap();
-            }
-        } catch (error) {
-            logMessage(`Error initializing data: ${error}`);
-            showBoundary(error);
+      try {
+        if (Object.keys(groupedAlbums).length > 0) {
+          logMessage(`Using cached genre album map: ${JSON.stringify(groupedAlbums)}`);
+          return;
         }
+        const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
+        if (cachedGenreAlbumMap) {
+          logMessage('Using cached genre album map.');
+          setGroupedAlbums(cachedGenreAlbumMap);
+        } else {
+          logMessage('No cached data found. Fetching from scratch...');
+          await fetchOrUpdateGenreAlbumMap();
+        }
+      } catch (error) {
+        logMessage(`Error initializing data: ${error}`);
+        showBoundary(error);
+      }
     };
 
     initializeData();
-}, []);
+  }, []);
 
   const fetchOrUpdateGenreAlbumMap = async () => {
     try {
@@ -96,7 +105,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         allAlbums = [...allAlbums, ...albums];
         allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
       }
-      
+
       logMessage(`Finished fetching album IDs: ${JSON.stringify(allAlbumIds)}`);
 
       return allAlbums;
@@ -106,7 +115,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       showBoundary(error);
     }
   }, []);
-  
+
   async function getSavedAlbumsWithRetries(limit, offset) {
     let response;
 
@@ -122,7 +131,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
     return [response.items.map(item => item.album), response.total];
   }
-  
+
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
     if (!albums || albums.length === 0) {
       logMessage('No albums to group');
@@ -182,11 +191,11 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   }))
 
   const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
-      genre.toLowerCase().includes(props.searchQuery) ||
-      albums.some(album =>
-          album.name.toLowerCase().includes(props.searchQuery) ||
-          album.artists.some(artist => artist.name.toLowerCase().includes(props.searchQuery))
-      )
+    genre.toLowerCase().includes(props.searchQuery) ||
+    albums.some(album =>
+      album.name.toLowerCase().includes(props.searchQuery) ||
+      album.artists.some(artist => artist.name.toLowerCase().includes(props.searchQuery))
+    )
   );
 
   const sortedGenres = filteredGenres.sort((a, b) => {
@@ -207,56 +216,73 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     setLoadingMessage(message);
   }
 
-  return (
-      <div>
-        {loadingMessage ? (
-            <p className="loading-message">{loadingMessage}</p>
-        ) : (
-            <div className="genre-grid">
-              {sortedGenres.map(([genre, albums], index) => (
-                  <GenreCard key={genre} genre={genre} albums={albums} index={index} />
-              ))}
-            </div>
-        )}
-      </div>
-  );
-});
+  const handleGenreClick = (genre, albums) => {
+    setSelectedGenre({ genre, albums });
+    navigate(`/genre?g=${encodeURIComponent(genre)}`);
+  };
 
-function GenreCard({ genre, albums, index }) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate(`/genre?g=${encodeURIComponent(genre)}`, { state: { genre, albums } });
+  const handleBackToGrid = () => {
+    setSelectedGenre(null);
+    navigate('/genre-album-map');
   };
 
   return (
-      <div className={`genre-section ${isCollapsed ? 'collapsed' : 'expanded'}`} onClick={handleClick}>
-        <h2 className="genre-title">
-          {genre}
-        </h2>
-        {isCollapsed ? (
-            <div className="album-preview">
-              {albums.slice(0, albums.length).map((album) => (
-                  <img key={album.id} src={album.images[0].url} alt={album.name} className="album-preview-image" />
-              ))}
+    <div>
+      {loadingMessage ? (
+        <p className="loading-message">{loadingMessage}</p>
+      ) : selectedGenre ? (
+        <GenreContainer
+          genre={selectedGenre.genre}
+          albums={selectedGenre.albums}
+          onBack={handleBackToGrid}
+        />
+      ) : (
+        <div className="genre-grid">
+          {sortedGenres.map(([genre, albums], index) => (
+            <GenreCard
+              key={genre}
+              genre={genre}
+              albums={albums}
+              index={index}
+              onClick={() => handleGenreClick(genre, albums)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+});
+
+function GenreCard({ genre, albums, onClick }) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  return (
+    <div className={`genre-section ${isCollapsed ? 'collapsed' : 'expanded'}`} onClick={onClick}>
+      <h2 className="genre-title">
+        {genre}
+      </h2>
+      {isCollapsed ? (
+        <div className="album-preview">
+          {albums.slice(0, albums.length).map((album) => (
+            <img key={album.id} src={album.images[0].url} alt={album.name} className="album-preview-image" />
+          ))}
+        </div>
+      ) : (
+        <div className="album-grid">
+          {albums.map((album) => (
+            <div key={album.id} className="album-item">
+              <a href={album.external_urls.spotify} target="_blank" rel="noopener noreferrer" className="album-link">
+                <img src={album.images[0].url} alt={album.name} className="album-image" />
+                <div className="album-info">
+                  <span className="album-name">{album.name}</span>
+                  <span className="album-artist">{album.artists[0].name}</span>
+                </div>
+              </a>
             </div>
-        ) : (
-            <div className="album-grid">
-              {albums.map((album) => (
-                  <div key={album.id} className="album-item">
-                    <a href={album.external_urls.spotify} target="_blank" rel="noopener noreferrer" className="album-link">
-                      <img src={album.images[0].url} alt={album.name} className="album-image" />
-                      <div className="album-info">
-                        <span className="album-name">{album.name}</span>
-                        <span className="album-artist">{album.artists[0].name}</span>
-                      </div>
-                    </a>
-                  </div>
-              ))}
-            </div>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -17,7 +17,6 @@ import useModal from './hooks/useModal';
 import { Route, Routes } from "react-router-dom";
 import { useNavigationHelpers } from './utilities/navigationHelpers';
 import OverlayMenu from './containers/overlayMenu/overlayMenu';
-import GenreContainer from './containers/genreContainer/genreContainer';
 
 Amplify.configure(awsconfig);
 
@@ -97,15 +96,6 @@ function App() {
     });
   };
 
-  function getGenreContainerProps(genreGridRef) {
-    const genreParam = new URLSearchParams(window.location.search).get('g');
-    const groupedAlbums = genreGridRef.current?.getGroupedAlbums() || {};
-    return {
-      genre: genreParam || '[Unknown Genre]',
-      albums: groupedAlbums[genreParam] || []
-    };
-  }
-
   return (
     <div className="App">
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
@@ -123,10 +113,7 @@ function App() {
           <Route path="*" element={<LoginContainer />} />
           <Route path="/authenticate" element={<LoginContainer />} />
           <Route path="/genre-album-map" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
-          <Route 
-            path="/genre" 
-            element={<GenreContainer {...getGenreContainerProps(genreGridRef)} />} 
-          />
+          <Route path="/genre" element={<GenreGridContainer searchQuery={searchQuery} sortOption={sortOption} ref={genreGridRef} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
           <Route path="/about" element={<AboutContainer />} />
         </Routes>

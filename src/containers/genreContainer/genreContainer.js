@@ -1,11 +1,11 @@
 import React from 'react';
 import './genreContainer.css';
 
-function GenreContainer({ genre, albums }) {
+function GenreContainer({ genre, albums, onBack }) {
     return (
         <div className="genre-container">
-            <h1 className="big-genre-title">{genre}</h1>
-            <hr className="horizontal-line" />
+            <h1 className="big-genre-title" onClick={onBack}>{genre}</h1>
+            <hr className="horizontal-line" onClick={onBack} />
             <div className="album-grid">
                 {albums.map((album) => (
                     <div key={album.id} className="album-item">
