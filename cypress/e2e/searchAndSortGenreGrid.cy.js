@@ -17,7 +17,7 @@ describe('GIVEN I am on the genre grid page', () => {
 
         });
 
-        it.only('THEN the genre grid should be filtered', () => {
+        it('THEN the genre grid should be filtered', () => {
             cy.get('.genre-section').should('have.length', 1);
 
             cy.get('.genre-grid .genre-section').eq(0).click();
@@ -34,7 +34,7 @@ describe('GIVEN I am on the genre grid page', () => {
             cy.get(`[placeholder="${searchBoxPlaceholder}"]`).clear().should('have.value', '');
         });
 
-        it.only('THEN the genre grid should be reset', () => {
+        it('THEN the genre grid should be reset', () => {
             cy.get('.genre-section').should('have.length', 2);
 
             cy.get('.genre-grid .genre-section').eq(0).click();
@@ -54,7 +54,7 @@ describe('GIVEN I am on the genre grid page', () => {
             cy.get('.sort-dropdown').select('alphabetical-asc');
         });
 
-        it.only('THEN the genre grid should be sorted alphabetically', () => {
+        it('THEN the genre grid should be sorted alphabetically', () => {
             cy.get('.genre-section').should('have.length', 2);
 
             cy.get('.genre-grid .genre-section').first()
@@ -68,7 +68,7 @@ describe('GIVEN I am on the genre grid page', () => {
             cy.get('.sort-dropdown').select('alphabetical-desc');
         });
 
-        it.only('THEN the genre grid should be sorted reverse alphabetically', () => {
+        it('THEN the genre grid should be sorted reverse alphabetically', () => {
             cy.get('.genre-section').should('have.length', 2);
 
             cy.get('.genre-grid .genre-section').first()
