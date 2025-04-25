@@ -25,8 +25,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     const url = new URL(window.location.href);
     if (url.pathname === '/genre-album-map') {
       setSelectedGenre(null);
-      setSortOption('number-desc'); 
-      setSearchQuery(''); 
+      setSortOption('number-desc');
+      setSearchQuery('');
     }
   }, [navigate]);
 
@@ -162,7 +162,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         });
       });
 
-      await delay(delayTimeMs); 
+      await delay(delayTimeMs);
     }
 
     // Combine genres with identical albums
@@ -315,34 +315,19 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 });
 
 function GenreCard({ genre, albums, onClick }) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-
   return (
-    <div className={`genre-section ${isCollapsed ? 'collapsed' : 'expanded'}`} onClick={onClick}>
-      <h2 className="genre-title">
-        {genre}
-      </h2>
-      {isCollapsed ? (
-        <div className="album-preview">
-          {albums.slice(0, albums.length).map((album) => (
-            <img key={album.id} src={album.images[0].url} alt={album.name} className="album-preview-image" />
-          ))}
-        </div>
-      ) : (
-        <div className="album-grid">
-          {albums.map((album) => (
-            <div key={album.id} className="album-item">
-              <a href={album.external_urls.spotify} target="_blank" rel="noopener noreferrer" className="album-link">
-                <img src={album.images[0].url} alt={album.name} className="album-image" />
-                <div className="album-info">
-                  <span className="album-name">{album.name}</span>
-                  <span className="album-artist">{album.artists[0].name}</span>
-                </div>
-              </a>
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="genre-section" onClick={onClick}>
+      <div className="album-preview">
+        {albums.slice(0, albums.length < 4 ? 1 : 4).map((album, index) => (
+          <img
+            key={album.id}
+            src={album.images[0].url}
+            alt={album.name}
+            className={`album-preview-image ${albums.length < 4 ? 'single-album' : ''}`}
+          />
+        ))}
+      </div>
+      <h2 className="genre-title">{genre}</h2>
     </div>
   );
 }
