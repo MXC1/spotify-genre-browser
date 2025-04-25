@@ -165,6 +165,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       await delay(delayTimeMs); // Avoid hitting rate limits
     }
 
+    setLoadingMessage('');
     logMessage('Finished grouping albums by artist genre.');
     return genreAlbumMap;
   }, []);
