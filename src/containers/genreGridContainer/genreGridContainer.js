@@ -38,7 +38,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
           return;
         }
         const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
-        if (cachedGenreAlbumMap) {
+        if (cachedGenreAlbumMap && Object.keys(cachedGenreAlbumMap).length > 0) {
           logMessage('Using cached genre album map.');
           setGroupedAlbums(cachedGenreAlbumMap);
         } else {
@@ -63,7 +63,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       }
 
       const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
-      if (cachedGenreAlbumMap) {
+      if (cachedGenreAlbumMap && Object.keys(cachedGenreAlbumMap).length > 0) {
         setGroupedAlbums(cachedGenreAlbumMap);
       } else {
         const allAlbums = await fetchAllSavedAlbums();
