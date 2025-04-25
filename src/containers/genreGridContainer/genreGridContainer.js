@@ -318,12 +318,12 @@ function GenreCard({ genre, albums, onClick }) {
   return (
     <div className="genre-section" onClick={onClick}>
       <div className="album-preview">
-        {albums.slice(0, 4).map((album) => (
+        {albums.slice(0, albums.length < 4 ? 1 : 4).map((album, index) => (
           <img
             key={album.id}
             src={album.images[0].url}
             alt={album.name}
-            className="album-preview-image"
+            className={`album-preview-image ${albums.length < 4 ? 'single-album' : ''}`}
           />
         ))}
       </div>

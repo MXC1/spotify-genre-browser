@@ -55,6 +55,11 @@
   object-fit: cover;
 }
 
+.album-preview-image.single-album {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
 .search-sort-container {
   width: 100%;
   max-width: 650px;
