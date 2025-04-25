@@ -18,12 +18,12 @@ describe('GIVEN I am on the genre grid page', () => {
         });
 
         it('THEN the genre grid should be filtered', () => {
-            cy.get('.genre-grid').children().its('length').should('eq', 1);
+            cy.get('.genre-section').should('have.length', 1);
 
             cy.get('.genre-grid .genre-section').eq(0).click();
-            cy.get('.album-name').eq(0).should('contain.text', 'The Bends');
+            cy.get('.album-name').eq(0).should('contain.text', 'Test Album Two');
             cy.get('.album-link')
-                .should('have.attr', 'href', 'https://open.spotify.com/album/35UJLpClj5EDrhpNIi4DFg');
+                .should('have.attr', 'href', 'https://open.spotify.com/album/test-album-2');
         });
     });
 
@@ -35,12 +35,12 @@ describe('GIVEN I am on the genre grid page', () => {
         });
 
         it('THEN the genre grid should be reset', () => {
-            cy.get('.genre-grid').children().its('length').should('eq', 2);
+            cy.get('.genre-section').should('have.length', 2);
 
             cy.get('.genre-grid .genre-section').eq(0).click();
-            cy.get('.album-name').eq(0).should('contain.text', 'As Days Get Dark');
+            cy.get('.album-name').eq(0).should('contain.text', 'Test Album One');
             cy.get('.album-link')
-                .should('have.attr', 'href', 'https://open.spotify.com/album/5jMbGYYNDo0lTyUnKtcm8J');
+                .should('have.attr', 'href', 'https://open.spotify.com/album/test-album-1');
         });
     });
 
@@ -55,7 +55,7 @@ describe('GIVEN I am on the genre grid page', () => {
         });
 
         it('THEN the genre grid should be sorted alphabetically', () => {
-            cy.get('.genre-grid').children().its('length').should('eq', 2);
+            cy.get('.genre-section').should('have.length', 2);
 
             cy.get('.genre-grid .genre-section').first()
                 .find('.genre-title')
@@ -69,7 +69,7 @@ describe('GIVEN I am on the genre grid page', () => {
         });
 
         it('THEN the genre grid should be sorted reverse alphabetically', () => {
-            cy.get('.genre-grid').children().its('length').should('eq', 2);
+            cy.get('.genre-section').should('have.length', 2);
 
             cy.get('.genre-grid .genre-section').first()
                 .find('.genre-title')

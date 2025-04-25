@@ -40,7 +40,7 @@ describe('GIVEN I authenticate successfully', () => {
     it('AND the album data should load', () => {
         cy.get('.genre-grid .genre-section .genre-title').should('contain', 'slowcore, spoken word');
         cy.get('.genre-grid .genre-section .album-preview img').should('have.attr', 'src')
-        .should('include', 'https://i.scdn.co/image/ab67616d0000b273c9ac1ea80b4c74c09733bcd3');
+        .should('include', 'https://i.scdn.co/image/test-album-1');
     });
 });
 

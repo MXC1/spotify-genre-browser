@@ -5,14 +5,21 @@
         "slowcore",
         "spoken word"
       ],
-      "id": "6g8Jqb5JMfv92eB2r0awTN"
+      "id": "test-artist-1"
     },
     {
       "genres": [
         "art rock",
         "alternative rock"
       ],
-      "id": "4Z8W4fKeB5YxbusRsdQVPb"
+      "id": "test-artist-2"
+    },
+    {
+      "genres": [
+        "slowcore",
+        "spoken word"
+      ],
+      "id": "test-artist-3"
     }
   ]
 }
