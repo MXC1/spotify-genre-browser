@@ -47,6 +47,30 @@ describe('GIVEN I am on the about page', () => {
     });
 });
 
+describe('GIVEN I am on the donate page', () => {
+    beforeEach(() => {
+        cy.visit('/donate');
+    });
+
+    it('THEN the about page should be displayed', () => {    
+        cy.get('.page-title').should('contain', 'Donate');
+        cy.get('.home-button').should('exist');
+        cy.get('.donate-container').should('exist');
+    });
+
+    describe('WHEN I click the hamburger menu home link', () => {
+        beforeEach(() => {
+            cy.get('.menu-button').click();
+            cy.get('.menu-item-button').contains('Home').click();
+        }
+        );
+
+        it('THEN the login page should be shown', () => {
+            cy.get('.login-button').should('exist');
+        });
+    });
+});
+
 const paths = [
     '/',
     '/genre-album-map',

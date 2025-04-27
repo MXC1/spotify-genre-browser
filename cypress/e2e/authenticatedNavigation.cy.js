@@ -127,6 +127,23 @@ describe('GIVEN I am on the privacy policy page', () => {
     });
 });
 
+describe('GIVEN I am on the donate page', () => {
+    beforeEach(() => {
+        cy.visit('/donate');
+    });
+
+    it('THEN the donate page should be shown', () => {
+        cy.get('.page-title').should('contain', 'Donate');
+        cy.get('.home-button').should('exist');
+        cy.get('.donate-container').should('exist');
+    });
+
+    it('THEN the donate iframe should be loaded', () => {
+        cy.get('#kofiframe').should('exist');
+        cy.get('#kofiframe').should('have.attr', 'src').and('include', 'ko-fi.com/genrebrowser');
+    })
+});
+
 describe('GIVEN my location is empty', () => {
     beforeEach(() => {
         cy.visit('/?code=valid_token&state=valid_state');
