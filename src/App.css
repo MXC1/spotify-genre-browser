@@ -10,38 +10,6 @@ body {
   padding: 0 20px;
 }
 
-.header-container {
-  width: 100%;
-  max-width: 600px;
-  align-self: center;
-  margin: 10px auto 10px auto; 
-}
-
-.title-container {
-  display: flex;
-  
-  justify-content: space-between; 
-}
-
-.refresh-button, .home-button, .back-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.5rem;
-  color: #fff;
-}
-
-.refresh-button:hover {
-  color: #007bff;
-}
-
-.page-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 10px 0;
-  text-align: left;
-}
-
 .albums-container {
   margin-top: 10px;
   display: flex;
