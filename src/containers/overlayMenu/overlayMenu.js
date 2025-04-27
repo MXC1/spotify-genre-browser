@@ -4,7 +4,7 @@ import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayPrivacyPolicy }, ref) => {
+const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayInstallModal }, ref) => {
     const { goTo } = useNavigationHelpers();
 
     const handleNavigation = (path) => {
@@ -38,6 +38,11 @@ const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayPri
                         </button>
                     </li>
                     <hr className="menu-divider"/>
+                    <li className="menu-item">
+                        <button className="menu-item-button" onClick={onDisplayInstallModal}>
+                            Install the app
+                        </button>
+                    </li>
                     <li className="menu-item">
                         <button className="menu-item-button" onClick={onDisconnect}>
                             Disconnect Spotify account

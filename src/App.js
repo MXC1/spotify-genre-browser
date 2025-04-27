@@ -28,6 +28,7 @@ function App() {
   const { goTo } = useNavigationHelpers();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const { captureInstallPrompt, showInstallPrompt } = useModal();
 
   useEffect(() => {
     logMessage('Environment is: ' + process.env.REACT_APP_ENV);
@@ -40,6 +41,18 @@ function App() {
       goTo(`/genre-album-map?code=${code}&state=${state}`);
     }
   }, []);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event) => {
+      logMessage('beforeinstallprompt event captured.');
+      captureInstallPrompt(event);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, [captureInstallPrompt]);
 
   const handleGenreAlbumMapRefresh = async () => {
     if (genreGridRef.current) {
@@ -87,6 +100,25 @@ function App() {
     });
   };
 
+  const handleOpenInstallModal = () => {
+    logMessage('Opening install modal.');
+    openModal({
+      title: "Install the app",
+      description: "Installing this app as a Progressive Web App (PWA) allows you to access it directly from your home screen or desktop, just like a native app.",
+      button1Text: "Cancel",
+      button1Action: () => {
+        logMessage('User canceled the install modal.');
+        closeModal();
+      },
+      button2Text: "Install",
+      button2Action: () => {
+        logMessage('User accepted the install modal. Showing install prompt.');
+        closeModal();
+        showInstallPrompt();
+      }
+    });
+  };
+
   return (
     <div className="App">
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
@@ -110,7 +142,13 @@ function App() {
       </ErrorBoundary>
 
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
-        <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
+        <OverlayMenu
+          ref={menuRef}
+          isOpen={isMenuOpen}
+          toggleMenu={toggleMenu}
+          onDisconnect={handleOpenDisconnectModal}
+          onDisplayInstallModal={handleOpenInstallModal}
+        />
       </ErrorBoundary>
 
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
