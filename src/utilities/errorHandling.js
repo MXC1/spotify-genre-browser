@@ -1,3 +1,4 @@
+import './errorHandling.css'
 import React, { useState } from 'react';
 import StackTrace from 'stacktrace-js';
 import logMessage from '../utilities/loggingConfig';
