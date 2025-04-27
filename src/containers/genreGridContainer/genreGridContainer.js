@@ -321,7 +321,7 @@ function GenreCard({ genre, albums, onClick }) {
         {albums.slice(0, albums.length < 4 ? 1 : 4).map((album, index) => (
           <img
             key={album.id}
-            src={album.images[0].url}
+            src={album.images[1].url}
             alt={album.name}
             className={`album-preview-image ${albums.length < 4 ? 'single-album' : ''}`}
           />

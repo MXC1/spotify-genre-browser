@@ -62,7 +62,7 @@ function GenreContainer({ genre, albums, onBack }) {
                             className="album-link"
                         >
                             <img
-                                src={album.images[0].url}
+                                src={album.images[1].url}
                                 alt={album.name}
                                 className="album-image"
                             />
