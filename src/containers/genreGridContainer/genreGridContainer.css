@@ -59,32 +59,3 @@
   grid-column: span 2;
   grid-row: span 2;
 }
-
-.search-sort-container {
-  width: 100%;
-  max-width: 650px;
-  align-self: center;
-  display: flex;
-  justify-content: space-between;
-  gap: 5px;
-  margin: 0 auto 15px auto; 
-}
-
-.album-details {
-  margin-top: 8px;
-}
-
-.album-name,
-.album-artist {
-  margin: 0;
-  text-align: left;
-}
-
-.album-name {
-  font-weight: bold;
-}
-
-.album-artist {
-  font-size: 0.9em;
-  color: gray;
-}

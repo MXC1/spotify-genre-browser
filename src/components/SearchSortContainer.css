@@ -1,6 +1,11 @@
 .search-sort-container {
+  width: 100%;
+  max-width: 650px;
   align-self: center;
-  margin: 0px auto 15px auto; 
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  margin: 0 auto 15px auto; 
 }
 
 .search-bar {
