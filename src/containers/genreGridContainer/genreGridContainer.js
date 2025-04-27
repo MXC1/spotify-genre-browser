@@ -134,7 +134,15 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       }
     } while (response.error && response.error.status === 429);
 
-    return [response.items.map(item => item.album), response.total];
+    const reducedAlbums = response.items.map(item => ({
+      id: item.album.id,
+      name: item.album.name,
+      artists: item.album.artists.map(artist => ({ id: artist.id, name: artist.name })),
+      external_urls: { spotify: item.album.external_urls.spotify },
+      images: [null, { url: item.album.images[1]?.url }],
+    }));
+
+    return [reducedAlbums, response.total];
   }
 
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
@@ -321,7 +329,7 @@ function GenreCard({ genre, albums, onClick }) {
         {albums.slice(0, albums.length < 4 ? 1 : 4).map((album, index) => (
           <img
             key={album.id}
-            src={album.images[0].url}
+            src={album.images[1].url}
             alt={album.name}
             className={`album-preview-image ${albums.length < 4 ? 'single-album' : ''}`}
           />

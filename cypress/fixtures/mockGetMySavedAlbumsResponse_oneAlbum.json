@@ -8,6 +8,9 @@
         "id": "test-album-1",
         "images": [
           {
+            "url": "https://i.scdn.co/image/dont-use-this-one"
+          },
+          {
             "url": "https://i.scdn.co/image/test-album-1"
           }
         ],
