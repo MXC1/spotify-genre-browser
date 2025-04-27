@@ -10,32 +10,6 @@ body {
   padding: 0 20px;
 }
 
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 40vh; 
-}
-
-
-.login-button {
-  display: inline-block;
-  padding: 12px 24px;
-  margin: 20px;
-  font-size: 18px;
-  color: #fff;
-  background-color: #1db954;
-  border: none;
-  border-radius: 30px;
-  text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.login-button:hover {
-  background-color: #1ed760;
-  transform: scale(1.05);
-}
-
 .header-container {
   width: 100%;
   max-width: 600px;
