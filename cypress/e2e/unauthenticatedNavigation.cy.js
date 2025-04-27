@@ -52,7 +52,7 @@ describe('GIVEN I am on the donate page', () => {
         cy.visit('/donate');
     });
 
-    it('THEN the about page should be displayed', () => {    
+    it('THEN the donate page should be displayed', () => {    
         cy.get('.page-title').should('contain', 'Donate');
         cy.get('.home-button').should('exist');
         cy.get('.donate-container').should('exist');
