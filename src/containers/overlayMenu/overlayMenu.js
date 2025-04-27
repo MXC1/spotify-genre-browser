@@ -26,6 +26,7 @@ const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayPri
                             Home
                         </button>
                     </li>
+                    <hr className="menu-divider"/>
                     <li className="menu-item">
                         <button className="menu-item-button" onClick={() => handleNavigation("/about")}>
                             About
@@ -36,11 +37,13 @@ const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayPri
                             Privacy Policy
                         </button>
                     </li>
+                    <hr className="menu-divider"/>
                     <li className="menu-item">
                         <button className="menu-item-button" onClick={onDisconnect}>
                             Disconnect Spotify account
                         </button>
                     </li>
+                    <hr className="menu-divider"/>
                     <li className="menu-item">
                         <button className="menu-item-button" onClick={() => handleNavigation("/donate")}>
                             Donate
