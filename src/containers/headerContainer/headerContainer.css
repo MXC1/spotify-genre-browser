@@ -27,17 +27,3 @@
   margin: 10px 0;
   text-align: left;
 }
-
-.title-container {
-    display: flex;
-    
-    justify-content: space-between; 
-  }
-  
-  .refresh-button, .home-button, .back-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: #fff;
-  }
