@@ -41,6 +41,11 @@ const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayPri
                             Disconnect Spotify account
                         </button>
                     </li>
+                    <li className="menu-item">
+                        <button className="menu-item-button" onClick={() => handleNavigation("/donate")}>
+                            Donate
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -12,6 +12,7 @@ import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
 import PrivacyPolicyContainer from './containers/privacyPolicyContainer/privacyPolicyContainer';
 import AboutContainer from './containers/aboutContainer/aboutContainer';
+import DonatePageContainer from './containers/donatePageContainer/donatePageContainer';
 import ModalContainer from './containers/modalContainer/modalContainer';
 import useModal from './hooks/useModal';
 import { Route, Routes } from "react-router-dom";
@@ -104,6 +105,7 @@ function App() {
           <Route path="/genre" element={<GenreGridContainer ref={genreGridRef} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
           <Route path="/about" element={<AboutContainer />} />
+          <Route path="/donate" element={<DonatePageContainer />} />
         </Routes>
       </ErrorBoundary>
 

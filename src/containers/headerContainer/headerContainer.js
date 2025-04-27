@@ -73,6 +73,21 @@ function HeaderContainer({ onRefresh, onOpenDisconnectModal, toggleMenu }) {
             </div>
         );
     }
+    else if (location.pathname === '/donate') {
+        return (
+            <div className="header-container">
+                <div className="title-container">
+                    <button className="menu-button" onClick={toggleMenu}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <h1 className="page-title">Donate</h1>
+                    <button className="home-button" onClick={() => checkAuthAndNavigate()}>
+                        <FontAwesomeIcon icon={faHouse} />
+                    </button>
+                </div>
+            </div>
+        );
+    }
     else if (location.pathname) {
         return (
             <div className="header-container">
