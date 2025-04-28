@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "album": {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/test-album-1"
+        },
+        "id": "test-album-1",
+        "images": [
+          {
+            "url": "https://i.scdn.co/image/dont-use-this-one"
+          },
+          {
+            "url": "https://i.scdn.co/image/test-album-1"
+          }
+        ],
+        "name": "Test Album One",
+        "artists": [
+          {
+            "id": "test-artist-two",
+            "name": "Test Artist Two"
+          }
+        ]
+      }
+    }
+  ],
+  "total": 1
+}

@@ -1,0 +1,118 @@
+.genre-container {
+  max-width: calc(120px * 8);
+  margin: 0 auto; 
+  display: block; 
+}
+
+.big-genre-title {
+  font-size: 28px; 
+  font-weight: bold;
+  margin: 0px;
+  padding: 8px 40px; 
+  text-align: center;
+}
+
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  max-width: calc(120px * 8);
+  margin: 0 auto; 
+  justify-content: center; 
+  gap: 15px; 
+}
+
+.album-item {
+  width: 110px; 
+  height: 205px;
+  max-height: 205px;
+  padding: 3px 6px; 
+  border: none; 
+  background-color: transparent; 
+  box-shadow: none; 
+  transition: transform 0.2s ease, box-shadow 0.2s ease; 
+  margin: 0 auto; 
+}
+
+.album-item:hover {
+  transform: scale(1.05); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+.album-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+.album-image {
+  width: 120px; 
+  height: 120px; 
+  border-radius: 4px; 
+  margin-bottom: 10px; 
+}
+
+.album-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; 
+  gap: 2px;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 300;
+  height: 100%;
+  margin-left: 0;
+  width: 110px; 
+}
+
+.album-name {
+  color: #1db954;
+  font-weight: 500;
+}
+
+.album-name,
+.album-artist {
+  text-align: left; 
+  max-height: 2.4em;
+  line-height: 1.2em;
+  font-size: 15px;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin: 0;
+}
+
+.album-artist {
+  font-size: 0.9em;
+  color: lightgrey;
+}
+
+.big-genre-title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  text-decoration: underline;
+  display: flex;
+  align-items: center;
+}
+
+.back-button:hover {
+  text-decoration: none;
+}

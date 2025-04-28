@@ -1,54 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './headerContainer.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSyncAlt, faBars, faHouse, faBackward } from '@fortawesome/free-solid-svg-icons';
-import OverlayMenu from './overlayMenu/overlayMenu';
+import { faSyncAlt, faBars, faHouse, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from "react-router-dom";
 import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 
-function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectModal }) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+function HeaderContainer({ onRefresh, onOpenDisconnectModal, toggleMenu }) {
     const location = useLocation();
-    const menuRef = useRef(null);
-    const { goTo } = useNavigationHelpers();
-
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
-
-    const handleClickOutside = (event) => {
-        if (menuRef.current && !menuRef.current.contains(event.target)) {
-            setIsMenuOpen(false);
-            event.stopImmediatePropagation();
-        }
-    };
-
-    useEffect(() => {
-        if (isMenuOpen) {
-            document.addEventListener('mousedown', handleClickOutside, true);
-        } else {
-            document.removeEventListener('mousedown', handleClickOutside, true);
-        }
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside, true);
-        };
-    }, [isMenuOpen]);
+    const { goTo, checkAuthAndNavigate } = useNavigationHelpers();
 
     const handleOpenDisconnectModal = () => {
-        setIsMenuOpen(false);
         onOpenDisconnectModal();
     };
 
     if (location.pathname === '/privacy-policy') {
         return (
             <div className="header-container">
-                <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
                 <div className="title-container">
                     <button className="menu-button" onClick={toggleMenu}>
                         <FontAwesomeIcon icon={faBars} />
                     </button>
                     <h1 className="page-title">Privacy policy</h1>
-                    <button className="home-button" onClick={() => goTo("/genre-album-map")}>
+                    <button className="home-button" onClick={async () => await checkAuthAndNavigate()}>
                         <FontAwesomeIcon icon={faHouse} />
                     </button>
                 </div>
@@ -58,7 +31,6 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
     else if (location.pathname === '/genre-album-map') {
         return (
             <div className="header-container">
-                <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
                 <div className="title-container">
                     <button className="menu-button" onClick={toggleMenu}>
                         <FontAwesomeIcon icon={faBars} />
@@ -68,19 +40,65 @@ function HeaderContainer({ onRefresh, onSearch, onSortChange, onOpenDisconnectMo
                         <FontAwesomeIcon icon={faSyncAlt} />
                     </button>
                 </div>
-                <div className="search-sort-container">
-                    <input
-                        type="text"
-                        placeholder="Search genres, albums, and artists..."
-                        onChange={onSearch}
-                        className="search-bar"
-                    />
-                    <select onChange={onSortChange} className="sort-dropdown" defaultValue="number-desc">
-                        <option value="alphabetical-asc">(A-Z)</option>
-                        <option value="alphabetical-desc">(Z-A)</option>
-                        <option value="number-asc">Size (Asc)</option>
-                        <option value="number-desc">Size (Desc)</option>
-                    </select>
+            </div>
+        );
+    }
+    else if (location.pathname.startsWith('/genre')) {
+        return (
+            <div className="header-container">
+                <div className="title-container">
+                    <button className="menu-button" onClick={toggleMenu}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <h1 className="page-title">Your album library</h1>
+                    <button className="home-button" onClick={async () => await checkAuthAndNavigate()}>
+                        <FontAwesomeIcon icon={faHouse} />
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    else if (location.pathname === '/about') {
+        return (
+            <div className="header-container">
+                <div className="title-container">
+                    <button className="menu-button" onClick={toggleMenu}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <h1 className="page-title">About</h1>
+                    <button className="home-button" onClick={() => checkAuthAndNavigate()}>
+                        <FontAwesomeIcon icon={faHouse} />
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    else if (location.pathname === '/donate') {
+        return (
+            <div className="header-container">
+                <div className="title-container">
+                    <button className="menu-button" onClick={toggleMenu}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <h1 className="page-title">Donate</h1>
+                    <button className="home-button" onClick={() => checkAuthAndNavigate()}>
+                        <FontAwesomeIcon icon={faHouse} />
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    else if (location.pathname) {
+        return (
+            <div className="header-container">
+                <div className="title-container">
+                    <button className="menu-button" onClick={toggleMenu}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <h1 className="page-title">Authentication</h1>
+                    <button className="refresh-button" onClick={() => goTo("/about")}>
+                        <FontAwesomeIcon icon={faCircleInfo} />
+                    </button>
                 </div>
             </div>
         );
