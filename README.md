@@ -51,12 +51,19 @@ Branch rules:
 
 ### Deployment Process 
 
-1. Conduct any necessary testing on `staging`.
-2. Create a new tag and a new release based from `staging`.
-3. In git, run:
-    1. `git fetch origin`
-    2. `git checkout main`
-    3. `git merge --ff-only <tag_name>` (replace `<tag_name>` with the tag you created in step 4)
-    4. `git push`
-4. This will push all commit history to main without creating a new commit. AWS Amplify will pick up changes and deploy to the `main` environment.
-5. Verify that deployment has been successful in AWS Amplify.
+1. Create a new release from staging:
+
+    1. Go to the GitHub web interface.
+    2. Navigate to Releases → Draft a new release.
+    3. Choose the latest commit from staging.
+
+2. Create a tag (e.g., v1.2.3) and publish the release.
+
+3. Open a pull request from the tag to main:
+
+    1. Go to Pull Requests → New Pull Request.
+    2. Set base as main and compare as staging.
+    3. GitHub will show the changes.
+    4. Confirm that everything looks correct.
+
+4. AWS Amplify will automatically detect changes and deploy.
