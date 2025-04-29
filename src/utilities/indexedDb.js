@@ -1,10 +1,13 @@
 import { openDB } from 'idb';
 import logMessage from './loggingConfig';
 
-const dbPromise = openDB('spotify-db', undefined, {
+const dbPromise = openDB('spotify-db', 3, {
   upgrade(db) {
     db.createObjectStore('auth');
     db.createObjectStore('data');
+    if (db.objectStoreNames.contains('keyval')) {
+      db.deleteObjectStore('keyval');
+    }
   },
 });
 
