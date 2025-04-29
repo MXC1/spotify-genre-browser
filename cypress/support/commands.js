@@ -7,6 +7,14 @@ Cypress.Commands.add('resetIndexedDb', () => {
     cy.getIndexedDb('@spotify-db').createObjectStore('data').as('data');
 });
 
+Cypress.Commands.add('seedIndexedDbWithOldFormat', () => {
+    cy.clearIndexedDb('spotify-db');
+    cy.openIndexedDb('spotify-db').as('spotify-db');
+    cy.getIndexedDb('@spotify-db').createObjectStore('keyval').as('keyval');
+    cy.getStore('@keyval').createItem('groupedAlbums', {});
+    cy.getStore('@keyval').createItem('token', "BQB");
+});
+
 Cypress.Commands.add('setIndexedDbData', (store, key, value) => {
     cy.getStore(`@${store}`).createItem(`${key}`, `${value}`);
 });
