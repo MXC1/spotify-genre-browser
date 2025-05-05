@@ -101,7 +101,7 @@
   position: relative;
 }
 
-.back-button {
+.back-button, .genre-back-button {
   position: absolute;
   left: 0;
   background: none;

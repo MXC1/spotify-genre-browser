@@ -13,7 +13,8 @@
 .menu-button,
 .refresh-button,
 .home-button,
-.back-button {
+.back-button,
+.genre-back-button {
   background: none;
   border: none;
   cursor: pointer;

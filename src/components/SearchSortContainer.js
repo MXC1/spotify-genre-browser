@@ -7,12 +7,14 @@ function SearchSortContainer({
   placeholderText,
   sortOptions,
   selectedSortOption,
+  searchQuery, 
 }) {
   return (
     <div className="search-sort-container">
       <input
         type="text"
         placeholder={placeholderText}
+        value={searchQuery} 
         onChange={(e) => onSearchQueryChange(e.target.value.toLowerCase())}
         className="search-bar"
       />
