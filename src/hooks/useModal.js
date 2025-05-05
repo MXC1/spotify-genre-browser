@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import logMessage from '../utilities/loggingConfig';
 
 const useModal = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,11 +16,13 @@ const useModal = () => {
     };
 
     const captureInstallPrompt = (event) => {
+        logMessage(`Install prompt captured: ${event.type}`);
         event.preventDefault();
         setInstallPromptEvent(event);
     };
 
     const showInstallPrompt = () => {
+        logMessage(`Showing install prompt: ${installPromptEvent.type}`);
         if (installPromptEvent) {
             installPromptEvent.prompt();
             setInstallPromptEvent(null);

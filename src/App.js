@@ -44,7 +44,6 @@ function App() {
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event) => {
-      logMessage('beforeinstallprompt event captured.');
       captureInstallPrompt(event);
     };
 
@@ -102,9 +101,10 @@ function App() {
 
   const handleOpenInstallModal = () => {
     logMessage('Opening install modal.');
+    setIsMenuOpen(false);
     openModal({
       title: "Install the app",
-      description: "Installing this app as a Progressive Web App (PWA) allows you to access it directly from your home screen or desktop, just like a native app.",
+      description: "Installing this app allows you to access it directly from your home screen, just like a native app.",
       button1Text: "Cancel",
       button1Action: () => {
         logMessage('User canceled the install modal.');
