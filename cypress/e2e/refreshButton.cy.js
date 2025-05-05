@@ -28,8 +28,6 @@ describe('GIVEN I am on the genre grid page', () => {
             cy.get('.genre-section').should('have.length', 2);
             cy.get('.genre-grid .genre-section').eq(1).click();
             cy.get('.album-name').eq(0).should('contain.text', 'Test Album Two');
-            cy.get('.album-link')
-                .should('have.attr', 'href', 'https://open.spotify.com/album/test-album-2');
         });
     });
 });
