@@ -50,6 +50,7 @@ function GenreContainer({ genre, albums, onBack }) {
                 selectedSortOption={sortOption}
                 placeholderText="Search albums or artists..."
                 sortOptions={sortOptions}
+                searchQuery={searchQuery} 
             />
             <div className="big-genre-title-container" onClick={onBack}>
                 <button className="back-button">
