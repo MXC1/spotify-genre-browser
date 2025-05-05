@@ -15,6 +15,7 @@ import AboutContainer from './containers/aboutContainer/aboutContainer';
 import DonatePageContainer from './containers/donatePageContainer/donatePageContainer';
 import ModalContainer from './containers/modalContainer/modalContainer';
 import useModal from './hooks/useModal';
+import usePWAInstall from './hooks/usePWAInstall';
 import { Route, Routes } from "react-router-dom";
 import { useNavigationHelpers } from './utilities/navigationHelpers';
 import OverlayMenu from './containers/overlayMenu/overlayMenu';
@@ -24,7 +25,8 @@ Amplify.configure(awsconfig);
 function App() {
   const { showBoundary } = useErrorBoundary()
   const genreGridRef = useRef();
-  const { isModalOpen, modalParams, openModal, closeModal, captureInstallPrompt, showInstallPrompt, installPromptEvent } = useModal();
+  const { isModalOpen, modalParams, openModal, closeModal } = useModal();
+  const { showInstallPrompt, installPromptEvent } = usePWAInstall();
   const { goTo } = useNavigationHelpers();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -40,17 +42,6 @@ function App() {
       goTo(`/genre-album-map?code=${code}&state=${state}`);
     }
   }, []);
-
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (event) => {
-      captureInstallPrompt(event);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, [captureInstallPrompt]);
 
   const handleGenreAlbumMapRefresh = async () => {
     if (genreGridRef.current) {
