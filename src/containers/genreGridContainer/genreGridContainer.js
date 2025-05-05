@@ -261,12 +261,14 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   }
 
   const handleGenreClick = (genre, albums) => {
+    logMessage(`Navigating to genre: ${genre}`);
     setSortOption('alphabetical-asc');
     setSelectedGenre({ genre, albums });
     navigate(`/genre?g=${encodeURIComponent(genre)}`);
   };
 
   const handleBackToGrid = () => {
+    logMessage('Navigating to /genre-album-map');
     setSelectedGenre(null);
     setSortOption('number-desc');
     setSearchQuery('');

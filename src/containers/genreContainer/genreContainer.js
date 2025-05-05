@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SearchSortContainer from "../../components/SearchSortContainer";
+import logMessage from "../../utilities/loggingConfig";
 import AlbumContainer from "../albumContainer/albumContainer";
 import "./genreContainer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -39,7 +40,10 @@ function GenreContainer({ genre, albums, onBack }) {
     });
 
     if (selectedAlbum) {
-        return <AlbumContainer album={selectedAlbum} onBack={() => setSelectedAlbum(null)} />;
+        return <AlbumContainer album={selectedAlbum} onBack={() => {
+            logMessage(`Navigating back to genre: ${genre}`);
+            setSelectedAlbum(null)}
+        } />;
     }
 
     return (
@@ -64,7 +68,10 @@ function GenreContainer({ genre, albums, onBack }) {
                     <div
                         key={album.id}
                         className="album-item"
-                        onClick={() => setSelectedAlbum(album)}
+                        onClick={() => {
+                            logMessage(`Selected album: ${album.id}`);
+                            setSelectedAlbum(album);
+                        }}
                     >
                         <div className="album-link">
                             <img

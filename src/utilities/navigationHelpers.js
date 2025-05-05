@@ -13,7 +13,11 @@ export const useNavigationHelpers = () => {
     }
   }
 
-  const goBack = () => navigate(-1);
+  const goBack = () => {
+    // navigate(-1)
+
+    logMessage(`Navigated back to ${location.pathname}`);
+  };
 
   const checkAuthAndNavigate = async () => {
     const accessToken = await getAccessToken();
