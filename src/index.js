@@ -24,5 +24,4 @@ function Root() {
 
 ReactDOM.render(<Root />, document.getElementById('root'));
 
-// Change unregister() to register() to enable service workers
 serviceWorkerRegistration.register();
