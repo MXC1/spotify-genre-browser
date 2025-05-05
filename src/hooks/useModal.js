@@ -35,7 +35,8 @@ const useModal = () => {
         openModal,
         closeModal,
         captureInstallPrompt,
-        showInstallPrompt
+        showInstallPrompt,
+        installPromptEvent // Ensure this is exposed
     };
 };
 

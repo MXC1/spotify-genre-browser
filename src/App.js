@@ -24,11 +24,10 @@ Amplify.configure(awsconfig);
 function App() {
   const { showBoundary } = useErrorBoundary()
   const genreGridRef = useRef();
-  const { isModalOpen, modalParams, openModal, closeModal } = useModal();
+  const { isModalOpen, modalParams, openModal, closeModal, captureInstallPrompt, showInstallPrompt, installPromptEvent } = useModal();
   const { goTo } = useNavigationHelpers();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
-  const { captureInstallPrompt, showInstallPrompt } = useModal();
 
   useEffect(() => {
     logMessage('Environment is: ' + process.env.REACT_APP_ENV);
@@ -148,6 +147,7 @@ function App() {
           toggleMenu={toggleMenu}
           onDisconnect={handleOpenDisconnectModal}
           onDisplayInstallModal={handleOpenInstallModal}
+          installPromptEvent={installPromptEvent}
         />
       </ErrorBoundary>
 
