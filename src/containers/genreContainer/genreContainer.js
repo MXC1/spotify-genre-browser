@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SearchSortContainer from "../../components/SearchSortContainer";
+import AlbumContainer from "../albumContainer/albumContainer";
 import "./genreContainer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -7,6 +8,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 function GenreContainer({ genre, albums, onBack }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [sortOption, setSortOption] = useState("alphabetical-asc-artist");
+    const [selectedAlbum, setSelectedAlbum] = useState(null);
 
     const sortOptions = [
         { value: "alphabetical-asc-album", label: "A-Z (Album)" },
@@ -36,6 +38,10 @@ function GenreContainer({ genre, albums, onBack }) {
         return 0;
     });
 
+    if (selectedAlbum) {
+        return <AlbumContainer album={selectedAlbum} onBack={() => setSelectedAlbum(null)} />;
+    }
+
     return (
         <div className="genre-container">
             <SearchSortContainer
@@ -54,13 +60,12 @@ function GenreContainer({ genre, albums, onBack }) {
             <hr className="horizontal-line" onClick={onBack} />
             <div className="album-grid">
                 {sortedAlbums.map((album) => (
-                    <div key={album.id} className="album-item">
-                        <a
-                            href={album.external_urls.spotify}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="album-link"
-                        >
+                    <div
+                        key={album.id}
+                        className="album-item"
+                        onClick={() => setSelectedAlbum(album)}
+                    >
+                        <div className="album-link">
                             <img
                                 src={album.images[1].url}
                                 alt={album.name}
@@ -70,7 +75,7 @@ function GenreContainer({ genre, albums, onBack }) {
                                 <span className="album-name">{album.name}</span>
                                 <span className="album-artist">{album.artists[0].name}</span>
                             </div>
-                        </a>
+                        </div>
                     </div>
                 ))}
             </div>

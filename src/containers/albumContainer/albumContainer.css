@@ -1,0 +1,90 @@
+.single-album-container {
+    text-align: left;
+}
+
+.back-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 5px;
+    height: 50px;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto; 
+}
+
+.genre-back-button {
+    margin-top: -10px;
+}
+
+.back-button:hover {
+    text-decoration: none;
+}
+
+.single-album-details {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    gap: 20px;
+}
+
+.single-album-image {
+    width: 300px;
+    height: 300px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin: auto;
+}
+
+.single-album-info {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 400px;
+    width: 100%; 
+    margin: 0 auto; 
+}
+
+.single-album-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.single-album-artists {
+    font-size: 20px;
+    color: lightgrey;
+    margin: 0;
+}
+
+.spotify-button {
+    display: inline-block;
+    padding: 5px 15px 5px 10px;
+    margin-top: 20px;
+    background-color: #1db954;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 16px;
+    text-align: left;
+}
+
+.spotify-button:hover {
+    background-color: #14833b;
+}
+
+.spotify-logo {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 8px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.end-of-album-rule {
+    margin: 30px 0;
+    border: 1px solid rgb(255, 255, 255, 0.1);
+}
