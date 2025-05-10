@@ -23,6 +23,8 @@ const usePWAInstall = () => {
             captureInstallPrompt(event);
         };
 
+        logMessage('Adding beforeinstallprompt event listener');
+
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
         return () => {
             window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
