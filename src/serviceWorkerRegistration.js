@@ -1,8 +1,3 @@
-// src/serviceWorkerRegistration.js
-
-// This optional code is used to register a service worker.
-// register() is not called by default.
-
 const isLocalhost = Boolean(
     window.location.hostname === 'localhost' ||
       // [::1] is the IPv6 localhost address.

@@ -15,6 +15,7 @@ import AboutContainer from './containers/aboutContainer/aboutContainer';
 import DonatePageContainer from './containers/donatePageContainer/donatePageContainer';
 import ModalContainer from './containers/modalContainer/modalContainer';
 import useModal from './hooks/useModal';
+import usePWAInstall from './hooks/usePWAInstall';
 import { Route, Routes } from "react-router-dom";
 import { useNavigationHelpers } from './utilities/navigationHelpers';
 import OverlayMenu from './containers/overlayMenu/overlayMenu';
@@ -25,6 +26,7 @@ function App() {
   const { showBoundary } = useErrorBoundary()
   const genreGridRef = useRef();
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
+  const { showInstallPrompt, installPromptEvent } = usePWAInstall();
   const { goTo } = useNavigationHelpers();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -87,6 +89,26 @@ function App() {
     });
   };
 
+  const handleOpenInstallModal = () => {
+    logMessage('Opening install modal.');
+    setIsMenuOpen(false);
+    openModal({
+      title: "Install the app",
+      description: "Installing this app allows you to access it directly from your home screen, just like a native app.",
+      button1Text: "Cancel",
+      button1Action: () => {
+        logMessage('User canceled the install modal.');
+        closeModal();
+      },
+      button2Text: "Install",
+      button2Action: () => {
+        logMessage('User accepted the install modal. Showing install prompt.');
+        closeModal();
+        showInstallPrompt();
+      }
+    });
+  };
+
   return (
     <div className="App">
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
@@ -110,7 +132,14 @@ function App() {
       </ErrorBoundary>
 
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
-        <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
+        <OverlayMenu
+          ref={menuRef}
+          isOpen={isMenuOpen}
+          toggleMenu={toggleMenu}
+          onDisconnect={handleOpenDisconnectModal}
+          onDisplayInstallModal={handleOpenInstallModal}
+          installPromptEvent={installPromptEvent}
+        />
       </ErrorBoundary>
 
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
