@@ -134,12 +134,12 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       }
     } while (response.error && response.error.status === 429);
 
-    const reducedAlbums = response.items.map(item => ({
-      id: item.album.id,
-      name: item.album.name,
-      artists: item.album.artists.map(artist => ({ id: artist.id, name: artist.name })),
-      external_urls: { spotify: item.album.external_urls.spotify },
-      images: [null, { url: item.album.images[1]?.url }],
+    const reducedAlbums = response.items.map(({ album }) => ({
+      id: album.id,
+      name: album.name,
+      artists: album.artists.map(({ id, name }) => ({ id, name })),
+      external_urls: { spotify: album.external_urls?.spotify || null },
+      images: album.images.slice(0, 2).map(image => ({ url: image?.url || null })),
     }));
 
     return [reducedAlbums, response.total];

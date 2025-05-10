@@ -14,7 +14,7 @@ function AlbumContainer({ album, onBack }) {
             </div>
             <div className="single-album-details">
                 <img
-                    src={album.images[1]?.url}
+                    src={album.images[0]?.url}
                     alt={album.name}
                     className="single-album-image"
                 />
