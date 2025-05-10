@@ -3,6 +3,7 @@ import logMessage from '../utilities/loggingConfig';
 
 const usePWAInstall = () => {
     const [installPromptEvent, setInstallPromptEvent] = useState(null);
+    const [isStandalone, setIsStandalone] = useState(false); // New state
 
     const captureInstallPrompt = (event) => {
         logMessage(`Install prompt captured: ${event.type}`);
@@ -46,10 +47,21 @@ const usePWAInstall = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const checkStandaloneMode = () => {
+            const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            setIsStandalone(isStandaloneMode);
+            logMessage(`App is running in ${isStandaloneMode ? 'standalone' : 'browser'} mode`);
+        };
+
+        checkStandaloneMode();
+    }, []);
+
     return {
         installPromptEvent,
         captureInstallPrompt,
-        showInstallPrompt
+        showInstallPrompt,
+        isStandalone 
     };
 };
 
