@@ -13,7 +13,22 @@ const usePWAInstall = () => {
     const showInstallPrompt = () => {
         if (installPromptEvent) {
             logMessage(`Showing install prompt: ${installPromptEvent.type}`);
-            installPromptEvent.prompt();
+            try {
+                installPromptEvent.prompt();
+                installPromptEvent.userChoice
+                    .then((choiceResult) => {
+                        if (choiceResult.outcome === 'dismissed') {
+                            logMessage('User dismissed the install prompt');
+                        } else if (choiceResult.outcome === 'accepted') {
+                            logMessage('User accepted the install prompt');
+                        }
+                    })
+                    .catch((error) => {
+                        logMessage(`PWA nstallation failed: ${error.message}`);
+                    });
+            } catch (error) {
+                logMessage(`PWA installation failed: ${error.message}`);
+            }
             setInstallPromptEvent(null);
         }
     };
