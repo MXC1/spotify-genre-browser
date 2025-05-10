@@ -83,7 +83,7 @@ describe('GIVEN I navigate to a single album', () => {
         cy.get('.single-album-title').contains('Test Album One')
         cy.get('.single-album-artists').contains('Test Artist One')
         cy.get('.single-album-image').should('have.attr', 'src')
-        .should('include', 'https://i.scdn.co/image/ab67616d0000b273c9ac1ea80b4c74c09733bcd3');
+        .should('include', 'https://i.scdn.co/image/ab67616d0000b27326597c053b38c9cf93f8f3a9');
         
         cy.get('.spotify-button').contains('Open in Spotify')
         cy.get('.spotify-button').should('have.attr', 'href')
