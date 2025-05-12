@@ -5,6 +5,7 @@ import { logger } from '../utilities/logger';
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const makeSpotifyRequestWithRetries = async (url, options, maxRetries = 3) => {
+  logger.debug('SPOT001', 'Making Spotify API request', { url, options });
   let retries = 0;
   while (retries <= maxRetries) {
     try {
@@ -13,7 +14,7 @@ const makeSpotifyRequestWithRetries = async (url, options, maxRetries = 3) => {
     } catch (error) {
       if (error.response?.status === 429 && retries < maxRetries) {
         const retryAfterSeconds = parseInt(error.response.headers['retry-after'], 10) || 1;
-        logger.error('SPOT003', 'Rate limited, retrying...', { retryAfterSeconds, retries });
+        logger.error('SPOT003', 'Rate limited, retrying', { retryAfterSeconds, retries });
         await delay(retryAfterSeconds * 1000);
         retries++;
       } else {
