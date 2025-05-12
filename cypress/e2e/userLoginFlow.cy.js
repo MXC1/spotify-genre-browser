@@ -1,4 +1,10 @@
-import '../support/commands.js';
+beforeEach(() => {
+  caches.keys().then(function (names) {
+    for (let name of names) {
+      caches.delete(name);
+    }
+  });
+});
 
 describe('GIVEN I visit the app', () => {
 
@@ -34,10 +40,12 @@ describe('GIVEN I visit the app', () => {
     cy.getIndexedDbData('auth', 'session_id');
 
     cy.getIndexedDbData('auth', 'session_id').should('exist').then((sessionIdBeforeReload) => {
-      cy.get('@consoleLog').should('be.calledWith', `Environment is: dev - SessionID: ${sessionIdBeforeReload}`)
+      cy.get('@consoleLog').should('have.been.calledWithMatch',
+        /Environment is/,
+        Cypress.sinon.match.has('env', 'dev'));
       expect(sessionIdBeforeReload).to.exist;
       cy.visit('about:blank');
-      
+
       cy.visit('/genre-album-map?code=valid_token&state=valid_state', {
         onBeforeLoad(win) {
           cy.stub(win.console, 'log').as('consoleLog')
@@ -45,7 +53,7 @@ describe('GIVEN I visit the app', () => {
         }
       });
 
-      cy.get('@consoleLog').should('be.calledWith', `Authenticating user... - SessionID: ${sessionIdBeforeReload}`)
+      cy.getIndexedDbData('auth', 'session_id').should('equal', sessionIdBeforeReload);
     });
   });
 });

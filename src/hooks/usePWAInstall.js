@@ -21,10 +21,10 @@ const usePWAInstall = () => {
                         logger.info('PWA004','Install prompt decision', { action: choiceResult.outcome });
                     })
                     .catch((error) => {
-                        logger.error('PWA005','Install prompt error', { error });
+                        logger.error('PWA005','Install prompt error', { errorMessage: error.message, errorStack: error.stack });
                     });
                 } catch (error) {
-                logger.error('PWA005','Install prompt error', { error });
+                    logger.error('PWA005','Install prompt error', { errorMessage: error.message, errorStack: error.stack });
             }
             setInstallPromptEvent(null);
         }

@@ -52,8 +52,11 @@ describe('GIVEN I visit the app on a PWA-enabled device', () => {
     })
     
     it('THEN the app should be installed', () => {
-      cy.get('@consoleLog').should('have.been.calledWithMatch', /Showing install prompt: beforeinstallprompt/);
-      cy.get('@consoleLog').should('have.been.calledWithMatch', /User accepted the install prompt/);
+      cy.get('@consoleLog').should('have.been.calledWithMatch', /Showing install prompt/);
+      cy.get('@consoleLog').should('have.been.calledWithMatch', /Install prompt decision/);
+      cy.get('@consoleLog').should('have.been.calledWithMatch',
+        /Install prompt decision/,
+        Cypress.sinon.match.has('action', 'accepted'));
     });
 
     it('THEN the install button should not be visible', () => {
@@ -90,7 +93,9 @@ describe('GIVEN I visit the app on a PWA-enabled device', () => {
     });
 
     it('THEN the app should log the installation failure', () => {
-      cy.get('@consoleLog').should('have.been.calledWithMatch', /PWA installation failed: PWA Error/);
+      cy.get('@consoleLog').should('have.been.calledWithMatch',
+        /Install prompt error/,
+        Cypress.sinon.match.has('errorMessage', 'PWA Error'));
     });
   });
 });
@@ -144,12 +149,16 @@ describe('GIVEN the user dismisses the beforeinstallprompt event', () => {
       win.dispatchEvent(event);
       cy.log(`beforeinstallprompt event dispatched: ${event.type}`);
     });
+  });
+  
+  it('THEN the app should log the dismissal', () => {
     cy.get('.menu-button').click();
     cy.get('.menu-item').contains('Install the app').click();
     cy.get('.modal-button').contains('Install').click();
-  });
-
-  it('THEN the app should log the dismissal', () => {
-    cy.get('@consoleLog').should('have.been.calledWithMatch', /User dismissed the install prompt/);
+      cy.get('@consoleLog').should('have.been.calledWithMatch', /Showing install prompt/);
+      cy.get('@consoleLog').should('have.been.calledWithMatch', /Install prompt decision/);
+      cy.get('@consoleLog').should('have.been.calledWithMatch',
+        /Install prompt decision/,
+        Cypress.sinon.match.has('action', 'dismissed'));
   });
 });
