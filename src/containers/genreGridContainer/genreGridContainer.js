@@ -91,7 +91,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       setLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`);
       logger.debug('MAP001', 'Fetching saved albums...', { offset, limit });
 
-      const [albums, numberOfAlbums] = await getSavedAlbumsWithRetries(limit, offset);
+      const [albums, numberOfAlbums] = await getReducedAlbumsAndTotal(limit, offset);
       allAlbums = [...allAlbums, ...albums];
       allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
 
@@ -108,7 +108,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         setLoadingMessage(`Requesting saved albums (${Math.min(offset + limit, numberOfAlbums)} / ${numberOfAlbums})...`);
         logger.debug('MAP001', 'Fetching saved albums...', { offset, limit, numberOfAlbums });
 
-        const [albums] = await getSavedAlbumsWithRetries(limit, offset);
+        const [albums] = await getReducedAlbumsAndTotal(limit, offset);
         allAlbums = [...allAlbums, ...albums];
         allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
       }
@@ -123,18 +123,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     }
   }, []);
 
-  async function getSavedAlbumsWithRetries(limit, offset) {
-    let response;
-
-    do {
-      response = await getMySavedAlbums(limit, offset);
-
-      if (response.error && response.error.status === 429) {
-        const retryAfterSeconds = parseInt(response.headers.get('Retry-After'), 10);
-        logger.error('MAP096', 'Rate limited', { retryAfterSeconds, status: response.error.status });
-        await delay(retryAfterSeconds * 1000);
-      }
-    } while (response.error && response.error.status === 429);
+  async function getReducedAlbumsAndTotal(limit, offset) {
+    const response = await getMySavedAlbums(limit, offset);
 
     const reducedAlbums = response.items.map(({ album }) => ({
       id: album.id,
