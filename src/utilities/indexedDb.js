@@ -1,9 +1,10 @@
 import { openDB } from 'idb';
 import logMessage from './loggingConfig';
+import logger from './logger';
 
 const dbPromise = openDB('spotify-db', 3, {
   upgrade(db, oldVersion, newVersion, transaction) {
-    logMessage(`Upgrading indexedDb from version ${oldVersion} to ${newVersion}`);
+    logger.debug('DB001', 'Upgrading indexedDb', { oldVersion, newVersion });
     if (!db.objectStoreNames.contains('auth')) {
       db.createObjectStore('auth');
     }
@@ -28,7 +29,7 @@ export const getCachedEntry = async (store, key) => {
 };
 
 export const clearAllData = async () => {
-  logMessage('Clearing all data from indexedDb...');
+  logger.debug('DB002', 'Clearing all data from indexedDb');
   const db = await dbPromise;
   const tx = db.transaction(['auth', 'data'], 'readwrite');
   const sessionID = await tx.objectStore('auth').get('session_id');
