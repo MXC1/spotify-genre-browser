@@ -48,7 +48,7 @@ const usePWAInstall = () => {
             const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             setIsStandalone(isStandaloneMode);
             const modeString = isStandaloneMode ? 'standalone' : 'browser'
-            logger.info('PWA007',`App is running in:`, { modeString });
+            logger.info('PWA007',`App is running in`, { mode: modeString });
         };
 
         checkStandaloneMode();
