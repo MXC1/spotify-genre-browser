@@ -34,7 +34,6 @@ describe('GIVEN I visit the app', () => {
     cy.getIndexedDbData('auth', 'session_id');
 
     cy.getIndexedDbData('auth', 'session_id').should('exist').then((sessionIdBeforeReload) => {
-      // cy.verifyWasLogged(`Environment is: staging - SessionID: ${sessionIdBeforeReload}`);
       cy.get('@consoleLog').should('be.calledWith', `Environment is: dev - SessionID: ${sessionIdBeforeReload}`)
       expect(sessionIdBeforeReload).to.exist;
       cy.visit('about:blank');

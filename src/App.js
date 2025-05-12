@@ -6,7 +6,6 @@ import { clearAllData } from './utilities/indexedDb';
 import './App.css';
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import { logMessage, fetchOrGenerateSessionID } from './utilities/loggingConfig';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
@@ -19,6 +18,7 @@ import usePWAInstall from './hooks/usePWAInstall';
 import { Route, Routes } from "react-router-dom";
 import { useNavigationHelpers } from './utilities/navigationHelpers';
 import OverlayMenu from './containers/overlayMenu/overlayMenu';
+import { logger } from './utilities/logger';
 
 Amplify.configure(awsconfig);
 
@@ -32,7 +32,7 @@ function App() {
   const menuRef = useRef(null);
 
   useEffect(() => {
-    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
+    logger.info('Environment is', { env: process.env.REACT_APP_ENV }, 'SYS001');
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
@@ -48,14 +48,14 @@ function App() {
       try {
         await genreGridRef.current.updateGenreAlbumMap();
       } catch (error) {
-        logMessage(`Error refreshing genre album map: ${error}`);
+        logger.error('Error refreshing genre album map', error, 'MAP001');
         showBoundary(error);
       }
     }
   }
 
   const handleDisconnect = async () => {
-    logMessage('Disconnecting Spotify account...');
+    logger.info('Disconnecting Spotify account...', {}, 'AUTH001');
     await clearAllData();
     clearAccessToken();
     if (genreGridRef.current) {
@@ -90,19 +90,19 @@ function App() {
   };
 
   const handleOpenInstallModal = () => {
-    logMessage('Opening install modal.');
+    logger.info('Opening install modal', {}, 'INSTALL001');
     setIsMenuOpen(false);
     openModal({
       title: "Install the app",
       description: "Installing this app allows you to access it directly from your home screen, just like a native app.",
       button1Text: "Cancel",
       button1Action: () => {
-        logMessage('User canceled the install modal.');
+        logger.info('User canceled the install modal', {}, 'INSTALL002');
         closeModal();
       },
       button2Text: "Install",
       button2Action: () => {
-        logMessage('User accepted the install modal. Showing install prompt.');
+        logger.info('User accepted the install modal', {}, 'INSTALL003');
         closeModal();
         showInstallPrompt();
       }
