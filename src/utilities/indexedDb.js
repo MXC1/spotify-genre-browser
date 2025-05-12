@@ -1,5 +1,4 @@
 import { openDB } from 'idb';
-import logMessage from './loggingConfig';
 import logger from './logger';
 
 const dbPromise = openDB('spotify-db', 3, {

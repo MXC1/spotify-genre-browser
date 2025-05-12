@@ -1,7 +1,7 @@
 import './errorHandling.css'
 import React, { useState } from 'react';
 import StackTrace from 'stacktrace-js';
-import logMessage from '../utilities/loggingConfig';
+import logger from './logger';
 
 export function ErrorFallback({ error, resetErrorBoundary }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +25,7 @@ export function ErrorFallback({ error, resetErrorBoundary }) {
         onClick={async () => {
           if (!isLoading) {
             setIsLoading(true);
-            logMessage('User reset the error boundary.');
+            logger.info('ERR001', 'User reset the error boundary');
             await new Promise(r => setTimeout(r, 2000));
             resetErrorBoundary();
           }
@@ -43,6 +43,9 @@ export function handleError(error) {
     const stackString = stackframes
       .map((sf) => `${sf.functionName || 'anonymous'} (${sf.fileName}:${sf.lineNumber}:${sf.columnNumber})`)
       .join('\n');
-    logMessage(`A fatal error occurred with error: ${error} and traceback:\n${stackString}`);
+    logger.error('ERR002', 'A fatal error occurred', {
+      error,
+      stack: stackString,
+    });
   });
 }

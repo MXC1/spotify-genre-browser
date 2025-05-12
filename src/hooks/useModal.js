@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import logMessage from '../utilities/loggingConfig';
 
 const useModal = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
