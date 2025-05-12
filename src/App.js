@@ -32,7 +32,7 @@ function App() {
   const menuRef = useRef(null);
 
   useEffect(() => {
-    logger.info('SYS001','Environment is', { env: process.env.REACT_APP_ENV });
+    logger.debug('SYS001','Environment is', { env: process.env.REACT_APP_ENV });
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');

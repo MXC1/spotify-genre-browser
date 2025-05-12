@@ -210,7 +210,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     },
 
     updateGenreAlbumMap: async () => {
-      logger.info('MAP013', 'Updating genre album map from scratch');
+      logger.debug('MAP013', 'Updating genre album map from scratch');
       const allAlbums = await fetchAllSavedAlbums();
 
       const grouped = await groupAlbumsByArtistGenre(allAlbums);
@@ -218,7 +218,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       await setCachedEntry('data', grouped, 'grouped_albums');
     },
     getCachedGenreAlbumMap: async () => {
-      logger.info('MAP012', 'Fetching genre album map from cache');
+      logger.debug('MAP012', 'Fetching genre album map from cache');
       setLoadingMessage(`Loading saved albums...`);
       const cachedGroupedAlbums = await getCachedEntry('data', 'grouped_albums');
       setGroupedAlbums(cachedGroupedAlbums);

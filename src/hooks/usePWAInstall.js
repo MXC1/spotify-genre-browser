@@ -35,7 +35,7 @@ const usePWAInstall = () => {
             captureInstallPrompt(event);
         };
 
-        logger.info('PWA001','Adding beforeinstallprompt event listener', {});
+        logger.debug('PWA001','Adding beforeinstallprompt event listener', {});
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
         return () => {
@@ -48,7 +48,7 @@ const usePWAInstall = () => {
             const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             setIsStandalone(isStandaloneMode);
             const modeString = isStandaloneMode ? 'standalone' : 'browser'
-            logger.info('PWA007',`App is running in`, { mode: modeString });
+            logger.debug('PWA007',`App is running in`, { mode: modeString });
         };
 
         checkStandaloneMode();
