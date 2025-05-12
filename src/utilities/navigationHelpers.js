@@ -19,7 +19,7 @@ export const useNavigationHelpers = () => {
     logger.debug('AUTH080','Checking authentication status...', {});
     const accessToken = await getAccessToken();
     if (accessToken) {
-      navigate('/genre-album-map');
+      goTo('/genre-album-map');
     } else {
       goTo('/authenticate');
     }
