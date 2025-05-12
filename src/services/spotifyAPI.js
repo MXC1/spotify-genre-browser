@@ -1,6 +1,6 @@
 import { getOrGenerateNewAccessToken } from './spotifyAuth';
 import axios from 'axios';
-import { logMessage } from '../utilities/loggingConfig';
+import { logger } from '../utilities/logger';
 
 export const getMySavedAlbums = async (limit, offset) => {
     const token = await getOrGenerateNewAccessToken();
@@ -20,7 +20,7 @@ export const getMySavedAlbums = async (limit, offset) => {
       });
       return response.data;
     } catch (error) {
-      logMessage(`Error fetching saved albums: ${error}`);
+      logger.error('SPOT001', 'Error fetching saved albums', { error });
       throw error;
     }
   };
@@ -41,7 +41,7 @@ export const getMySavedAlbums = async (limit, offset) => {
       });
       return response.data;
     } catch (error) {
-    logMessage(`Error fetching artists: ${error}`);
+      logger.error('SPOT002', 'Error fetching artists', { error });
       throw error;
     }
   };

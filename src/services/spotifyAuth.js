@@ -1,6 +1,6 @@
 import axios from 'axios';
-import logMessage from '../utilities/loggingConfig';
 import { setCachedEntry, getCachedEntry } from '../utilities/indexedDb';
+import { logger } from '../utilities/logger';
 
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = window.location.origin;
@@ -39,18 +39,18 @@ export const getOrGenerateNewAccessToken = async () => {
 }
 
 export const setAuthUrl = async () => {
-  logMessage(`Redirecting to authorization URL...`);
+  logger.debug('AUTH013', 'Redirecting to authorization URL...', {});
   const authUrlToNavigateTo = (await getAuthorizationURL()).authorizationURL;
   window.location.href = authUrlToNavigateTo;
 }
 
 export const authenticateUser = async () => {
-  logMessage('Authenticating user...');
+  logger.info('AUTH001', 'Authenticating user...', {});
 
   // Check if a token exists in indexedDb
   const cachedToken = await getCachedEntry('auth', 'access_token');
   if (cachedToken) {
-    logMessage(`Cached token found: ${cachedToken}`);
+    logger.debug('AUTH020', 'Using cached token', { cachedToken });
     setAccessToken(cachedToken);
   }
 
@@ -61,10 +61,9 @@ export const authenticateUser = async () => {
 
   if (existingCodeVerifier && code) {
     // If a codeVerifier and code exist, proceed with token exchange
-    logMessage(`Using existing codeVerifier for token exchange.`);
+    logger.debug('AUTH002', 'Using existing codeVerifier for token exchange');
     try {
       const token = await exchangeCodeForToken(code, existingCodeVerifier);
-      logMessage(`Token: ${token}`);
       setAccessToken(token);
     } catch(error) {
       throw error;
@@ -115,14 +114,14 @@ const generateCodeChallenge = async (codeVerifier) => {
 };
 
 export const getAuthorizationURL = async () => {
-  logMessage(`Getting authorization URL...`);
+  logger.debug('AUTH010', 'Generating authorization URL');
   const authUrl = new URL("https://accounts.spotify.com/authorize");
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
   await setCachedEntry('auth', codeVerifier, 'spotify_code_verifier');
 
-  logMessage(`Code verifier: ${codeVerifier}`);
+  logger.debug('AUTH011', 'Generated code verifier and challenge', { codeVerifier });
 
   const state = generateState();
   const params = new URLSearchParams({
@@ -136,17 +135,12 @@ export const getAuthorizationURL = async () => {
   });
   authUrl.search = new URLSearchParams(params).toString();
   const authorizationURL = authUrl.toString();
-  logMessage(`Authorization URL: ${authorizationURL}`);
+  logger.debug('AUTH012', 'Generated authorization URL', { authorizationURL });
   return { authorizationURL };
 };
 
 
 export const exchangeCodeForToken = async (code, codeVerifier) => {
-  logMessage(`Exchanging code for token...`);
-  logMessage(`Code: ${code}`);
-  logMessage(`Redirect URI: ${REDIRECT_URI}`);
-  logMessage(`Client ID: ${CLIENT_ID}`);
-  logMessage(`Code verifier: ${codeVerifier}`);
 
   const payload = {
     code: code,
@@ -156,7 +150,8 @@ export const exchangeCodeForToken = async (code, codeVerifier) => {
   };
 
   const url = 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/' + process.env.REACT_APP_ENV + "/";
-  logMessage(`Token exchange URL: ${url}`);
+  
+  logger.debug('AUTH004', 'Exchanging code for token', { payload , url});
 
   try {
     const response = await axios.post(url, payload, {
@@ -165,7 +160,7 @@ export const exchangeCodeForToken = async (code, codeVerifier) => {
       }
     });
 
-    logMessage(`Token response: ${JSON.stringify(response.data)}`);
+    logger.debug('AUTH005', 'Token exchange successful', { response: response.data });
     const accessToken = response.data.access_token;
     const refreshToken = response.data.refresh_token;
     const expiresAt = Date.now() + response.data.expires_in * 1000;
@@ -175,17 +170,17 @@ export const exchangeCodeForToken = async (code, codeVerifier) => {
     return accessToken;
 
   } catch (error) {
-    logMessage(`Error exchanging code for token: ${error.response ? JSON.stringify(error.response.data) : error.message}`);
+    logger.error('AUTH090', 'Error exchanging code for token', { error });
     throw error; 
   }
 };
 
 export const refreshAccessToken = async () => {
-  logMessage(`Access token expired. Refreshing...`);
+  logger.debug('AUTH030', 'Refreshing access token');
   const refreshToken = await getCachedEntry('auth', 'refresh_token');
 
   if (!refreshToken) {
-    logMessage(`No refresh token found. Cannot refresh access token.`);
+    logger.error('AUTH032', 'No refresh token found');
     return null;
   }
 
@@ -206,7 +201,7 @@ export const refreshAccessToken = async () => {
     const response = await fetch(url, payload);
     const data = await response.json();
 
-    logMessage(`Refresh token response: ${JSON.stringify(data)}`);
+    logger.debug('AUTH031', 'Refresh token response', { data });
     const newAccessToken = data.access_token;
     await setAccessToken(newAccessToken);
     if (data.refresh_token) {
@@ -216,7 +211,7 @@ export const refreshAccessToken = async () => {
     }
     return newAccessToken;
   } catch (error) {
-    logMessage(`Error refreshing access token: ${error.response ? JSON.stringify(error.response.data) : error.message}`);
+    logger.error('AUTH091', 'Error refreshing access token', { error });
     return null;
   }
 };

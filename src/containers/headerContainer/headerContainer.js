@@ -43,7 +43,7 @@ function HeaderContainer({ onRefresh, onOpenDisconnectModal, toggleMenu }) {
             </div>
         );
     }
-    else if (location.pathname.startsWith('/genre')) {
+    else if (location.pathname.startsWith('/genre') || location.pathname.startsWith('/album')) {
         return (
             <div className="header-container">
                 <div className="title-container">
