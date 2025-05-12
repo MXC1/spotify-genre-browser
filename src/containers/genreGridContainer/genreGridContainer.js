@@ -7,6 +7,7 @@ import logMessage from "../../utilities/loggingConfig";
 import './genreGridContainer.css';
 import GenreContainer from '../genreContainer/genreContainer';
 import { useNavigate } from "react-router-dom";
+import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 import SearchSortContainer from '../../components/SearchSortContainer';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
@@ -16,6 +17,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [sortOption, setSortOption] = useState('number-desc');
   const { showBoundary } = useErrorBoundary();
   const [selectedGenre, setSelectedGenre] = useState(null);
+  const { goTo } = useNavigationHelpers();
   const navigate = useNavigate();
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -58,7 +60,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     try {
       const token = await authenticateUser();
       if (!token) {
-        navigate("/authenticate");
+        goTo("/authenticate");
         return;
       }
 
@@ -261,18 +263,16 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   }
 
   const handleGenreClick = (genre, albums) => {
-    logMessage(`Navigating to genre: ${genre}`);
     setSortOption('alphabetical-asc');
     setSelectedGenre({ genre, albums });
-    navigate(`/genre?g=${encodeURIComponent(genre)}`);
+    goTo(`/genre`, { genre });
   };
 
   const handleBackToGrid = () => {
-    logMessage('Navigating to /genre-album-map');
     setSelectedGenre(null);
     setSortOption('number-desc');
     setSearchQuery('');
-    navigate('/genre-album-map');
+    goTo('/genre-album-map');
   };
 
   const sortOptions = [

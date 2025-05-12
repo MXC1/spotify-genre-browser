@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import SearchSortContainer from "../../components/SearchSortContainer";
-import logMessage from "../../utilities/loggingConfig";
 import AlbumContainer from "../albumContainer/albumContainer";
 import "./genreContainer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 
 function GenreContainer({ genre, albums, onBack }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [sortOption, setSortOption] = useState("alphabetical-asc-artist");
     const [selectedAlbum, setSelectedAlbum] = useState(null);
+    const { goTo } = useNavigationHelpers();
 
     const sortOptions = [
         { value: "alphabetical-asc-album", label: "A-Z (Album)" },
@@ -41,8 +42,10 @@ function GenreContainer({ genre, albums, onBack }) {
 
     if (selectedAlbum) {
         return <AlbumContainer album={selectedAlbum} onBack={() => {
-            logMessage(`Navigating back to genre: ${genre}`);
-            setSelectedAlbum(null)}
+            setSelectedAlbum(null)
+            goTo(`/genre`, { genre: genre });
+        }
+
         } />;
     }
 
@@ -69,8 +72,8 @@ function GenreContainer({ genre, albums, onBack }) {
                         key={album.id}
                         className="album-item"
                         onClick={() => {
-                            logMessage(`Selected album: ${album.id}`);
                             setSelectedAlbum(album);
+                            goTo(`/album`, { albumId: album.id });
                         }}
                     >
                         <div className="album-link">

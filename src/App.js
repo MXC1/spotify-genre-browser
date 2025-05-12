@@ -39,7 +39,7 @@ function App() {
     const state = params.get('state');
 
     if (code && state) {
-      goTo(`/genre-album-map?code=${code}&state=${state}`);
+      goTo(`/genre-album-map`, {code: code, state: state});
     }
   }, []);
 
@@ -125,6 +125,7 @@ function App() {
           <Route path="/authenticate" element={<LoginContainer />} />
           <Route path="/genre-album-map" element={<GenreGridContainer ref={genreGridRef} />} />
           <Route path="/genre" element={<GenreGridContainer ref={genreGridRef} />} />
+          <Route path="/album" element={<GenreGridContainer ref={genreGridRef} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
           <Route path="/about" element={<AboutContainer />} />
           <Route path="/donate" element={<DonatePageContainer />} />
