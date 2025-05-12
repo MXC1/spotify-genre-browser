@@ -79,4 +79,3 @@ export const logger = {
   debug: (event_id, msg, context) => logMessage('DEBUG', msg, event_id, context),
 };
 
-export default logger;

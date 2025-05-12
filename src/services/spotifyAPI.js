@@ -1,6 +1,6 @@
 import { getOrGenerateNewAccessToken } from './spotifyAuth';
 import axios from 'axios';
-import logger from '../utilities/logger';
+import { logger } from '../utilities/logger';
 
 export const getMySavedAlbums = async (limit, offset) => {
     const token = await getOrGenerateNewAccessToken();

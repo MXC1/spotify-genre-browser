@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { getAccessToken } from '../services/spotifyAuth';
-import logger from "./logger";
+import { logger } from "./logger";
 
 export const useNavigationHelpers = () => {
   const navigate = useNavigate();

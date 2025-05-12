@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { setCachedEntry, getCachedEntry } from '../utilities/indexedDb';
-import logger from '../utilities/logger';
+import { logger } from '../utilities/logger';
 
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = window.location.origin;

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import logger from '../utilities/logger';
+import { logger } from '../utilities/logger';
 
 const usePWAInstall = () => {
     const [installPromptEvent, setInstallPromptEvent] = useState(null);

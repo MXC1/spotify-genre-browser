@@ -1,7 +1,7 @@
 import './errorHandling.css'
 import React, { useState } from 'react';
 import StackTrace from 'stacktrace-js';
-import logger from './logger';
+import { logger } from './logger';
 
 export function ErrorFallback({ error, resetErrorBoundary }) {
   const [isLoading, setIsLoading] = useState(false);

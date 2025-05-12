@@ -1,5 +1,5 @@
 import { openDB } from 'idb';
-import logger from './logger';
+import { logger } from './logger';
 
 const dbPromise = openDB('spotify-db', 3, {
   upgrade(db, oldVersion, newVersion, transaction) {
