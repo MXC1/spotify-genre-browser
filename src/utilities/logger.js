@@ -28,7 +28,7 @@ async function fetchOrGenerateSessionID() {
 
 // -- CloudWatch Log Stream/Group Configuration --
 const LOG_GROUP = 'SGB_Operational_Logs';
-const LOG_STREAM = 'SGB_Operational_Logs'; // For production use, you might want per-session or per-day stream names
+const LOG_STREAM = 'SGB_Operational_Logs'; 
 
 async function logToCloudWatch(logEvent) {
   const params = {
