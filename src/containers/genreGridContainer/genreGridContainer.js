@@ -89,7 +89,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       // Call the API once to get the total value
 
       setLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`);
-      logger.debug('MAP001', 'Fetching saved albums...', { offset, limit });
+      logger.info('MAP001', 'Fetching saved albums...');
 
       const [albums, numberOfAlbums] = await getReducedAlbumsAndTotal(limit, offset);
       allAlbums = [...allAlbums, ...albums];
@@ -106,7 +106,6 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
       for (offset; offset <= batchesToProcess * limit; offset += limit) {
         setLoadingMessage(`Requesting saved albums (${Math.min(offset + limit, numberOfAlbums)} / ${numberOfAlbums})...`);
-        logger.debug('MAP001', 'Fetching saved albums...', { offset, limit, numberOfAlbums });
 
         const [albums] = await getReducedAlbumsAndTotal(limit, offset);
         allAlbums = [...allAlbums, ...albums];
@@ -147,7 +146,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     const artistIds = [...new Set(albums.map(album => album.artists[0].id))];
 
     setLoadingMessage('Grouping albums by artist genre...');
-    logger.debug('MAP020', 'Grouping albums by artist genre');
+    logger.info('MAP020', 'Grouping albums by artist genre');
 
     for (let i = 0; i < artistIds.length; i += 50) {
       const batch = artistIds.slice(i, i + 50);
