@@ -73,9 +73,9 @@ async function logMessage(level, message, event_id = null, context = {}) {
 
 // -- Public API --
 export const logger = {
-  info: (event_id, msg, context) => logMessage('INFO', msg, event_id, context),
-  error: (event_id, msg, context) => logMessage('ERROR', msg, event_id, context),
-  warn: (event_id, msg, context) => logMessage('WARN', msg, event_id, context),
-  debug: (event_id, msg, context) => logMessage('DEBUG', msg, event_id, context),
+  info: (event_id, msg, context = {}) => logMessage('INFO', msg, event_id, context),
+  error: (event_id, msg, context = {}) => logMessage('ERROR', msg, event_id, context),
+  warn: (event_id, msg, context = {}) => logMessage('WARN', msg, event_id, context),
+  debug: (event_id, msg, context = {}) => logMessage('DEBUG', msg, event_id, context),
 };
 

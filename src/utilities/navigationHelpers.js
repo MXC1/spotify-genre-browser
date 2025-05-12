@@ -8,7 +8,7 @@ export const useNavigationHelpers = () => {
 
   const goTo = (path, params={}) => {
     if (location.pathname !== path) {
-      logger.info('NAV001', 'Navigating to:', { path: path });
+      logger.info('NAV001', 'Navigating to:', { path, params });
       const queryString = new URLSearchParams(params).toString();
       const fullPath = queryString ? `${path}?${queryString}` : path;
       navigate(fullPath, { replace: true });
