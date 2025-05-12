@@ -55,7 +55,7 @@ function App() {
   }
 
   const handleDisconnect = async () => {
-    logger.info('AUTH001','Disconnecting Spotify account...', {});
+    logger.info('AUTH080','Disconnecting Spotify account...', {});
     await clearAllData();
     clearAccessToken();
     if (genreGridRef.current) {

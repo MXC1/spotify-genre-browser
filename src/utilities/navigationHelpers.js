@@ -16,7 +16,7 @@ export const useNavigationHelpers = () => {
   }
 
   const checkAuthAndNavigate = async () => {
-    logger.info('AUTH002','Checking authentication status...', {});
+    logger.info('AUTH080','Checking authentication status...', {});
     const accessToken = await getAccessToken();
     if (accessToken) {
       navigate('/genre-album-map');
