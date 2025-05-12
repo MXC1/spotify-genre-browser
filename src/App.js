@@ -32,7 +32,7 @@ function App() {
   const menuRef = useRef(null);
 
   useEffect(() => {
-    logger.info('Environment is', { env: process.env.REACT_APP_ENV }, 'SYS001');
+    logger.info('SYS001','Environment is', { env: process.env.REACT_APP_ENV });
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
@@ -48,14 +48,14 @@ function App() {
       try {
         await genreGridRef.current.updateGenreAlbumMap();
       } catch (error) {
-        logger.error('Error refreshing genre album map', error, 'MAP001');
+        logger.error('MAP001','Error refreshing genre album map', error);
         showBoundary(error);
       }
     }
   }
 
   const handleDisconnect = async () => {
-    logger.info('Disconnecting Spotify account...', {}, 'AUTH001');
+    logger.info('AUTH001','Disconnecting Spotify account...', {});
     await clearAllData();
     clearAccessToken();
     if (genreGridRef.current) {
@@ -90,19 +90,19 @@ function App() {
   };
 
   const handleOpenInstallModal = () => {
-    logger.info('Opening install modal', {}, 'INSTALL001');
+    logger.info('INSTALL001','Opening install modal', {});
     setIsMenuOpen(false);
     openModal({
       title: "Install the app",
       description: "Installing this app allows you to access it directly from your home screen, just like a native app.",
       button1Text: "Cancel",
       button1Action: () => {
-        logger.info('User canceled the install modal', {}, 'INSTALL002');
+        logger.info('INSTALL002','User canceled the install modal', {});
         closeModal();
       },
       button2Text: "Install",
       button2Action: () => {
-        logger.info('User accepted the install modal', {}, 'INSTALL003');
+        logger.info('INSTALL003','User accepted the install modal', {});
         closeModal();
         showInstallPrompt();
       }

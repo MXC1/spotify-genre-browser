@@ -6,25 +6,25 @@ const usePWAInstall = () => {
     const [isStandalone, setIsStandalone] = useState(false); 
 
     const captureInstallPrompt = (event) => {
-        logger.info('Install prompt captured', { event }, 'PWA002');
+        logger.info('PWA002','Install prompt captured', { event });
         event.preventDefault();
         setInstallPromptEvent(event);
     };
 
     const showInstallPrompt = () => {
         if (installPromptEvent) {
-            logger.info('Showing install prompt', { installPromptEvent }, 'PWA003');
+            logger.info('PWA003','Showing install prompt', { installPromptEvent });
             try {
                 installPromptEvent.prompt();
                 installPromptEvent.userChoice
                     .then((choiceResult) => {
-                        logger.info('Install prompt decision', { action: choiceResult.outcome }, 'PWA004');
+                        logger.info('PWA004','Install prompt decision', { action: choiceResult.outcome });
                     })
                     .catch((error) => {
-                        logger.error('Install prompt error', { error }, 'PWA005');
+                        logger.error('PWA005','Install prompt error', { error });
                     });
                 } catch (error) {
-                logger.error('Install prompt error', { error }, 'PWA005');
+                logger.error('PWA005','Install prompt error', { error });
             }
             setInstallPromptEvent(null);
         }
@@ -35,7 +35,7 @@ const usePWAInstall = () => {
             captureInstallPrompt(event);
         };
 
-        logger.info('Adding beforeinstallprompt event listener', {}, 'PWA001');
+        logger.info('PWA001','Adding beforeinstallprompt event listener', {});
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
         return () => {
@@ -48,7 +48,7 @@ const usePWAInstall = () => {
             const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             setIsStandalone(isStandaloneMode);
             const modeString = isStandaloneMode ? 'standalone' : 'browser'
-            logger.info(`App is running in:`, { modeString }, 'PWA007');
+            logger.info('PWA007',`App is running in:`, { modeString });
         };
 
         checkStandaloneMode();

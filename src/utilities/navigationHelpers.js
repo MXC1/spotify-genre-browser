@@ -8,7 +8,7 @@ export const useNavigationHelpers = () => {
 
   const goTo = (path, params={}) => {
     if (location.pathname !== path) {
-      logger.info(`Navigating to:`, { path: path, params: params }, 'NAV001');
+      logger.info('NAV001', 'Navigating to:', { path: path });
       const queryString = new URLSearchParams(params).toString();
       const fullPath = queryString ? `${path}?${queryString}` : path;
       navigate(fullPath, { replace: true });
@@ -16,7 +16,7 @@ export const useNavigationHelpers = () => {
   }
 
   const checkAuthAndNavigate = async () => {
-    logger.info('Checking authentication status...', {}, 'AUTH002');
+    logger.info('AUTH002','Checking authentication status...', {});
     const accessToken = await getAccessToken();
     if (accessToken) {
       navigate('/genre-album-map');
