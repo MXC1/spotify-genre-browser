@@ -17,6 +17,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [sortOption, setSortOption] = useState('number-desc');
   const { showBoundary } = useErrorBoundary();
   const [selectedGenre, setSelectedGenre] = useState(null);
+  const [prevSearchQuery, setPrevSearchQuery] = useState(''); // Add a state to store the previous search query
   const { goTo } = useNavigationHelpers();
   const navigate = useNavigate();
 
@@ -28,7 +29,6 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     if (url.pathname === '/genre-album-map') {
       setSelectedGenre(null);
       setSortOption('number-desc');
-      setSearchQuery('');
     }
   }, [navigate]);
 
@@ -248,15 +248,17 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   });
 
   const handleGenreClick = (genre, albums) => {
+    setPrevSearchQuery(searchQuery); 
     setSortOption('alphabetical-asc');
     setSelectedGenre({ genre, albums });
+    setSearchQuery(''); 
     goTo(`/genre`, { genre });
   };
 
   const handleBackToGrid = () => {
     setSelectedGenre(null);
     setSortOption('number-desc');
-    setSearchQuery('');
+    setSearchQuery(prevSearchQuery); 
     goTo('/genre-album-map');
   };
 
@@ -291,6 +293,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
                 : "Search genres, albums, and artists..."
             }
             sortOptions={selectedGenre ? sortOptions.slice(0, 2) : sortOptions}
+            searchQuery={searchQuery} 
           />
           <div className="genre-grid">
             {sortedGenres.map(([genre, albums], index) => (

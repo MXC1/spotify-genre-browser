@@ -3,6 +3,23 @@ describe('GIVEN I am on the genre grid page', () => {
         cy.mockAPIResponsesAndInitialiseAuthenticatedState();
     });
 
+    describe('WHEN I change the search query', () => {
+        beforeEach(() => {
+            cy.get('.search-bar').type('slowcore');
+        });
+
+        it('THEN the genre grid is filtered', () => {
+            cy.get('.genre-section').should('have.length', 1);
+            cy.get('.genre-section').eq(0).should('contain', 'slowcore, spoken word');
+        });
+
+        it('THEN the search query is retained', () => {
+            cy.get('.genre-section').eq(0).click();
+            cy.get('.back-button').click();
+            cy.get('.search-bar').should('have.value', 'slowcore');
+        });
+    });
+    
     describe('WHEN I click on a genre card', () => {
         beforeEach(() => {
             cy.get('.genre-section').eq(0).click();
