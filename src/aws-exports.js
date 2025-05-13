@@ -3,6 +3,20 @@
 
 const awsmobile = {
     "aws_project_region": "eu-west-2",
+    "aws_dynamodb_all_tables_region": "eu-west-2",
+    "aws_dynamodb_table_schemas": [
+        {
+            "tableName": "feedbackTable-dev",
+            "region": "eu-west-2"
+        }
+    ],
+    "aws_cloud_logic_custom": [
+        {
+            "name": "feedbackAPI",
+            "endpoint": "https://obhjtma0z8.execute-api.eu-west-2.amazonaws.com/dev",
+            "region": "eu-west-2"
+        }
+    ],
     "Auth": {
         "identityPoolId": "eu-west-2:e1f1f662-0c4a-46b4-b707-123a98e849f1",
         "region": "eu-west-2"

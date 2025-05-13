@@ -13,7 +13,16 @@
     },
     "categories": {
       "function": {
-        "feedbackLambda": {}
+        "feedbackLambda": {
+          "deploymentBucketName": "amplify-genrebrowser-dev-3671a-deployment",
+          "s3Key": "amplify-builds/feedbackLambda-314b4d517a7475624b42-build.zip"
+        }
+      },
+      "storage": {
+        "feedbackTable": {}
+      },
+      "api": {
+        "feedbackAPI": {}
       }
     }
   }
