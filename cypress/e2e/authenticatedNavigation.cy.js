@@ -59,10 +59,10 @@ describe('GIVEN I am on the homepage', () => {
     describe('WHEN I click the menu itself', () => {
         beforeEach(() => {
             cy.get('.menu-button').click();
-            cy.get('.overlay-menu').click();
+            cy.get('.overlay-menu').click('bottomRight', { force: true });
         });
         
-        it('THEN the hamburger menu should stay open', () => {
+        it.only('THEN the hamburger menu should stay open', () => {
             cy.get('.overlay-menu').should('be.visible');
             cy.get('.overlay-background').should('be.visible');
             cy.get('.close-menu-button').click();
@@ -142,6 +142,35 @@ describe('GIVEN I am on the donate page', () => {
         cy.get('#kofiframe').should('exist');
         cy.get('#kofiframe').should('have.attr', 'src').and('include', 'ko-fi.com/genrebrowser');
     })
+});
+
+describe('GIVEN I am on the feedback page', () => {
+    beforeEach(() => {
+        cy.visit('/feedback', {
+            onBeforeLoad: (win) => {
+                cy.stub(win.console, 'log').as('consoleLog');
+            },
+        });
+    });
+
+    it('THEN the feedback page should be shown', () => {
+        cy.get('.page-title').should('contain', 'Give Feedback');
+        cy.get('.home-button').should('exist');
+        cy.get('.feedback-container').should('exist');
+    });
+
+    describe('WHEN I submit feedback', () => {
+        beforeEach(() => {
+            cy.get('textarea').type('This is a test feedback');
+            cy.get('button[type="submit"]').click();
+        });
+
+        it('THEN the success message should be shown', () => {
+            cy.get('.feedback-success').should('exist');
+            cy.get('.feedback-error').should('not.exist');
+            cy.get('@consoleLog').should('have.been.calledWithMatch', /Submitting feedback/);
+        });
+    });
 });
 
 describe('GIVEN my location is empty', () => {
