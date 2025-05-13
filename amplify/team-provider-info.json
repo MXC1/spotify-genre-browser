@@ -16,13 +16,54 @@
         "feedbackLambda": {
           "deploymentBucketName": "amplify-genrebrowser-dev-3671a-deployment",
           "s3Key": "amplify-builds/feedbackLambda-737378517569524a4d50-build.zip"
-        }
+        },
+        "feedbackTable": {}
       },
       "storage": {
         "feedbackTable": {}
       },
       "api": {
         "feedbackAPI": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d1oxklzichgkwx",
+          "type": "cicd"
+        }
+      }
+    }
+  },
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-genrebrowser-staging-07292-authRole",
+      "UnauthRoleArn": "arn:aws:iam::976193252222:role/amplify-genrebrowser-staging-07292-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::976193252222:role/amplify-genrebrowser-staging-07292-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-genrebrowser-staging-07292-deployment",
+      "UnauthRoleName": "amplify-genrebrowser-staging-07292-unauthRole",
+      "StackName": "amplify-genrebrowser-staging-07292",
+      "StackId": "arn:aws:cloudformation:eu-west-2:976193252222:stack/amplify-genrebrowser-staging-07292/c217b1a0-2fee-11f0-9c71-064274f1ebd5",
+      "AmplifyAppId": "d1oxklzichgkwx"
+    },
+    "categories": {
+      "function": {
+        "feedbackLambda": {
+          "deploymentBucketName": "amplify-genrebrowser-staging-07292-deployment",
+          "s3Key": "amplify-builds/feedbackLambda-737378517569524a4d50-build.zip"
+        },
+        "feedbackTable": {}
+      },
+      "api": {
+        "feedbackAPI": {}
+      },
+      "storage": {
+        "feedbackTable": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d1oxklzichgkwx",
+          "type": "cicd"
+        }
       }
     }
   }
