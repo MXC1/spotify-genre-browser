@@ -1,15 +1,20 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-spotify-genre-browser-dev-65ffe-authRole",
-      "UnauthRoleArn": "arn:aws:iam::976193252222:role/amplify-spotify-genre-browser-dev-65ffe-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::976193252222:role/amplify-spotify-genre-browser-dev-65ffe-authRole",
+      "AuthRoleName": "amplify-genrebrowser-dev-3671a-authRole",
+      "UnauthRoleArn": "arn:aws:iam::976193252222:role/amplify-genrebrowser-dev-3671a-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::976193252222:role/amplify-genrebrowser-dev-3671a-authRole",
       "Region": "eu-west-2",
-      "DeploymentBucketName": "amplify-spotify-genre-browser-dev-65ffe-deployment",
-      "UnauthRoleName": "amplify-spotify-genre-browser-dev-65ffe-unauthRole",
-      "StackName": "amplify-spotify-genre-browser-dev-65ffe",
-      "StackId": "arn:aws:cloudformation:eu-west-2:976193252222:stack/amplify-spotify-genre-browser-dev-65ffe/948e1e60-7cc8-11ef-9e9a-0655181224a7",
-      "AmplifyAppId": "de83zdyzq2kwu"
+      "DeploymentBucketName": "amplify-genrebrowser-dev-3671a-deployment",
+      "UnauthRoleName": "amplify-genrebrowser-dev-3671a-unauthRole",
+      "StackName": "amplify-genrebrowser-dev-3671a",
+      "StackId": "arn:aws:cloudformation:eu-west-2:976193252222:stack/amplify-genrebrowser-dev-3671a/d79fd060-2f8b-11f0-989e-0279d4c0a0fb",
+      "AmplifyAppId": "d1oxklzichgkwx"
+    },
+    "categories": {
+      "function": {
+        "feedbackLambda": {}
+      }
     }
   }
 }
