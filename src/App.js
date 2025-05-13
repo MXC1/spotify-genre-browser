@@ -9,6 +9,8 @@ import awsconfig from './aws-exports';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
+import GenreContainer from './containers/genreContainer/genreContainer';
+import AlbumContainer from './containers/albumContainer/albumContainer';
 import PrivacyPolicyContainer from './containers/privacyPolicyContainer/privacyPolicyContainer';
 import AboutContainer from './containers/aboutContainer/aboutContainer';
 import DonatePageContainer from './containers/donatePageContainer/donatePageContainer';
@@ -125,8 +127,8 @@ function App() {
           <Route path="*" element={<LoginContainer />} />
           <Route path="/authenticate" element={<LoginContainer />} />
           <Route path="/genre-album-map" element={<GenreGridContainer ref={genreGridRef} />} />
-          <Route path="/genre" element={<GenreGridContainer ref={genreGridRef} />} />
-          <Route path="/album" element={<GenreGridContainer ref={genreGridRef} />} />
+          <Route path="/genre" element={<GenreContainer />} />
+          <Route path="/album" element={<AlbumContainer />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
           <Route path="/about" element={<AboutContainer />} />
           <Route path="/feedback" element={<FeedbackContainer />} />
