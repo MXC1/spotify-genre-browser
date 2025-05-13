@@ -32,15 +32,19 @@ const path = "/feedback";
 app.post(path, async function(req, res) {
 
   const feedback = req.body.message;
+  const id = req.body.id; // Get id from request
 
   if (!feedback) {
     return res.status(400).json({ error: 'Feedback cannot be empty' });
+  }
+  if (!id) {
+    return res.status(400).json({ error: 'ID is required' });
   }
 
   const putItemParams = {
     TableName: tableName,
     Item: {
-      id: new Date().toISOString(),  // Using timestamp as unique ID
+      id: id, // Use id from request
       message: feedback,
       timestamp: new Date().toISOString(),
     },

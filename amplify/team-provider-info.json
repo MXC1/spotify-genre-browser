@@ -15,7 +15,7 @@
       "function": {
         "feedbackLambda": {
           "deploymentBucketName": "amplify-genrebrowser-dev-3671a-deployment",
-          "s3Key": "amplify-builds/feedbackLambda-314b4d517a7475624b42-build.zip"
+          "s3Key": "amplify-builds/feedbackLambda-737378517569524a4d50-build.zip"
         }
       },
       "storage": {
