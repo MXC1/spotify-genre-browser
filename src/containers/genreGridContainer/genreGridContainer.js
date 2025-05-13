@@ -5,7 +5,6 @@ import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
 import { authenticateUser } from "../../services/spotifyAuth";
 import { logger } from "../../utilities/logger";
 import './genreGridContainer.css';
-import GenreContainer from '../genreContainer/genreContainer';
 import { useNavigate } from "react-router-dom";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 import SearchSortContainer from '../../components/SearchSortContainer';
@@ -16,8 +15,6 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
   const { showBoundary } = useErrorBoundary();
-  const [selectedGenre, setSelectedGenre] = useState(null);
-  const [prevSearchQuery, setPrevSearchQuery] = useState(''); // Add a state to store the previous search query
   const { goTo } = useNavigationHelpers();
   const navigate = useNavigate();
 
@@ -27,7 +24,6 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   useEffect(() => {
     const url = new URL(window.location.href);
     if (url.pathname === '/genre-album-map') {
-      setSelectedGenre(null);
       setSortOption('number-desc');
     }
   }, [navigate]);
@@ -247,21 +243,6 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     return 0;
   });
 
-  const handleGenreClick = (genre, albums) => {
-    setPrevSearchQuery(searchQuery); 
-    setSortOption('alphabetical-asc');
-    setSelectedGenre({ genre, albums });
-    setSearchQuery(''); 
-    goTo(`/genre`, { genre });
-  };
-
-  const handleBackToGrid = () => {
-    setSelectedGenre(null);
-    setSortOption('number-desc');
-    setSearchQuery(prevSearchQuery); 
-    goTo('/genre-album-map');
-  };
-
   const sortOptions = [
     { value: "alphabetical-asc", label: "A-Z (Genre)" },
     { value: "alphabetical-desc", label: "Z-A (Genre)" },
@@ -273,26 +254,14 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     <div>
       {loadingMessage ? (
         <p className="loading-message">{loadingMessage}</p>
-      ) : selectedGenre ? (
-        <GenreContainer
-          genre={selectedGenre.genre}
-          albums={selectedGenre.albums}
-          onBack={handleBackToGrid}
-          searchQuery={searchQuery}
-          sortOption={sortOption}
-        />
       ) : (
         <div>
           <SearchSortContainer
             onSearchQueryChange={setSearchQuery}
             onSortOptionChange={setSortOption}
             selectedSortOption={sortOption}
-            placeholderText={
-              selectedGenre
-                ? "Search albums and artists..."
-                : "Search genres, albums, and artists..."
-            }
-            sortOptions={selectedGenre ? sortOptions.slice(0, 2) : sortOptions}
+            placeholderText="Search genres, albums, and artists..."
+            sortOptions={sortOptions}
             searchQuery={searchQuery} 
           />
           <div className="genre-grid">
@@ -302,7 +271,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
                 genre={genre}
                 albums={albums}
                 index={index}
-                onClick={() => handleGenreClick(genre, albums)}
+                onClick={() => goTo(`/genre`, { genre })}
               />
             ))}
           </div>

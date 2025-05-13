@@ -1,16 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SearchSortContainer from "../../components/SearchSortContainer";
 import AlbumContainer from "../albumContainer/albumContainer";
 import "./genreContainer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getCachedEntry } from "../../utilities/indexedDb";
+import { logger } from "../../utilities/logger";
 
-function GenreContainer({ genre, albums, onBack, searchQuery: initialSearchQuery = "", sortOption: initialSortOption = "alphabetical-asc-artist" }) {
-    const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
-    const [sortOption, setSortOption] = useState(initialSortOption);
-    const [selectedAlbum, setSelectedAlbum] = useState(null);
+function GenreContainer() {
+    const location = useLocation();
+    const navigate = useNavigate();
     const { goTo } = useNavigationHelpers();
+
+    const params = new URLSearchParams(location.search);
+    const genre = params.get("genre");
+
+    const [albums, setAlbums] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [sortOption, setSortOption] = useState("alphabetical-asc-artist");
+    const [selectedAlbumId, setSelectedAlbumId] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchAlbums() {
+            setLoading(true);
+            try {
+                const groupedAlbums = await getCachedEntry('data', 'grouped_albums');
+                let genreAlbums = [];
+                if (groupedAlbums && groupedAlbums[genre]) {
+                    genreAlbums = groupedAlbums[genre];
+                }
+                setAlbums(genreAlbums);
+            } catch (e) {
+                logger.error('GENRE001', 'Error fetching genre albums', { genre, error: e });
+            }
+            setLoading(false);
+        }
+        if (genre) fetchAlbums();
+    }, [genre]);
 
     const sortOptions = [
         { value: "alphabetical-asc-album", label: "A-Z (Album)" },
@@ -40,13 +69,13 @@ function GenreContainer({ genre, albums, onBack, searchQuery: initialSearchQuery
         return 0;
     });
 
-    if (selectedAlbum) {
-        return <AlbumContainer album={selectedAlbum} onBack={() => {
-            setSelectedAlbum(null)
-            goTo(`/genre`, { genre: genre });
-        }
+    if (loading) return <div className="genre-container">Loading...</div>;
+    if (!genre || !albums.length) return <div className="genre-container">No albums found for this genre.</div>;
 
-        } />;
+    if (selectedAlbumId) {
+        // Navigate to /album?albumId=...
+        goTo(`/album`, { albumId: selectedAlbumId, genre: genre });
+        return null;
     }
 
     return (
@@ -59,22 +88,19 @@ function GenreContainer({ genre, albums, onBack, searchQuery: initialSearchQuery
                 sortOptions={sortOptions}
                 searchQuery={searchQuery} 
             />
-            <div className="big-genre-title-container" onClick={onBack}>
+            <div className="big-genre-title-container" onClick={() => goTo('/genre-album-map')}>
                 <button className="back-button">
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </button>
                 <h1 className="big-genre-title">{genre}</h1>
             </div>
-            <hr className="horizontal-line" onClick={onBack} />
+            <hr className="horizontal-line" onClick={() => goTo('/genre-album-map')} />
             <div className="album-grid">
                 {sortedAlbums.map((album) => (
                     <div
                         key={album.id}
                         className="album-item"
-                        onClick={() => {
-                            setSelectedAlbum(album);
-                            goTo(`/album`, { albumId: album.id });
-                        }}
+                        onClick={() => setSelectedAlbumId(album.id)}
                     >
                         <div className="album-link">
                             <img
