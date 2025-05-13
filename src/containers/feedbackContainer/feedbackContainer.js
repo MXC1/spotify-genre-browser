@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './feedbackContainer.css';
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '../../utilities/logger';
 
 const FeedbackContainer = () => {
     const [feedback, setFeedback] = useState('');
@@ -16,7 +17,8 @@ const FeedbackContainer = () => {
     };
 
     const submitFeedback = async (feedbackText) => {
-        const response = await fetch(`https://obhjtma0z8.execute-api.eu-west-2.amazonaws.com/${process.env.REACT_APP_ENV}/feedback`, {
+        logger.debug('FEED001', 'Submitting feedback', { feedbackEndpoint: process.env.REACT_APP_FEEDBACK_ENDPOINT });
+        const response = await fetch(process.env.REACT_APP_FEEDBACK_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

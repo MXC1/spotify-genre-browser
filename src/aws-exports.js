@@ -6,10 +6,13 @@ const awsmobile = {
     "aws_cloud_logic_custom": [
         {
             "name": "feedbackAPI",
-            "endpoint": "https://obhjtma0z8.execute-api.eu-west-2.amazonaws.com/dev",
+            "endpoint": "https://xom7zxq0ml.execute-api.eu-west-2.amazonaws.com/dev",
             "region": "eu-west-2"
         }
     ],
+    "aws_content_delivery_bucket": "genrebrowser-20250513145614-hostingbucket-dev",
+    "aws_content_delivery_bucket_region": "eu-west-2",
+    "aws_content_delivery_url": "https://d1unm1yin1uydi.cloudfront.net",
     "aws_dynamodb_all_tables_region": "eu-west-2",
     "aws_dynamodb_table_schemas": [
         {

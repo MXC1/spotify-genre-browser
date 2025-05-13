@@ -15,7 +15,7 @@
       "function": {
         "feedbackLambda": {
           "deploymentBucketName": "amplify-genrebrowser-dev-3671a-deployment",
-          "s3Key": "amplify-builds/feedbackLambda-737378517569524a4d50-build.zip"
+          "s3Key": "amplify-builds/feedbackLambda-6a4243394b3333526930-build.zip"
         },
         "feedbackTable": {}
       },
@@ -29,7 +29,8 @@
         "amplifyhosting": {
           "appId": "d1oxklzichgkwx",
           "type": "cicd"
-        }
+        },
+        "S3AndCloudFront": {}
       }
     }
   },
