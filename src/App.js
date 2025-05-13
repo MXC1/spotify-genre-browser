@@ -19,6 +19,7 @@ import { Route, Routes } from "react-router-dom";
 import { useNavigationHelpers } from './utilities/navigationHelpers';
 import OverlayMenu from './containers/overlayMenu/overlayMenu';
 import { logger } from './utilities/logger';
+import FeedbackContainer from './containers/feedbackContainer/feedbackContainer';
 
 Amplify.configure(awsconfig);
 
@@ -128,6 +129,7 @@ function App() {
           <Route path="/album" element={<GenreGridContainer ref={genreGridRef} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
           <Route path="/about" element={<AboutContainer />} />
+          <Route path="/feedback" element={<FeedbackContainer />} />
           <Route path="/donate" element={<DonatePageContainer />} />
         </Routes>
       </ErrorBoundary>

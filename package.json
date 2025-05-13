@@ -32,7 +32,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "dev:publish": "dotenv -e .env.dev -- powershell -Command \"echo $env:REACT_APP_FEEDBACK_ENDPOINT; npm run build; amplify publish\""
   },
   "eslintConfig": {
     "extends": [
@@ -53,6 +54,7 @@
     ]
   },
   "devDependencies": {
-    "cypress": "^13.17.0"
+    "cypress": "^13.17.0",
+    "dotenv-cli": "^8.0.0"
   }
 }

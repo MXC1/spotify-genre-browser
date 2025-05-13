@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import { getCachedEntry, setCachedEntry } from './indexedDb';
-import { v1 as uuidv1 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 // Configure AWS
 AWS.config.update({
@@ -21,7 +21,7 @@ async function fetchOrGenerateSessionID() {
     return cachedSessionID;
   }
 
-  sessionID = uuidv1();
+  sessionID = uuidv4();
   await setCachedEntry('auth', sessionID, 'session_id');
   return sessionID;
 }
