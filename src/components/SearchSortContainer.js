@@ -11,13 +11,26 @@ function SearchSortContainer({
 }) {
   return (
     <div className="search-sort-container">
-      <input
-        type="text"
-        placeholder={placeholderText}
-        value={searchQuery} 
-        onChange={(e) => onSearchQueryChange(e.target.value.toLowerCase())}
-        className="search-bar"
-      />
+      <div className="search-bar-wrapper">
+        <input
+          type="text"
+          placeholder={placeholderText}
+          value={searchQuery} 
+          onChange={(e) => onSearchQueryChange(e.target.value.toLowerCase())}
+          className="search-bar"
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            className="clear-search-button"
+            aria-label="Clear search"
+            onClick={() => onSearchQueryChange('')}
+            tabIndex={0}
+          >
+            ×
+          </button>
+        )}
+      </div>
       <select
         value={selectedSortOption}
         onChange={(e) => onSortOptionChange(e.target.value)}
