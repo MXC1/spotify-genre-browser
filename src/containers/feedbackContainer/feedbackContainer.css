@@ -1,35 +1,94 @@
 .feedback-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 20px;
-	background-color: #000;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	width: 300px;
-	margin: 0 auto;
+    max-width: 600px;
+    margin: 0 auto;
+    color: #ffffff;
+    text-align: left;
+    box-sizing: border-box;
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0 0 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
-.feedback-container input[type="text"] {
-	width: 100%;
-	padding: 10px;
-	margin-bottom: 10px;
-	border: 1px solid #ccc;
-    background-color: #1c1c1c;
-	border-radius: 4px;
-	font-size: 14px;
+.feedback-container h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.7em;
+}
+
+.feedback-description {
+	margin-top: 0;
+    margin-bottom: 18px;
+    color: #b3b3b3;
+    font-size: 1em;
+}
+
+.feedback-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.feedback-container textarea {
+    width: 100%-24px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background-color: #282828;
+    color: #ffffff;
+    font-size: 16px;
+    font-family: sans-serif, 'Helvetica Neue', 'Helvetica', 'Arial';
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: background-color 0.3s ease;
+}
+
+.feedback-container textarea:focus {
+    background-color: #3e3e3e;
 }
 
 .feedback-container button {
-	padding: 10px 20px;
-	background-color: #1db954;
-	color: white;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-	font-size: 14px;
+    align-self: flex-end;
+    padding: 10px 24px;
+    background-color: #1db954;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.2s;
 }
 
-.feedback-container button:hover {
-	background-color: #14833b;
+.feedback-container button:disabled {
+    background-color: #3e3e3e;
+    cursor: not-allowed;
+}
+
+.feedback-container button:hover:not(:disabled) {
+    background-color: #14833b;
+}
+
+.feedback-success {
+    color: #1db954;
+    margin-top: 8px;
+    font-size: 1em;
+}
+
+.feedback-error {
+    color: #ff4d4f;
+    margin-top: 8px;
+    font-size: 1em;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    height: 1px; width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
 }

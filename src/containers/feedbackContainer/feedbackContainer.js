@@ -5,15 +5,23 @@ import { logger } from '../../utilities/logger';
 
 const FeedbackContainer = () => {
     const [feedback, setFeedback] = useState('');
+    const [status, setStatus] = useState('idle'); // idle | submitting | success | error
 
     const handleInputChange = (event) => {
         setFeedback(event.target.value);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        submitFeedback(feedback);
-        setFeedback('');
+        if (!feedback.trim()) return;
+        setStatus('submitting');
+        try {
+            await submitFeedback(feedback);
+            setStatus('success');
+            setFeedback('');
+        } catch (e) {
+            setStatus('error');
+        }
     };
 
     const submitFeedback = async (feedbackText) => {
@@ -28,25 +36,42 @@ const FeedbackContainer = () => {
                 message: feedbackText,
             }),
         });
-
         const data = await response.json();
-        if (data.success) {
-            console.log('Feedback submitted');
-        } else {
-            console.error('Error submitting feedback');
+        if (!data.success) {
+            throw new Error('Error submitting feedback');
         }
     };
 
     return (
         <div className="feedback-container">
+            <h3>We'd love to hear your thoughts</h3>
+            <p className="feedback-description">
+                As a beta tester, your input is especially valuable. Use the form below to report bugs, suggest features, or share any thoughts you have. <br/>
+                The more feedback we get, the better we can make the app.
+            </p>
             <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
+                <label htmlFor="feedback-textarea" className="visually-hidden">Feedback</label>
+                <textarea
+                    id="feedback-textarea"
                     placeholder="Enter your feedback"
                     value={feedback}
                     onChange={handleInputChange}
+                    rows={4}
+                    required
+                    disabled={status === 'submitting'}
                 />
-                <button type="submit">Submit</button>
+                <button
+                    type="submit"
+                    disabled={status === 'submitting' || !feedback.trim()}
+                >
+                    {status === 'submitting' ? 'Submitting...' : 'Submit'}
+                </button>
+                {status === 'success' && (
+                    <div className="feedback-success">Thank you for your feedback!</div>
+                )}
+                {status === 'error' && (
+                    <div className="feedback-error">Error submitting feedback. Please try again.</div>
+                )}
             </form>
         </div>
     );
