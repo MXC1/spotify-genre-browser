@@ -13,12 +13,6 @@
     align-items: stretch;
 }
 
-.feedback-container h2 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.7em;
-}
-
 .feedback-description {
 	margin-top: 0;
     margin-bottom: 18px;
@@ -33,7 +27,7 @@
 }
 
 .feedback-container textarea {
-    width: 100%-24px;
+    width: calc(100% - 24px);
     padding: 12px;
     border: none;
     border-radius: 10px;
