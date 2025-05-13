@@ -18,6 +18,8 @@ function AlbumContainer() {
     const params = new URLSearchParams(location.search);
     const albumId = params.get("albumId");
     const genre = params.get("genre");
+    const albumSearch = params.get("albumSearch") || "";
+    const genreSearch = params.get("genreSearch") || "";
 
     useEffect(() => {
         async function fetchAlbum() {
@@ -50,7 +52,7 @@ function AlbumContainer() {
 
     return (
         <div className="single-album-container">
-            <div className="back-button-container" onClick={() => goTo('/genre', { genre })}>
+            <div className="back-button-container" onClick={() => goTo('/genre', { genre, albumSearch, genreSearch })}>
                 <button className="genre-back-button">
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </button>

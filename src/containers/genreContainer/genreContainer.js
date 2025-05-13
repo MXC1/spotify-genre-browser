@@ -16,11 +16,12 @@ function GenreContainer() {
 
     const params = new URLSearchParams(location.search);
     const genre = params.get("genre");
+    const genreSearch = params.get("genreSearch") || "";
+    const albumSearch = params.get("albumSearch") || "";
 
     const [albums, setAlbums] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState(albumSearch || "");
     const [sortOption, setSortOption] = useState("alphabetical-asc-artist");
-    const [selectedAlbumId, setSelectedAlbumId] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -72,12 +73,6 @@ function GenreContainer() {
     if (loading) return <div className="genre-container">Loading...</div>;
     if (!genre || !albums.length) return <div className="genre-container">No albums found for this genre.</div>;
 
-    if (selectedAlbumId) {
-        // Navigate to /album?albumId=...
-        goTo(`/album`, { albumId: selectedAlbumId, genre: genre });
-        return null;
-    }
-
     return (
         <div className="genre-container">
             <SearchSortContainer
@@ -88,19 +83,19 @@ function GenreContainer() {
                 sortOptions={sortOptions}
                 searchQuery={searchQuery} 
             />
-            <div className="big-genre-title-container" onClick={() => goTo('/genre-album-map')}>
+            <div className="big-genre-title-container" onClick={() => goTo('/genre-album-map', { genreSearch })}>
                 <button className="back-button">
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </button>
                 <h1 className="big-genre-title">{genre}</h1>
             </div>
-            <hr className="horizontal-line" onClick={() => goTo('/genre-album-map')} />
+            <hr className="horizontal-line" onClick={() => goTo('/genre-album-map', { genreSearch })} />
             <div className="album-grid">
                 {sortedAlbums.map((album) => (
                     <div
                         key={album.id}
                         className="album-item"
-                        onClick={() => setSelectedAlbumId(album.id)}
+                        onClick={() => goTo(`/album`, { albumId: album.id, genre: genre, genreSearch, albumSearch: searchQuery })}
                     >
                         <div className="album-link">
                             <img

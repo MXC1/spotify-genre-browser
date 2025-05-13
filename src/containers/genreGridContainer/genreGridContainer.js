@@ -5,14 +5,18 @@ import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
 import { authenticateUser } from "../../services/spotifyAuth";
 import { logger } from "../../utilities/logger";
 import './genreGridContainer.css';
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 import SearchSortContainer from '../../components/SearchSortContainer';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const genreSearch = params.get("genreSearch") || '';
+  const [searchQuery, setSearchQuery] = useState(genreSearch || '');
   const [sortOption, setSortOption] = useState('number-desc');
   const { showBoundary } = useErrorBoundary();
   const { goTo } = useNavigationHelpers();
@@ -271,7 +275,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
                 genre={genre}
                 albums={albums}
                 index={index}
-                onClick={() => goTo(`/genre`, { genre })}
+                onClick={() => goTo(`/genre`, { genre, genreSearch: searchQuery })}
               />
             ))}
           </div>
