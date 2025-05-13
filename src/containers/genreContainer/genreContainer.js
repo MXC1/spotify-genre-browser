@@ -6,9 +6,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 
-function GenreContainer({ genre, albums, onBack }) {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [sortOption, setSortOption] = useState("alphabetical-asc-artist");
+function GenreContainer({ genre, albums, onBack, searchQuery: initialSearchQuery = "", sortOption: initialSortOption = "alphabetical-asc-artist" }) {
+    const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+    const [sortOption, setSortOption] = useState(initialSortOption);
     const [selectedAlbum, setSelectedAlbum] = useState(null);
     const { goTo } = useNavigationHelpers();
 
