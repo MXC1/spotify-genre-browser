@@ -50,6 +50,11 @@ const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayIns
                     </li>
                     <hr className="menu-divider" />
                     <li className="menu-item">
+                        <button className="menu-item-button" onClick={() => handleNavigation("/feedback")}>
+                            Give Feedback
+                        </button>
+                    </li>
+                    <li className="menu-item">
                         <button className="menu-item-button" onClick={() => handleNavigation("/donate")}>
                             Donate
                         </button>
