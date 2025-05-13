@@ -29,7 +29,8 @@ describe('GIVEN I am on the genre grid page', () => {
         beforeEach(() => {
             cy.get(`[placeholder="${searchBoxPlaceholder}"]`).click();
             cy.get(`[placeholder="${searchBoxPlaceholder}"]`).type("rock").should('have.value', "rock");
-            cy.get(`[placeholder="${searchBoxPlaceholder}"]`).clear().should('have.value', '');
+            cy.get('.clear-search-button').click();
+            cy.get(`[placeholder="${searchBoxPlaceholder}"]`).should('have.value', '');
         });
 
         it('THEN the genre grid should be reset', () => {
