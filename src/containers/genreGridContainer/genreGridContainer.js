@@ -3,10 +3,11 @@ import { useErrorBoundary } from "react-error-boundary";
 import { setCachedEntry, getCachedEntry } from "../../utilities/indexedDb";
 import { getMySavedAlbums, getArtists } from '../../services/spotifyAPI';
 import { authenticateUser } from "../../services/spotifyAuth";
-import logMessage from "../../utilities/loggingConfig";
+import { logger } from "../../utilities/logger";
 import './genreGridContainer.css';
 import GenreContainer from '../genreContainer/genreContainer';
 import { useNavigate } from "react-router-dom";
+import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 import SearchSortContainer from '../../components/SearchSortContainer';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
@@ -16,6 +17,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [sortOption, setSortOption] = useState('number-desc');
   const { showBoundary } = useErrorBoundary();
   const [selectedGenre, setSelectedGenre] = useState(null);
+  const { goTo } = useNavigationHelpers();
   const navigate = useNavigate();
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -34,31 +36,31 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     const initializeData = async () => {
       try {
         if (Object.keys(groupedAlbums).length > 0) {
-          logMessage(`Using cached genre album map`);
+          logger.debug('MAP014', 'Using cached genre album map');
           return;
         }
         const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
         if (cachedGenreAlbumMap && Object.keys(cachedGenreAlbumMap).length > 0) {
-          logMessage('Using cached genre album map.');
+          logger.debug('MAP014', 'Using cached genre album map');
           setGroupedAlbums(cachedGenreAlbumMap);
         } else {
-          logMessage('No cached data found. Fetching from scratch...');
+          logger.debug('MAP016', 'No cached data found. Fetching from scratch...');
           await fetchOrUpdateGenreAlbumMap();
         }
       } catch (error) {
-        logMessage(`Error initializing data: ${error}`);
+        logger.error('MAP094', 'Error initializing data', { location: "initializeData", error });
         showBoundary(error);
       }
     };
 
     initializeData();
   }, []);
-
+  
   const fetchOrUpdateGenreAlbumMap = async () => {
     try {
       const token = await authenticateUser();
       if (!token) {
-        navigate("/authenticate");
+        goTo("/authenticate");
         return;
       }
 
@@ -72,15 +74,13 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         await setCachedEntry('data', grouped, 'grouped_albums');
       }
     } catch (error) {
-      logMessage(`Error updating genre album map: ${error}`);
+      logger.error('MAP094', 'Error initializing data', { location: "fetchOrUpdateGenreAlbumMap", error });
       showBoundary(error);
     }
   };
 
   const fetchAllSavedAlbums = useCallback(async () => {
     try {
-      logMessage('Fetching saved albums...');
-
       let allAlbums = [];
       let allAlbumIds = [];
       let offset = 0;
@@ -88,9 +88,10 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
       // Call the API once to get the total value
 
-      logAndSetLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`);
+      setLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`);
+      logger.info('MAP001', 'Fetching saved albums...');
 
-      const [albums, numberOfAlbums] = await getSavedAlbumsWithRetries(limit, offset);
+      const [albums, numberOfAlbums] = await getReducedAlbumsAndTotal(limit, offset);
       allAlbums = [...allAlbums, ...albums];
       allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
 
@@ -104,42 +105,32 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       // Collect the remaining batches
 
       for (offset; offset <= batchesToProcess * limit; offset += limit) {
-        logAndSetLoadingMessage(`Requesting saved albums (${Math.min(offset + limit, numberOfAlbums)} / ${numberOfAlbums})...`);
+        setLoadingMessage(`Requesting saved albums (${Math.min(offset + limit, numberOfAlbums)} / ${numberOfAlbums})...`);
 
-        const [albums] = await getSavedAlbumsWithRetries(limit, offset);
+        const [albums] = await getReducedAlbumsAndTotal(limit, offset);
         allAlbums = [...allAlbums, ...albums];
         allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
       }
 
-      logMessage(`Finished fetching album IDs: ${JSON.stringify(allAlbumIds)}`);
+      logger.debug('MAP002', 'Fetched all saved albums');
 
       return allAlbums;
     } catch (error) {
-      logMessage(`Error fetching saved albums: ${error}`);
+      logger.error('MAP095', 'Error fetching saved albums', { location: "fetchAllSavedAlbums", error });
       setLoadingMessage('Error fetching albums.');
       showBoundary(error);
     }
   }, []);
 
-  async function getSavedAlbumsWithRetries(limit, offset) {
-    let response;
+  async function getReducedAlbumsAndTotal(limit, offset) {
+    const response = await getMySavedAlbums(limit, offset);
 
-    do {
-      response = await getMySavedAlbums(limit, offset);
-
-      if (response.error && response.error.status === 429) {
-        const retryAfterSeconds = parseInt(response.headers.get('Retry-After'), 10);
-        logMessage(`Rate limited. Retrying after ${retryAfterSeconds} seconds`);
-        await delay(retryAfterSeconds * 1000);
-      }
-    } while (response.error && response.error.status === 429);
-
-    const reducedAlbums = response.items.map(item => ({
-      id: item.album.id,
-      name: item.album.name,
-      artists: item.album.artists.map(artist => ({ id: artist.id, name: artist.name })),
-      external_urls: { spotify: item.album.external_urls.spotify },
-      images: [null, { url: item.album.images[1]?.url }],
+    const reducedAlbums = response.items.map(({ album }) => ({
+      id: album.id,
+      name: album.name,
+      artists: album.artists.map(({ id, name }) => ({ id, name })),
+      external_urls: { spotify: album.external_urls?.spotify || null },
+      images: album.images.slice(0, 2).map(image => ({ url: image?.url || null })),
     }));
 
     return [reducedAlbums, response.total];
@@ -147,14 +138,15 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
     if (!albums || albums.length === 0) {
-      logMessage('No albums to group');
+      logger.info('MAP011', 'No albums to group');
       return {};
     }
 
     const genreAlbumMap = {};
     const artistIds = [...new Set(albums.map(album => album.artists[0].id))];
 
-    logAndSetLoadingMessage('Grouping albums by artist genre...');
+    setLoadingMessage('Grouping albums by artist genre...');
+    logger.info('MAP020', 'Grouping albums by artist genre');
 
     for (let i = 0; i < artistIds.length; i += 50) {
       const batch = artistIds.slice(i, i + 50);
@@ -196,7 +188,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     });
 
     setLoadingMessage('');
-    logMessage('Finished grouping albums by artist genre.');
+    logger.info('MAP021', 'Finished grouping albums by artist genre');
     return finalGenreAlbumMap;
   }, []);
 
@@ -207,7 +199,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     },
 
     updateGenreAlbumMap: async () => {
-      logMessage(`Updating genre album map from scratch...`);
+      logger.debug('MAP013', 'Updating genre album map from scratch');
       const allAlbums = await fetchAllSavedAlbums();
 
       const grouped = await groupAlbumsByArtistGenre(allAlbums);
@@ -215,7 +207,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       await setCachedEntry('data', grouped, 'grouped_albums');
     },
     getCachedGenreAlbumMap: async () => {
-      logMessage(`Fetching genre album map from cache...`);
+      logger.debug('MAP012', 'Fetching genre album map from cache');
       setLoadingMessage(`Loading saved albums...`);
       const cachedGroupedAlbums = await getCachedEntry('data', 'grouped_albums');
       setGroupedAlbums(cachedGroupedAlbums);
@@ -255,22 +247,17 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     return 0;
   });
 
-  function logAndSetLoadingMessage(message) {
-    logMessage(message);
-    setLoadingMessage(message);
-  }
-
   const handleGenreClick = (genre, albums) => {
     setSortOption('alphabetical-asc');
     setSelectedGenre({ genre, albums });
-    navigate(`/genre?g=${encodeURIComponent(genre)}`);
+    goTo(`/genre`, { genre });
   };
 
   const handleBackToGrid = () => {
     setSelectedGenre(null);
     setSortOption('number-desc');
     setSearchQuery('');
-    navigate('/genre-album-map');
+    goTo('/genre-album-map');
   };
 
   const sortOptions = [

@@ -1,30 +1,29 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { logMessage } from './loggingConfig';
 import { getAccessToken } from '../services/spotifyAuth';
+import { logger } from "./logger";
 
 export const useNavigationHelpers = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const goTo = (path) => {
+  const goTo = (path, params={}) => {
     if (location.pathname !== path) {
-      logMessage(`Navigating to ${path}`);
-      navigate(path, { replace: true });
+      logger.info('NAV001', 'Navigating to:', { path, params });
+      const queryString = new URLSearchParams(params).toString();
+      const fullPath = queryString ? `${path}?${queryString}` : path;
+      navigate(fullPath, { replace: true });
     }
   }
 
-  const goBack = () => navigate(-1);
-
   const checkAuthAndNavigate = async () => {
+    logger.debug('AUTH080','Checking authentication status...', {});
     const accessToken = await getAccessToken();
     if (accessToken) {
-      logMessage('User is authenticated. Redirecting to /genre-album-map.');
-      navigate('/genre-album-map', { replace: true });
+      goTo('/genre-album-map');
     } else {
-      logMessage('User is not authenticated. Redirecting to /authenticate.');
-      navigate('/authenticate', { replace: true });
+      goTo('/authenticate');
     }
   };
 
-  return { goTo, goBack, checkAuthAndNavigate };
+  return { goTo, checkAuthAndNavigate };
 };

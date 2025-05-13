@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/feedback": {
+      "name": "/feedback",
+      "lambdaFunction": "feedbackLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

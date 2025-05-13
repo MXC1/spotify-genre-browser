@@ -18,10 +18,19 @@
 .env.test.local
 .env.production.local
 .env
+.env*
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+# Cypress screenshots and videos
+cypress/screenshots/
+cypress/videos/
+
+# Cypress cache
+.cypress_cache/
 
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
@@ -34,6 +43,7 @@ amplify/backend/.temp
 build/
 dist/
 node_modules/
+aws-exports.js
 awsconfiguration.json
 amplifyconfiguration.json
 amplifyconfiguration.dart
@@ -43,10 +53,3 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
-
-# Cypress screenshots and videos
-cypress/screenshots/
-cypress/videos/
-
-# Cypress cache
-.cypress_cache/

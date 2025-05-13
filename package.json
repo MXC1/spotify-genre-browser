@@ -21,6 +21,7 @@
     "react-error-boundary": "^5.0.0",
     "react-router-dom": "^7.3.0",
     "react-scripts": "^5.0.1",
+    "serve": "^14.2.4",
     "spotify-web-api-js": "^1.5.2",
     "stacktrace-js": "^2.0.2",
     "uuidv1": "^1.6.14",
@@ -31,7 +32,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "dev:publish": "dotenv -e .env.dev -- powershell -Command \"echo $env:REACT_APP_FEEDBACK_ENDPOINT; npm run build; amplify publish\""
   },
   "eslintConfig": {
     "extends": [
@@ -52,6 +54,7 @@
     ]
   },
   "devDependencies": {
-    "cypress": "^13.17.0"
+    "cypress": "^13.17.0",
+    "dotenv-cli": "^8.0.0"
   }
 }

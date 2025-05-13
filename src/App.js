@@ -6,7 +6,6 @@ import { clearAllData } from './utilities/indexedDb';
 import './App.css';
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import { logMessage, fetchOrGenerateSessionID } from './utilities/loggingConfig';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
@@ -15,9 +14,12 @@ import AboutContainer from './containers/aboutContainer/aboutContainer';
 import DonatePageContainer from './containers/donatePageContainer/donatePageContainer';
 import ModalContainer from './containers/modalContainer/modalContainer';
 import useModal from './hooks/useModal';
+import usePWAInstall from './hooks/usePWAInstall';
 import { Route, Routes } from "react-router-dom";
 import { useNavigationHelpers } from './utilities/navigationHelpers';
 import OverlayMenu from './containers/overlayMenu/overlayMenu';
+import { logger } from './utilities/logger';
+import FeedbackContainer from './containers/feedbackContainer/feedbackContainer';
 
 Amplify.configure(awsconfig);
 
@@ -25,19 +27,20 @@ function App() {
   const { showBoundary } = useErrorBoundary()
   const genreGridRef = useRef();
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
+  const { showInstallPrompt, installPromptEvent } = usePWAInstall();
   const { goTo } = useNavigationHelpers();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
-    logMessage('Environment is: ' + process.env.REACT_APP_ENV);
+    logger.debug('SYS001','Environment is', { env: process.env.REACT_APP_ENV });
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     const state = params.get('state');
 
     if (code && state) {
-      goTo(`/genre-album-map?code=${code}&state=${state}`);
+      goTo(`/genre-album-map`, {code: code, state: state});
     }
   }, []);
 
@@ -46,14 +49,14 @@ function App() {
       try {
         await genreGridRef.current.updateGenreAlbumMap();
       } catch (error) {
-        logMessage(`Error refreshing genre album map: ${error}`);
+        logger.error('MAP001','Error refreshing genre album map', error);
         showBoundary(error);
       }
     }
   }
 
   const handleDisconnect = async () => {
-    logMessage('Disconnecting Spotify account...');
+    logger.info('AUTH080','Disconnecting Spotify account...', {});
     await clearAllData();
     clearAccessToken();
     if (genreGridRef.current) {
@@ -87,6 +90,26 @@ function App() {
     });
   };
 
+  const handleOpenInstallModal = () => {
+    logger.info('INSTALL001','Opening install modal', {});
+    setIsMenuOpen(false);
+    openModal({
+      title: "Install the app",
+      description: "Installing this app allows you to access it directly from your home screen, just like a native app.",
+      button1Text: "Cancel",
+      button1Action: () => {
+        logger.info('INSTALL002','User canceled the install modal', {});
+        closeModal();
+      },
+      button2Text: "Install",
+      button2Action: () => {
+        logger.info('INSTALL003','User accepted the install modal', {});
+        closeModal();
+        showInstallPrompt();
+      }
+    });
+  };
+
   return (
     <div className="App">
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
@@ -103,14 +126,23 @@ function App() {
           <Route path="/authenticate" element={<LoginContainer />} />
           <Route path="/genre-album-map" element={<GenreGridContainer ref={genreGridRef} />} />
           <Route path="/genre" element={<GenreGridContainer ref={genreGridRef} />} />
+          <Route path="/album" element={<GenreGridContainer ref={genreGridRef} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />
           <Route path="/about" element={<AboutContainer />} />
+          <Route path="/feedback" element={<FeedbackContainer />} />
           <Route path="/donate" element={<DonatePageContainer />} />
         </Routes>
       </ErrorBoundary>
 
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
-        <OverlayMenu ref={menuRef} isOpen={isMenuOpen} toggleMenu={toggleMenu} onDisconnect={handleOpenDisconnectModal} />
+        <OverlayMenu
+          ref={menuRef}
+          isOpen={isMenuOpen}
+          toggleMenu={toggleMenu}
+          onDisconnect={handleOpenDisconnectModal}
+          onDisplayInstallModal={handleOpenInstallModal}
+          installPromptEvent={installPromptEvent}
+        />
       </ErrorBoundary>
 
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>

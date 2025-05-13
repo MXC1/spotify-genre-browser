@@ -2,13 +2,13 @@
   "short_name": "Genre Browser for Spotify",
   "name": "Genre Browser for Spotify",
   "icons": [
-        {
+    {
       "src": "spotify-favicon.png",
       "type": "image/png",
       "sizes": "120x120"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"

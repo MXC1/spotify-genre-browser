@@ -8,10 +8,10 @@
         "id": "test-album-1",
         "images": [
           {
-            "url": "https://i.scdn.co/image/dont-use-this-one"
+            "url": "https://i.scdn.co/image/ab67616d0000b27326597c053b38c9cf93f8f3a9" 
           },
           {
-            "url": "https://i.scdn.co/image/test-album-1"
+            "url": "https://i.scdn.co/image/ab67616d00001e0226597c053b38c9cf93f8f3a9"
           }
         ],
         "name": "Test Album One",
@@ -31,10 +31,10 @@
         "id": "test-album-2",
         "images": [
           {
-            "url": "https://i.scdn.co/image/dont-use-this-one"
+            "url": "https://i.scdn.co/image/ab67616d0000b273d8601e15fa1b4351fe1fc6ae"
           },
           {
-            "url": "https://i.scdn.co/image/test-album-2"
+            "url": "https://i.scdn.co/image/ab67616d00001e02d8601e15fa1b4351fe1fc6ae"
           }
         ],
         "name": "Test Album Two",
@@ -54,10 +54,10 @@
         "id": "test-album-3",
         "images": [
           {
-            "url": "https://i.scdn.co/image/dont-use-this-one"
+            "url": "https://i.scdn.co/image/ab67616d0000b2732c25dad9f8fd54652f7ba5df"
           },
           {
-            "url": "https://i.scdn.co/image/test-album-3"
+            "url": "https://i.scdn.co/image/ab67616d00001e022c25dad9f8fd54652f7ba5df"
           }
         ],
         "name": "Test Album Three",

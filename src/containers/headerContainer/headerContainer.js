@@ -43,7 +43,7 @@ function HeaderContainer({ onRefresh, onOpenDisconnectModal, toggleMenu }) {
             </div>
         );
     }
-    else if (location.pathname.startsWith('/genre')) {
+    else if (location.pathname.startsWith('/genre') || location.pathname.startsWith('/album')) {
         return (
             <div className="header-container">
                 <div className="title-container">
@@ -81,6 +81,21 @@ function HeaderContainer({ onRefresh, onOpenDisconnectModal, toggleMenu }) {
                         <FontAwesomeIcon icon={faBars} />
                     </button>
                     <h1 className="page-title">Donate</h1>
+                    <button className="home-button" onClick={() => checkAuthAndNavigate()}>
+                        <FontAwesomeIcon icon={faHouse} />
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    else if (location.pathname === '/feedback') {
+        return (
+            <div className="header-container">
+                <div className="title-container">
+                    <button className="menu-button" onClick={toggleMenu}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <h1 className="page-title">Give Feedback</h1>
                     <button className="home-button" onClick={() => checkAuthAndNavigate()}>
                         <FontAwesomeIcon icon={faHouse} />
                     </button>

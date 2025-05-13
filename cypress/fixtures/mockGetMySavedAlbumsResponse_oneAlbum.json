@@ -8,10 +8,10 @@
         "id": "test-album-1",
         "images": [
           {
-            "url": "https://i.scdn.co/image/dont-use-this-one"
+            "url": "https://i.scdn.co/image/ab67616d0000b27326597c053b38c9cf93f8f3a9" 
           },
           {
-            "url": "https://i.scdn.co/image/test-album-1"
+            "url": "https://i.scdn.co/image/ab67616d00001e0226597c053b38c9cf93f8f3a9"
           }
         ],
         "name": "Test Album One",

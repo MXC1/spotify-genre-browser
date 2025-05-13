@@ -3,7 +3,7 @@ import './aboutContainer.css';
 const AboutContainer = () => {
     return (
         <div className="about-container">
-            <h1>About Genre Browser for Spotify</h1>
+            <h3>About Genre Browser for Spotify</h3>
             <p>
                 Genre Browser for Spotify is a web application that helps you explore your saved albums on Spotify by grouping them into genres. 
                 It provides an intuitive interface to navigate through your music library and discover patterns in your listening habits.

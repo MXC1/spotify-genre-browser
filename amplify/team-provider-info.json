@@ -1,15 +1,71 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-spotify-genre-browser-dev-65ffe-authRole",
-      "UnauthRoleArn": "arn:aws:iam::976193252222:role/amplify-spotify-genre-browser-dev-65ffe-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::976193252222:role/amplify-spotify-genre-browser-dev-65ffe-authRole",
+      "AuthRoleName": "amplify-genrebrowser-dev-3671a-authRole",
+      "UnauthRoleArn": "arn:aws:iam::976193252222:role/amplify-genrebrowser-dev-3671a-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::976193252222:role/amplify-genrebrowser-dev-3671a-authRole",
       "Region": "eu-west-2",
-      "DeploymentBucketName": "amplify-spotify-genre-browser-dev-65ffe-deployment",
-      "UnauthRoleName": "amplify-spotify-genre-browser-dev-65ffe-unauthRole",
-      "StackName": "amplify-spotify-genre-browser-dev-65ffe",
-      "StackId": "arn:aws:cloudformation:eu-west-2:976193252222:stack/amplify-spotify-genre-browser-dev-65ffe/948e1e60-7cc8-11ef-9e9a-0655181224a7",
-      "AmplifyAppId": "de83zdyzq2kwu"
+      "DeploymentBucketName": "amplify-genrebrowser-dev-3671a-deployment",
+      "UnauthRoleName": "amplify-genrebrowser-dev-3671a-unauthRole",
+      "StackName": "amplify-genrebrowser-dev-3671a",
+      "StackId": "arn:aws:cloudformation:eu-west-2:976193252222:stack/amplify-genrebrowser-dev-3671a/d79fd060-2f8b-11f0-989e-0279d4c0a0fb",
+      "AmplifyAppId": "d1oxklzichgkwx"
+    },
+    "categories": {
+      "function": {
+        "feedbackLambda": {
+          "deploymentBucketName": "amplify-genrebrowser-dev-3671a-deployment",
+          "s3Key": "amplify-builds/feedbackLambda-6a4243394b3333526930-build.zip"
+        },
+        "feedbackTable": {}
+      },
+      "storage": {
+        "feedbackTable": {}
+      },
+      "api": {
+        "feedbackAPI": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d1oxklzichgkwx",
+          "type": "cicd"
+        },
+        "S3AndCloudFront": {}
+      }
+    }
+  },
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-genrebrowser-staging-07292-authRole",
+      "UnauthRoleArn": "arn:aws:iam::976193252222:role/amplify-genrebrowser-staging-07292-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::976193252222:role/amplify-genrebrowser-staging-07292-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-genrebrowser-staging-07292-deployment",
+      "UnauthRoleName": "amplify-genrebrowser-staging-07292-unauthRole",
+      "StackName": "amplify-genrebrowser-staging-07292",
+      "StackId": "arn:aws:cloudformation:eu-west-2:976193252222:stack/amplify-genrebrowser-staging-07292/c217b1a0-2fee-11f0-9c71-064274f1ebd5",
+      "AmplifyAppId": "d1oxklzichgkwx"
+    },
+    "categories": {
+      "function": {
+        "feedbackLambda": {
+          "deploymentBucketName": "amplify-genrebrowser-staging-07292-deployment",
+          "s3Key": "amplify-builds/feedbackLambda-737378517569524a4d50-build.zip"
+        },
+        "feedbackTable": {}
+      },
+      "api": {
+        "feedbackAPI": {}
+      },
+      "storage": {
+        "feedbackTable": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d1oxklzichgkwx",
+          "type": "cicd"
+        }
+      }
     }
   }
 }
