@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 AWS.config.update({
   region: 'eu-west-2',
   credentials: new AWS.CognitoIdentityCredentials({
-    IdentityPoolId: 'eu-west-2:e1f1f662-0c4a-46b4-b707-123a98e849f1',
+    IdentityPoolId: process.env.REACT_APP_COGNITO_IDENTITY_POOL_ID,
   }),
 });
 
@@ -27,8 +27,8 @@ async function fetchOrGenerateSessionID() {
 }
 
 // -- CloudWatch Log Stream/Group Configuration --
-const LOG_GROUP = 'SGB_Operational_Logs';
-const LOG_STREAM = 'SGB_Operational_Logs'; 
+const LOG_GROUP = `operationalLogs`;
+const LOG_STREAM = `operationalLogs-${process.env.REACT_APP_ENV}`; 
 
 async function logToCloudWatch(logEvent) {
   const params = {
@@ -66,7 +66,7 @@ async function logMessage(level, message, event_id = null, context = {}) {
   console.log(`${consolePrefix} ${message}`, context);
 
   // Send to CloudWatch in production
-  if (process.env.REACT_APP_ENV === 'prod') {
+  if (process.env.REACT_APP_ENV === 'prod' || process.env.REACT_APP_ENV === 'staging') {
     logToCloudWatch(logPayload);
   }
 }

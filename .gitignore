@@ -24,7 +24,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-
 # Cypress screenshots and videos
 cypress/screenshots/
 cypress/videos/
@@ -52,4 +51,7 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 **.sample
+amplify/backend/awscloudformation
+src/aws-exports.js
+amplify/team-provider-info.json
 #amplify-do-not-edit-end
