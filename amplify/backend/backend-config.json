@@ -13,6 +13,20 @@
       ],
       "providerPlugin": "awscloudformation",
       "service": "API Gateway"
+    },
+    "pkceAPI": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "pkceProxy"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
     }
   },
   "function": {
@@ -34,6 +48,11 @@
       ],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "pkceProxy": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "hosting": {
@@ -48,6 +67,38 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_feedbackLambda_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "feedbackLambda"
+        }
+      ]
+    },
+    "AMPLIFY_function_feedbackLambda_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "feedbackLambda"
+        }
+      ]
+    },
+    "AMPLIFY_function_pkceProxy_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "pkceProxy"
+        }
+      ]
+    },
+    "AMPLIFY_function_pkceProxy_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "pkceProxy"
+        }
+      ]
+    },
     "AMPLIFY_hosting_amplifyhosting_appId": {
       "usedBy": [
         {
