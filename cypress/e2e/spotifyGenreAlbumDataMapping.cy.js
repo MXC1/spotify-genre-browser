@@ -15,7 +15,7 @@ const interceptWithError = (method, url, alias) => {
 };
 
 const interceptSuccessfulAuth = () => {
-    cy.intercept('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
+    cy.intercept('POST', 'https://3tvo4kdc9a.execute-api.eu-west-2.amazonaws.com/dev/auth', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
     cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { fixture: "mockGetMySavedAlbumsResponse.json" }).as('getMySavedAlbums');
     cy.intercept('GET', 'https://api.spotify.com/v1/artists*', { fixture: "mockGetArtistsResponse.json" }).as('getArtists');
 };
@@ -48,9 +48,9 @@ describe('GIVEN I authenticate successfully', () => {
     { 
         name: 'token exchange proxy', 
         method: 'POST', 
-        url: 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', 
+        url: 'https://3tvo4kdc9a.execute-api.eu-west-2.amazonaws.com/dev/auth', 
         alias: 'authTokenError', 
-        setup: () => interceptWithError('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', 'authTokenError') 
+        setup: () => interceptWithError('POST', 'https://3tvo4kdc9a.execute-api.eu-west-2.amazonaws.com/dev/auth', 'authTokenError') 
     },
     { 
         name: 'albums', 
@@ -58,7 +58,7 @@ describe('GIVEN I authenticate successfully', () => {
         url: 'https://api.spotify.com/v1/me/albums*', 
         alias: 'albumsError', 
         setup: () => {
-            cy.intercept('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
+            cy.intercept('POST', 'https://3tvo4kdc9a.execute-api.eu-west-2.amazonaws.com/dev/auth', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
             interceptWithError('GET', 'https://api.spotify.com/v1/me/albums*', 'albumsError') 
         }
     },
@@ -68,7 +68,7 @@ describe('GIVEN I authenticate successfully', () => {
         url: 'https://api.spotify.com/v1/artists*', 
         alias: 'artistsError', 
         setup: () => {
-            cy.intercept('POST', 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/*', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
+            cy.intercept('POST', 'https://3tvo4kdc9a.execute-api.eu-west-2.amazonaws.com/dev/auth', { fixture: "mockAuthTokenResponse.json" }).as('authToken');
             cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { fixture: "mockGetMySavedAlbumsResponse.json" }).as('getMySavedAlbums');
             interceptWithError('GET', 'https://api.spotify.com/v1/artists*', 'artistsError');
         } 

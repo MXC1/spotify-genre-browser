@@ -8,6 +8,11 @@ const awsmobile = {
             "name": "feedbackAPI",
             "endpoint": "https://xom7zxq0ml.execute-api.eu-west-2.amazonaws.com/dev",
             "region": "eu-west-2"
+        },
+        {
+            "name": "pkceAPI",
+            "endpoint": "https://3tvo4kdc9a.execute-api.eu-west-2.amazonaws.com/dev",
+            "region": "eu-west-2"
         }
     ],
     "aws_content_delivery_bucket": "genrebrowser-20250513145614-hostingbucket-dev",

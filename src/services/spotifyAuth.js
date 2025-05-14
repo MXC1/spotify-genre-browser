@@ -149,7 +149,7 @@ export const exchangeCodeForToken = async (code, codeVerifier) => {
     redirect_uri: REDIRECT_URI,
   };
 
-  const url = 'https://9kr3sn67ag.execute-api.eu-west-2.amazonaws.com/' + process.env.REACT_APP_ENV + "/";
+  const url = process.env.REACT_APP_PKCE_ENDPOINT + '/auth';
   
   logger.debug('AUTH004', 'Exchanging code for token', { payload , url});
 

@@ -13,6 +13,20 @@
       ],
       "providerPlugin": "awscloudformation",
       "service": "API Gateway"
+    },
+    "pkceAPI": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "pkceProxy"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
     }
   },
   "function": {
@@ -32,6 +46,11 @@
           "resourceName": "feedbackTable"
         }
       ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "pkceProxy": {
+      "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
@@ -61,6 +80,22 @@
         {
           "category": "function",
           "resourceName": "feedbackLambda"
+        }
+      ]
+    },
+    "AMPLIFY_function_pkceProxy_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "pkceProxy"
+        }
+      ]
+    },
+    "AMPLIFY_function_pkceProxy_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "pkceProxy"
         }
       ]
     },

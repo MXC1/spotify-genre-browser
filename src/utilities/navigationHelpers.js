@@ -7,11 +7,11 @@ export const useNavigationHelpers = () => {
   const location = useLocation();
 
   const goTo = (path, params={}) => {
-    if (location.pathname !== path) {
+    if (location.pathname !== path || Object.keys(params).length > 0) {
       logger.info('NAV001', 'Navigating to:', { path, params });
       const queryString = new URLSearchParams(params).toString();
       const fullPath = queryString ? `${path}?${queryString}` : path;
-      navigate(fullPath, { replace: true });
+      navigate(fullPath);
     }
   }
 

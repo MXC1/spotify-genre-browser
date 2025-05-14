@@ -26,7 +26,7 @@ const FeedbackContainer = () => {
 
     const submitFeedback = async (feedbackText) => {
         logger.debug('FEED001', 'Submitting feedback', { feedbackEndpoint: process.env.REACT_APP_FEEDBACK_ENDPOINT });
-        const response = await fetch(process.env.REACT_APP_FEEDBACK_ENDPOINT, {
+        const response = await fetch(process.env.REACT_APP_FEEDBACK_ENDPOINT + '/feedback', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
