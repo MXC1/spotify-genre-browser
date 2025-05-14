@@ -1,32 +1,30 @@
-const express = require('express');
-const bodyParser = require('body-parser');
 const https = require('https');
-const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 
-const app = express();
-app.use(bodyParser.json());
-app.use(awsServerlessExpressMiddleware.eventContext());
+exports.handler = async (event) => {
+  console.log('Received event:', JSON.stringify(event, null, 2));
 
-// Enable CORS for all routes
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-  next();
-});
-
-const path = '/exchange-token';
-
-app.post(path, async (req, res) => {
-  console.log('Received request body:', JSON.stringify(req.body, null, 2));
-
-  const { code, codeVerifier, client_id, redirect_uri } = req.body;
-
-  if (!code || !codeVerifier || !client_id || !redirect_uri) {
-    console.error('Invalid parameters');
-    return res.status(400).json({ error: 'Invalid parameters' });
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (err) {
+    console.error('Failed to parse request body:', err);
+    return {
+      statusCode: 400,
+      headers: corsHeaders(),
+      body: JSON.stringify({ error: 'Invalid JSON in request body' }),
+    };
   }
 
-  console.log('Parsed parameters:', { code, codeVerifier, client_id, redirect_uri });
+  const { code, codeVerifier, client_id, redirect_uri } = body;
+
+  if (!code || !codeVerifier || !client_id || !redirect_uri) {
+    console.error('Missing parameters');
+    return {
+      statusCode: 400,
+      headers: corsHeaders(),
+      body: JSON.stringify({ error: 'Missing required parameters' }),
+    };
+  }
 
   const postData = new URLSearchParams({
     client_id,
@@ -35,8 +33,6 @@ app.post(path, async (req, res) => {
     redirect_uri,
     code_verifier: codeVerifier,
   }).toString();
-
-  console.log('Post data:', postData);
 
   const options = {
     hostname: 'accounts.spotify.com',
@@ -49,45 +45,49 @@ app.post(path, async (req, res) => {
   };
 
   try {
-    const spotifyResponse = await new Promise((resolve, reject) => {
-      console.log('Making HTTPS request to Spotify...');
-      const req = https.request(options, (resFromSpotify) => {
-        let data = '';
+    const response = await makeHttpsRequest(options, postData);
+    return {
+      statusCode: response.statusCode,
+      headers: corsHeaders(),
+      body: JSON.stringify(response.body),
+    };
+  } catch (error) {
+    console.error('Request error:', error);
+    return {
+      statusCode: 500,
+      headers: corsHeaders(),
+      body: JSON.stringify({ error: 'Internal Server Error', details: error.toString() }),
+    };
+  }
+};
 
-        console.log(`Received response status: ${resFromSpotify.statusCode}`);
-        resFromSpotify.on('data', (chunk) => {
-          console.log(`Received chunk: ${chunk}`);
-          data += chunk;
-        });
+// Helper: HTTPS request as a Promise
+function makeHttpsRequest(options, postData) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      let data = '';
 
-        resFromSpotify.on('end', () => {
-          console.log('Request ended. Full response data:', data);
-          try {
-            const parsedData = JSON.parse(data);
-            resolve({ status: resFromSpotify.statusCode, data: parsedData });
-          } catch (err) {
-            console.error('Failed to parse response data:', err);
-            reject(new Error('Failed to parse response data as JSON'));
-          }
-        });
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          resolve({ statusCode: res.statusCode, body: parsed });
+        } catch (err) {
+          reject(new Error('Failed to parse JSON response from Spotify'));
+        }
       });
-
-      req.on('error', (e) => {
-        console.error(`HTTPS request error: ${e.message}`);
-        reject(new Error(`Problem with request: ${e.message}`));
-      });
-
-      req.write(postData);
-      req.end();
     });
 
-    console.log('Response from Spotify:', spotifyResponse);
-    res.status(spotifyResponse.status).json(spotifyResponse.data);
+    req.on('error', (err) => reject(err));
+    req.write(postData);
+    req.end();
+  });
+}
 
-  } catch (error) {
-    console.error('Caught error:', error);
-    res.status(500).json({ error: 'Internal Server Error', details: error.toString() });
-  }
-});
-
-module.exports = app;
+// Helper: CORS headers
+function corsHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  };
+}
