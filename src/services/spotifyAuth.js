@@ -149,7 +149,7 @@ export const exchangeCodeForToken = async (code, codeVerifier) => {
     redirect_uri: REDIRECT_URI,
   };
 
-  const url = process.env.REACT_APP_PKCE_ENDPOINT;
+  const url = process.env.REACT_APP_PKCE_ENDPOINT + '/auth';
   
   logger.debug('AUTH004', 'Exchanging code for token', { payload , url});
 

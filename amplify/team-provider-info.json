@@ -55,12 +55,17 @@
       "function": {
         "feedbackLambda": {
           "deploymentBucketName": "amplify-genrebrowser-staging-07292-deployment",
-          "s3Key": "amplify-builds/feedbackLambda-737378517569524a4d50-build.zip"
+          "s3Key": "amplify-builds/feedbackLambda-6a4243394b3333526930-build.zip"
         },
-        "feedbackTable": {}
+        "feedbackTable": {},
+        "pkceProxy": {
+          "deploymentBucketName": "amplify-genrebrowser-staging-07292-deployment",
+          "s3Key": "amplify-builds/pkceProxy-78697a444e634c576270-build.zip"
+        }
       },
       "api": {
-        "feedbackAPI": {}
+        "feedbackAPI": {},
+        "pkceAPI": {}
       },
       "storage": {
         "feedbackTable": {}
@@ -69,7 +74,8 @@
         "amplifyhosting": {
           "appId": "d1oxklzichgkwx",
           "type": "cicd"
-        }
+        },
+        "S3AndCloudFront": {}
       }
     }
   },
