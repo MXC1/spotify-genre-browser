@@ -20,7 +20,7 @@
         "feedbackTable": {},
         "pkceProxy": {
           "deploymentBucketName": "amplify-genrebrowser-dev-3671a-deployment",
-          "s3Key": "amplify-builds/pkceProxy-78697a444e634c576270-build.zip"
+          "s3Key": "amplify-builds/pkceProxy-5a716a6347384a2b3964-build.zip"
         }
       },
       "storage": {
@@ -36,6 +36,9 @@
           "type": "cicd"
         },
         "S3AndCloudFront": {}
+      },
+      "auth": {
+        "logsToCloudWatchAuth": {}
       }
     }
   },
