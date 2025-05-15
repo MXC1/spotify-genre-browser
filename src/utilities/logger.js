@@ -1,16 +1,5 @@
-import AWS from 'aws-sdk';
 import { getCachedEntry, setCachedEntry } from './indexedDb';
 import { v4 as uuidv4 } from 'uuid';
-
-// Configure AWS
-AWS.config.update({
-  region: 'eu-west-2',
-  credentials: new AWS.CognitoIdentityCredentials({
-    IdentityPoolId: 'eu-west-2:e1f1f662-0c4a-46b4-b707-123a98e849f1',
-  }),
-});
-
-const cloudwatchlogs = new AWS.CloudWatchLogs();
 
 let sessionID;
 
@@ -26,29 +15,28 @@ async function fetchOrGenerateSessionID() {
   return sessionID;
 }
 
-// -- CloudWatch Log Stream/Group Configuration --
-const LOG_GROUP = 'SGB_Operational_Logs';
-const LOG_STREAM = 'SGB_Operational_Logs'; 
+async function logToCloudWatch(logPayload) {
+  if (
+    process.env.REACT_APP_ENV !== 'main' &&
+    process.env.REACT_APP_ENV !== 'staging'
+  ) {
+    return;
+  }
 
-async function logToCloudWatch(logEvent) {
-  const params = {
-    logGroupName: LOG_GROUP,
-    logStreamName: LOG_STREAM,
-    logEvents: [
-      {
-        message: JSON.stringify(logEvent),
-        timestamp: Date.now(),
+  try {
+    await fetch(process.env.REACT_APP_LOG_ENDPOINT + "/logs", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    ],
-  };
-
-  cloudwatchlogs.putLogEvents(params, (err) => {
-    if (err) console.error('CloudWatch error:', err);
-  });
+      body: JSON.stringify(logPayload),
+    });
+  } catch (error) {
+    console.error('[CloudWatch] Failed to send log:', error, logPayload);
+  }
 }
 
 // -- Logging Functionality --
-
 async function logMessage(level, message, event_id = null, context = {}) {
   if (!sessionID) await fetchOrGenerateSessionID();
 
@@ -65,10 +53,7 @@ async function logMessage(level, message, event_id = null, context = {}) {
   const consolePrefix = `[${logPayload.timestamp}] [${level}]${event_id ? ` [${event_id}]` : ''}`;
   console.log(`${consolePrefix} ${message}`, context);
 
-  // Send to CloudWatch in production
-  if (process.env.REACT_APP_ENV === 'prod') {
-    logToCloudWatch(logPayload);
-  }
+  logToCloudWatch(logPayload);
 }
 
 // -- Public API --

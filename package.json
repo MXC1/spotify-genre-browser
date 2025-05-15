@@ -26,7 +26,8 @@
     "stacktrace-js": "^2.0.2",
     "uuidv1": "^1.6.14",
     "web-vitals": "^2.1.4",
-    "yarn": "^1.22.22"
+    "yarn": "^1.22.22",
+    "zip": "^1.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
