@@ -17,12 +17,12 @@ async function fetchOrGenerateSessionID() {
 
 async function logToCloudWatch(logPayload) {
   // Only send logs in production or staging
-  // if (
-  //   process.env.REACT_APP_ENV !== 'prod' &&
-  //   process.env.REACT_APP_ENV !== 'staging'
-  // ) {
-  //   return;
-  // }
+  if (
+    process.env.REACT_APP_ENV !== 'main' &&
+    process.env.REACT_APP_ENV !== 'staging'
+  ) {
+    return;
+  }
 
   try {
     await fetch(process.env.REACT_APP_LOG_ENDPOINT + "/logs", {
