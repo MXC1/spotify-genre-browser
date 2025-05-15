@@ -16,13 +16,17 @@ async function fetchOrGenerateSessionID() {
 }
 
 async function logToCloudWatch(logPayload) {
+  console.log(`logPayload: ${JSON.stringify(logPayload)}`);
+  console.log(`process.env.REACT_APP_LOG_ENDPOINT: ${process.env.REACT_APP_LOG_ENDPOINT}`);
+  console.log(`process.env.REACT_APP_ENV: ${process.env.REACT_APP_ENV}`);
+
   // Only send logs in production or staging
-  if (
-    process.env.REACT_APP_ENV !== 'main' &&
-    process.env.REACT_APP_ENV !== 'staging'
-  ) {
-    return;
-  }
+  // if (
+  //   process.env.REACT_APP_ENV !== 'main' &&
+  //   process.env.REACT_APP_ENV !== 'staging'
+  // ) {
+  //   return;
+  // }
 
   try {
     await fetch(process.env.REACT_APP_LOG_ENDPOINT + "/logs", {
