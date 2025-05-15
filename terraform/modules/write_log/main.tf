@@ -67,7 +67,7 @@ resource "aws_lambda_function" "write_log" {
 }
 
 resource "aws_iam_role" "lambda_exec" {
-  name = "lambda-exec-role-${var.env}"
+  name = "write-log-lambda-exec-role-${var.env}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
