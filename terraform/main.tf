@@ -18,7 +18,7 @@ resource "aws_apigatewayv2_api" "log_api" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = ["http://localhost:3000", "https://staging.d1oxklzichgkwx.amplifyapp.com"]
+    allow_origins = ["http://localhost:3000", "https://staging.d1oxklzichgkwx.amplifyapp.com", "https://main.d1oxklzichgkwx.amplifyapp.com"]
     allow_methods = ["POST", "OPTIONS"]
     allow_headers = ["*"]
     max_age       = 3600
