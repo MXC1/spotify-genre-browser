@@ -48,3 +48,23 @@ module "feedback" {
 output "feedback_api_url" {
   value = module.feedback.api_url
 }
+
+# PKCE module
+
+module "pkce_proxy" {
+  source             = "./modules/pkceProxy"
+  env                = local.env
+  lambda_zip         = "./modules/pkceProxy/pkce_proxy_lambda.zip"
+  lambda_handler     = "index.handler"
+  lambda_runtime     = "nodejs18.x"
+  allowed_origins    = [
+    "http://localhost:3000",
+    "https://staging.d1oxklzichgkwx.amplifyapp.com",
+    "https://main.d1oxklzichgkwx.amplifyapp.com"
+  ]
+}
+
+output "pkce_proxy_endpoint" {
+  value = module.pkce_proxy.api_url
+}
+
