@@ -19,7 +19,7 @@ variable "allowed_origins" {
 }
 
 resource "aws_apigatewayv2_api" "log_api" {
-  name          = "log-api"
+  name          = "log-api-${var.env}"
   protocol_type = "HTTP"
 
   cors_configuration {
