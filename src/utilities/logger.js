@@ -54,9 +54,6 @@ async function logMessage(level, message, event_id = null, context = {}) {
   const consolePrefix = `[${logPayload.timestamp}] [${level}]${event_id ? ` [${event_id}]` : ''}`;
   console.log(`${consolePrefix} ${message}`, context);
 
-  // Send to CloudWatch in production
-  if (process.env.REACT_APP_ENV === 'prod' || process.env.REACT_APP_ENV === 'staging') {
-  }
   logToCloudWatch(logPayload);
 }
 
