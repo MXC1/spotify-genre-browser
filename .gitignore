@@ -31,6 +31,11 @@ cypress/videos/
 # Cypress cache
 .cypress_cache/
 
+
+amplify/backend/awscloudformation
+src/aws-exports.js
+amplify/team-provider-info.json
+
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
 amplify/.config/local-*
@@ -51,7 +56,4 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 **.sample
-amplify/backend/awscloudformation
-src/aws-exports.js
-amplify/team-provider-info.json
 #amplify-do-not-edit-end
