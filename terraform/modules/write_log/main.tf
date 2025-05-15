@@ -30,10 +30,31 @@ resource "aws_apigatewayv2_api" "log_api" {
   }
 }
 
+// Add CloudWatch Log Group for API Gateway access logs
+resource "aws_cloudwatch_log_group" "api_access_log" {
+  name = "/aws/apigateway/log-api-access-${var.env}"
+  retention_in_days = 14
+}
+
 resource "aws_apigatewayv2_stage" "stage" {
   api_id      = aws_apigatewayv2_api.log_api.id
   name        = var.env
   auto_deploy = true
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_access_log.arn
+    format = jsonencode({
+      requestId       = "$context.requestId"
+      ip              = "$context.identity.sourceIp"
+      requestTime     = "$context.requestTime"
+      httpMethod      = "$context.httpMethod"
+      routeKey        = "$context.routeKey"
+      status          = "$context.status"
+      protocol        = "$context.protocol"
+      responseLength  = "$context.responseLength"
+      integrationErrorMessage = "$context.integrationErrorMessage"
+    })
+  }
 }
 
 resource "aws_lambda_function" "write_log" {

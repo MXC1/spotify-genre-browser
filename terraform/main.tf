@@ -12,6 +12,7 @@ locals {
   env = var.env != "" ? var.env : terraform.workspace
 }
 
+# Log module
 module "write_log" {
   source             = "./modules/write_log"
   env                = local.env
@@ -25,7 +26,25 @@ module "write_log" {
   ]
 }
 
-output "api_url" {
+output "write_log_api_url" {
   value = module.write_log.api_url
 }
 
+# Feedback module
+
+module "feedback" {
+  source             = "./modules/feedback"
+  env                = local.env
+  lambda_zip         = "./modules/feedback/feedback_lambda.zip"
+  lambda_handler     = "index.handler"
+  lambda_runtime     = "nodejs18.x"
+  allowed_origins    = [
+    "http://localhost:3000",
+    "https://staging.d1oxklzichgkwx.amplifyapp.com",
+    "https://main.d1oxklzichgkwx.amplifyapp.com"
+  ]
+}
+
+output "feedback_api_url" {
+  value = module.feedback.api_url
+}
