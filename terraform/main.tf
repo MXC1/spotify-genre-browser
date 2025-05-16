@@ -3,16 +3,28 @@ provider "aws" {
   profile = "genrebrowser"
 }
 
-variable "env" {
-  type    = string
-  default = ""
-}
-
 locals {
   env = var.env != "" ? var.env : terraform.workspace
 }
 
+# Hosting module
+
+module "hosting" {
+  source             = "./modules/hosting"
+  env                = local.env
+  github_token       = var.github_token
+  spotify_client_id  = var.spotify_client_id
+  feedback_endpoint  = module.feedback.api_url
+  pkce_endpoint      = module.pkce_proxy.api_url
+  log_endpoint       = module.write_log.api_url
+}
+
+output "hosting_url" {
+  value = module.hosting.hosting_url
+}
+
 # Log module
+
 module "write_log" {
   source             = "./modules/write_log"
   env                = local.env
