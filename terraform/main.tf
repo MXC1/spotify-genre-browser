@@ -21,8 +21,8 @@ module "write_log" {
   lambda_runtime     = "nodejs18.x"
   allowed_origins    = [
     "http://localhost:3000",
-    "https://staging.d1oxklzichgkwx.amplifyapp.com",
-    "https://main.d1oxklzichgkwx.amplifyapp.com"
+    "https://staging.d2wb7vdb8dayud.amplifyapp.com",
+    "https://main.d2wb7vdb8dayud.amplifyapp.com"
   ]
 }
 
@@ -40,8 +40,8 @@ module "feedback" {
   lambda_runtime     = "nodejs18.x"
   allowed_origins    = [
     "http://localhost:3000",
-    "https://staging.d1oxklzichgkwx.amplifyapp.com",
-    "https://main.d1oxklzichgkwx.amplifyapp.com"
+    "https://staging.d2wb7vdb8dayud.amplifyapp.com",
+    "https://main.d2wb7vdb8dayud.amplifyapp.com"
   ]
 }
 
@@ -59,8 +59,8 @@ module "pkce_proxy" {
   lambda_runtime     = "nodejs18.x"
   allowed_origins    = [
     "http://localhost:3000",
-    "https://staging.d1oxklzichgkwx.amplifyapp.com",
-    "https://main.d1oxklzichgkwx.amplifyapp.com"
+    "https://staging.d2wb7vdb8dayud.amplifyapp.com",
+    "https://main.d2wb7vdb8dayud.amplifyapp.com"
   ]
 }
 
