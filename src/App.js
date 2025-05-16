@@ -4,8 +4,6 @@ import { ErrorFallback, handleError } from './utilities/errorHandling';
 import { clearAccessToken } from './services/spotifyAuth';
 import { clearAllData } from './utilities/indexedDb';
 import './App.css';
-import { Amplify } from 'aws-amplify';
-import awsconfig from './aws-exports';
 import LoginContainer from './containers/loginContainer/loginContainer';
 import HeaderContainer from './containers/headerContainer/headerContainer';
 import GenreGridContainer from './containers/genreGridContainer/genreGridContainer';
@@ -22,8 +20,6 @@ import { useNavigationHelpers } from './utilities/navigationHelpers';
 import OverlayMenu from './containers/overlayMenu/overlayMenu';
 import { logger } from './utilities/logger';
 import FeedbackContainer from './containers/feedbackContainer/feedbackContainer';
-
-Amplify.configure(awsconfig);
 
 function App() {
   const { showBoundary } = useErrorBoundary()
