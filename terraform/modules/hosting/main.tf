@@ -10,13 +10,6 @@ terraform {
       version = "~> 5.0"
     }
   }
-
-  # Uncomment to use remote state
-  # backend "s3" {
-  #   bucket = "your-terraform-state-bucket"
-  #   key    = "react-cicd/terraform.tfstate"
-  #   region = "eu-west-2"
-  # }
 }
 
 ##################################################
