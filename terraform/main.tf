@@ -12,7 +12,45 @@ locals {
   env = var.env != "" ? var.env : terraform.workspace
 }
 
+# Hosting module
+
+module "hosting" {
+  source       = "./modules/hosting"
+  
+  # Required parameters
+  project_name       = "genre-browser"
+  env                = local.env
+  repository_name    = "https://github.com/MXC1/spotify-genre-browser"
+  repository_branch  = local.env
+
+  # Optional with defaults
+  # domain_name      = ""
+  # use_existing_domain = false
+}
+
+output "website_endpoint" {
+  value       = module.hosting.website_endpoint
+  # value       = module.storage.website_endpoint
+  description = "S3 website endpoint"
+}
+
+output "cloudfront_domain_name" {
+  value       = module.hosting.cloudfront_domain_name
+  description = "CloudFront distribution domain name"
+}
+
+output "codepipeline_name" {
+  value       = module.hosting.codepipeline_name
+  description = "Name of the CodePipeline"
+}
+
+output "deployment_role_arn" {
+  value       = module.hosting.deployment_role_arn
+  description = "ARN of the deployment IAM role"
+}
+
 # Log module
+
 module "write_log" {
   source             = "./modules/write_log"
   env                = local.env
