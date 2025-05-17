@@ -68,10 +68,10 @@ module "write_log" {
   lambda_zip     = "./modules/write_log/lambda_write_log.zip"
   lambda_handler = "index.handler"
   lambda_runtime = "nodejs18.x"
-  allowed_origins = [
-    "http://localhost:3000",
-    "https://${module.hosting.cloudfront_domain_name}"
-  ]
+  allowed_origins = concat(
+    local.env == "dev" ? ["http://localhost:3000"] : [],
+    ["https://${module.hosting.cloudfront_domain_name}"]
+  )
 }
 
 output "write_log_api_url" {
@@ -86,10 +86,10 @@ module "feedback" {
   lambda_zip     = "./modules/feedback/feedback_lambda.zip"
   lambda_handler = "index.handler"
   lambda_runtime = "nodejs18.x"
-  allowed_origins = [
-    "http://localhost:3000",
-    "https://${module.hosting.cloudfront_domain_name}"
-  ]
+  allowed_origins = concat(
+    local.env == "dev" ? ["http://localhost:3000"] : [],
+    ["https://${module.hosting.cloudfront_domain_name}"]
+  )
 }
 
 output "feedback_api_url" {
@@ -104,10 +104,10 @@ module "pkce_proxy" {
   lambda_zip     = "./modules/pkceProxy/pkce_proxy_lambda.zip"
   lambda_handler = "index.handler"
   lambda_runtime = "nodejs18.x"
-  allowed_origins = [
-    "http://localhost:3000",
-    "https://${module.hosting.cloudfront_domain_name}"
-  ]
+  allowed_origins = concat(
+    local.env == "dev" ? ["http://localhost:3000"] : [],
+    ["https://${module.hosting.cloudfront_domain_name}"]
+  )
 }
 
 output "pkce_proxy_endpoint" {
