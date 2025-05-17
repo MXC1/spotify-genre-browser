@@ -3,6 +3,16 @@ provider "aws" {
   profile = "genrebrowser"
 }
 
+# terraform {
+#   backend "s3" {
+#     bucket         = "genrebrowser-tf-state"
+#     key            = "global/s3/terraform.tfstate" 
+#     region         = "eu-west-2"
+#     dynamodb_table = "terraform-lock-table"        
+#     encrypt        = true
+#   }
+# }
+
 variable "env" {
   type    = string
   default = ""
