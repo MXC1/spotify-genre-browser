@@ -8,6 +8,12 @@ variable "env" {
   default = ""
 }
 
+variable "spotify_client_id" {
+  description = "Spotify client ID"
+  type        = string
+  sensitive   = true
+}
+
 locals {
   env = var.env != "" ? var.env : terraform.workspace
 }
@@ -15,13 +21,18 @@ locals {
 # Hosting module
 
 module "hosting" {
-  source       = "./modules/hosting"
-  
+  source = "./modules/hosting"
+
   # Required parameters
-  project_name       = "genre-browser"
-  env                = local.env
-  repository_name    = "https://github.com/MXC1/spotify-genre-browser"
-  repository_branch  = local.env
+  project_name      = "genre-browser"
+  env               = local.env
+  repository_name   = "https://github.com/MXC1/spotify-genre-browser"
+  repository_branch = local.env
+
+  spotify_client_id = var.spotify_client_id
+  feedback_endpoint = module.feedback.api_url
+  pkce_endpoint     = module.pkce_proxy.api_url
+  log_endpoint      = module.write_log.api_url
 
   # Optional with defaults
   # domain_name      = ""
@@ -29,13 +40,13 @@ module "hosting" {
 }
 
 output "website_endpoint" {
-  value       = module.hosting.website_endpoint
+  value = module.hosting.website_endpoint
   # value       = module.storage.website_endpoint
   description = "S3 website endpoint"
 }
 
 output "cloudfront_domain_name" {
-  value       = module.hosting.cloudfront_domain_name
+  value       = "https://${module.hosting.cloudfront_domain_name}"
   description = "CloudFront distribution domain name"
 }
 
@@ -52,15 +63,14 @@ output "deployment_role_arn" {
 # Log module
 
 module "write_log" {
-  source             = "./modules/write_log"
-  env                = local.env
-  lambda_zip         = "./modules/write_log/lambda_write_log.zip"
-  lambda_handler     = "index.handler"
-  lambda_runtime     = "nodejs18.x"
-  allowed_origins    = [
+  source         = "./modules/write_log"
+  env            = local.env
+  lambda_zip     = "./modules/write_log/lambda_write_log.zip"
+  lambda_handler = "index.handler"
+  lambda_runtime = "nodejs18.x"
+  allowed_origins = [
     "http://localhost:3000",
-    "https://staging.d2wb7vdb8dayud.amplifyapp.com",
-    "https://main.d2wb7vdb8dayud.amplifyapp.com"
+    "https://${module.hosting.cloudfront_domain_name}"
   ]
 }
 
@@ -71,15 +81,14 @@ output "write_log_api_url" {
 # Feedback module
 
 module "feedback" {
-  source             = "./modules/feedback"
-  env                = local.env
-  lambda_zip         = "./modules/feedback/feedback_lambda.zip"
-  lambda_handler     = "index.handler"
-  lambda_runtime     = "nodejs18.x"
-  allowed_origins    = [
+  source         = "./modules/feedback"
+  env            = local.env
+  lambda_zip     = "./modules/feedback/feedback_lambda.zip"
+  lambda_handler = "index.handler"
+  lambda_runtime = "nodejs18.x"
+  allowed_origins = [
     "http://localhost:3000",
-    "https://staging.d2wb7vdb8dayud.amplifyapp.com",
-    "https://main.d2wb7vdb8dayud.amplifyapp.com"
+    "https://${module.hosting.cloudfront_domain_name}"
   ]
 }
 
@@ -90,15 +99,14 @@ output "feedback_api_url" {
 # PKCE module
 
 module "pkce_proxy" {
-  source             = "./modules/pkceProxy"
-  env                = local.env
-  lambda_zip         = "./modules/pkceProxy/pkce_proxy_lambda.zip"
-  lambda_handler     = "index.handler"
-  lambda_runtime     = "nodejs18.x"
-  allowed_origins    = [
+  source         = "./modules/pkceProxy"
+  env            = local.env
+  lambda_zip     = "./modules/pkceProxy/pkce_proxy_lambda.zip"
+  lambda_handler = "index.handler"
+  lambda_runtime = "nodejs18.x"
+  allowed_origins = [
     "http://localhost:3000",
-    "https://staging.d2wb7vdb8dayud.amplifyapp.com",
-    "https://main.d2wb7vdb8dayud.amplifyapp.com"
+    "https://${module.hosting.cloudfront_domain_name}"
   ]
 }
 

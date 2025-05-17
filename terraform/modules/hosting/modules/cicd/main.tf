@@ -37,6 +37,27 @@ variable "cloudfront_dist_id" {
   type        = string
 }
 
+variable "feedback_endpoint" {
+  description = "Feedback endpoint for React app"
+  type        = string
+}
+
+variable "pkce_endpoint" {
+  description = "PKCE endpoint for React app"
+  type        = string
+}
+
+variable "log_endpoint" {
+  description = "Log endpoint for React app"
+  type        = string
+}
+
+variable "spotify_client_id" {
+  description = "Spotify Client ID for React app"
+  type        = string
+  sensitive   = true
+}
+
 # IAM role for CodeBuild
 resource "aws_iam_role" "codebuild_role" {
   name = "${var.project_name}-${var.environment}-codebuild-role"
@@ -135,6 +156,32 @@ resource "aws_codebuild_project" "react_build" {
     environment_variable {
       name  = "CLOUDFRONT_DISTRIBUTION_ID"
       value = var.cloudfront_dist_id
+    }
+
+    # React environment variables
+    environment_variable {
+      name  = "REACT_APP_SPOTIFY_CLIENT_ID"
+      value = var.spotify_client_id
+    }
+
+    environment_variable {
+      name  = "REACT_APP_ENV"
+      value = var.environment
+    }
+
+    environment_variable {
+      name  = "REACT_APP_FEEDBACK_ENDPOINT"
+      value = var.feedback_endpoint
+    }
+
+    environment_variable {
+      name  = "REACT_APP_PKCE_ENDPOINT"
+      value = var.pkce_endpoint
+    }
+
+    environment_variable {
+      name  = "REACT_APP_LOG_ENDPOINT"
+      value = var.log_endpoint
     }
   }
 

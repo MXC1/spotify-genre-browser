@@ -10,7 +10,7 @@ terraform {
       version = "~> 5.0"
     }
   }
-  
+
   # Uncomment to use remote state
   # backend "s3" {
   #   bucket = "your-terraform-state-bucket"
@@ -64,6 +64,31 @@ variable "use_existing_domain" {
   default     = false
 }
 
+variable "feedback_endpoint" {
+  description = "API endpoint for feedback"
+  type        = string
+  default     = ""
+}
+
+variable "pkce_endpoint" {
+  description = "API endpoint for PKCE"
+  type        = string
+  default     = ""
+}
+
+variable "log_endpoint" {
+  description = "API endpoint for logging"
+  type        = string
+  default     = ""
+}
+
+variable "spotify_client_id" {
+  description = "Spotify client ID"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 ##################################################
 # Module Invocations
 ##################################################
@@ -75,11 +100,11 @@ module "storage" {
 }
 
 module "cdn" {
-  source             = "./modules/cdn"
-  project_name       = var.project_name
-  environment        = var.env
-  website_bucket     = module.storage.website_bucket
-  domain_name        = var.domain_name
+  source              = "./modules/cdn"
+  project_name        = var.project_name
+  environment         = var.env
+  website_bucket      = module.storage.website_bucket
+  domain_name         = var.domain_name
   use_existing_domain = var.use_existing_domain
 }
 
@@ -91,6 +116,11 @@ module "cicd" {
   repository_branch  = var.env
   website_bucket     = module.storage.website_bucket
   cloudfront_dist_id = module.cdn.cloudfront_distribution_id
+
+  spotify_client_id = var.spotify_client_id
+  feedback_endpoint = var.feedback_endpoint
+  pkce_endpoint     = var.pkce_endpoint
+  log_endpoint      = var.log_endpoint
 }
 
 ##################################################
