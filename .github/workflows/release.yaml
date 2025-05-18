@@ -28,7 +28,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          ref: test-branch-2
+          ref: staging
           fetch-depth: 0
 
       - name: Setup Git
@@ -82,50 +82,83 @@ jobs:
 
       - name: Generate release notes
         id: release_notes
-        run: |
-          # Get commits between the latest tag and the current test-branch-2
-          if [ "$LATEST_TAG" = "v0.0.0" ]; then
-            COMMITS=$(git log --pretty=format:"- %s" test-branch-2)
-          else
-            COMMITS=$(git log --pretty=format:"- %s" $LATEST_TAG..test-branch-2)
-          fi
-          
-          # Create release notes content
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          echo "## Release $NEW_VERSION" >> $GITHUB_ENV
-          if [ -n "${{ github.event.inputs.release_name }}" ]; then
-            echo "### ${{ github.event.inputs.release_name }}" >> $GITHUB_ENV
-          fi
-          echo "" >> $GITHUB_ENV
-          echo "### Changes" >> $GITHUB_ENV
-          echo "$COMMITS" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data } = await github.rest.repos.generateReleaseNotes({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: process.env.NEW_VERSION,
+              previous_tag_name: process.env.LATEST_TAG
+            });
+            core.setOutput('body', data.body);
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NEW_VERSION }}
-          name: Release ${{ env.NEW_VERSION }} ${{ github.event.inputs.release_name != '' && format('- {0}', github.event.inputs.release_name) || '' }}
-          body: ${{ env.RELEASE_NOTES }}
+          name: ${{ env.NEW_VERSION }} ${{ github.event.inputs.release_name != '' && format('- {0}', github.event.inputs.release_name) || '' }}
+          body: ${{ steps.release_notes.outputs.body }}
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Pull Request from test-branch-2 to test-branch-1
-        uses: peter-evans/create-pull-request@v5
+      - name: Create Pull Request from staging to main
+        uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: test-branch-1
-          branch: test-branch-2
-          title: "Release ${{ env.NEW_VERSION }} to production"
-          body: |
-            ## Release ${{ env.NEW_VERSION }} to production
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:staging`,
+              base: 'main',
+              state: 'open'
+            });
+
+            const body = `## Release Notes\n\n${process.env.RELEASE_NOTES}`;
+
+            if (pullRequests.length === 0) {
+              const { data: pullRequest } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Release ${process.env.NEW_VERSION} to production`,
+                head: 'staging',
+                base: 'main',
+                body: body
+              });
+              console.log(`Created Pull Request #${pullRequest.number}`);
+            } else {
+              console.log(`Pull Request already exists: #${pullRequests[0].number}`);
+            }
+        env:
+          RELEASE_NOTES: ${{ steps.release_notes.outputs.body }}
+
+      - name: Create Pull Request from staging to main
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:staging`,
+              base: 'main',
+              state: 'open'
+            });
             
-            This PR merges the changes from `test-branch-2` into `test-branch-1` for release ${{ env.NEW_VERSION }}.
-            
-            ${{ env.RELEASE_NOTES }}
-            
-            Please review and merge manually.
-          draft: false
-          labels: "release"
+            if (pullRequests.length === 0) {
+              const { data: pullRequest } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Release ${process.env.NEW_VERSION} to production`,
+                head: 'staging',
+                base: 'main'
+              });
+              
+              console.log(`Created Pull Request #${pullRequest.number}`);
+            } else {
+              console.log(`Pull Request already exists: #${pullRequests[0].number}`);
+            }
