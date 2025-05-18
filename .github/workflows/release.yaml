@@ -1,0 +1,164 @@
+name: Create Release and PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type (major, minor, patch)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      release_name:
+        description: 'Release name (optional)'
+        required: false
+        type: string
+
+jobs:
+  create-release-and-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: staging
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+      
+      - name: Get latest version
+        id: get_latest_version
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          
+          # Remove the 'v' prefix for version calculations
+          VERSION=${LATEST_TAG#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          
+          # Split the version into major, minor, and patch
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
+          
+          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
+          echo "MINOR=$MINOR" >> $GITHUB_ENV
+          echo "PATCH=$PATCH" >> $GITHUB_ENV
+
+      - name: Calculate new version
+        id: calculate_version
+        run: |
+          if [ "${{ github.event.inputs.release_type }}" == "major" ]; then
+            NEW_MAJOR=$((MAJOR + 1))
+            NEW_MINOR=0
+            NEW_PATCH=0
+          elif [ "${{ github.event.inputs.release_type }}" == "minor" ]; then
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$((MINOR + 1))
+            NEW_PATCH=0
+          else
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$MINOR
+            NEW_PATCH=$((PATCH + 1))
+          fi
+          
+          NEW_VERSION="v$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Create new tag
+        run: |
+          git tag $NEW_VERSION
+          git push origin $NEW_VERSION
+
+      - name: Generate release notes
+        id: release_notes
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data } = await github.rest.repos.generateReleaseNotes({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: process.env.NEW_VERSION,
+              previous_tag_name: process.env.LATEST_TAG
+            });
+            core.setOutput('body', data.body);
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.NEW_VERSION }}
+          name: ${{ env.NEW_VERSION }} ${{ github.event.inputs.release_name != '' && format('- {0}', github.event.inputs.release_name) || '' }}
+          body: ${{ steps.release_notes.outputs.body }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request from staging to main
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:staging`,
+              base: 'main',
+              state: 'open'
+            });
+
+            const body = `## Release Notes\n\n${process.env.RELEASE_NOTES}`;
+
+            if (pullRequests.length === 0) {
+              const { data: pullRequest } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Release ${process.env.NEW_VERSION} to production`,
+                head: 'staging',
+                base: 'main',
+                body: body
+              });
+              console.log(`Created Pull Request #${pullRequest.number}`);
+            } else {
+              console.log(`Pull Request already exists: #${pullRequests[0].number}`);
+            }
+        env:
+          RELEASE_NOTES: ${{ steps.release_notes.outputs.body }}
+
+      - name: Create Pull Request from staging to main
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:staging`,
+              base: 'main',
+              state: 'open'
+            });
+            
+            if (pullRequests.length === 0) {
+              const { data: pullRequest } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Release ${process.env.NEW_VERSION} to production`,
+                head: 'staging',
+                base: 'main'
+              });
+              
+              console.log(`Created Pull Request #${pullRequest.number}`);
+            } else {
+              console.log(`Pull Request already exists: #${pullRequests[0].number}`);
+            }
