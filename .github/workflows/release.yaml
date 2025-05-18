@@ -82,20 +82,59 @@ jobs:
 
       - name: Generate release notes
         id: release_notes
-        run: |
-          # Let GitHub generate the default release notes
-          echo "Using GitHub's default release notes" >> /dev/null
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data } = await github.rest.repos.generateReleaseNotes({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: process.env.NEW_VERSION,
+              previous_tag_name: process.env.LATEST_TAG
+            });
+            core.setOutput('body', data.body);
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NEW_VERSION }}
           name: ${{ env.NEW_VERSION }} ${{ github.event.inputs.release_name != '' && format('- {0}', github.event.inputs.release_name) || '' }}
-          generate_release_notes: true
+          body: ${{ steps.release_notes.outputs.body }}
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request from 93-test-branch-2 to 93-test-branch-1
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:93-test-branch-2`,
+              base: '93-test-branch-1',
+              state: 'open'
+            });
+
+            const body = `## Release Notes\n\n${process.env.RELEASE_NOTES}`;
+
+            if (pullRequests.length === 0) {
+              const { data: pullRequest } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Release ${process.env.NEW_VERSION} to production`,
+                head: '93-test-branch-2',
+                base: '93-test-branch-1',
+                body: body
+              });
+              console.log(`Created Pull Request #${pullRequest.number}`);
+            } else {
+              console.log(`Pull Request already exists: #${pullRequests[0].number}`);
+            }
+        env:
+          RELEASE_NOTES: ${{ steps.release_notes.outputs.body }}
 
       - name: Create Pull Request from 93-test-branch-2 to 93-test-branch-1
         uses: actions/github-script@v6
