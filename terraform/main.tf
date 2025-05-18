@@ -3,6 +3,18 @@ provider "aws" {
   profile = "genrebrowser"
 }
 
+terraform {
+  backend "s3" {
+    profile = "genrebrowser"
+    bucket  = "genrebrowser-tf-state"
+    key     = "global/s3/terraform.tfstate"
+    region  = "eu-west-2"
+    encrypt = true
+
+    use_lockfile = true
+  }
+}
+
 variable "env" {
   type    = string
   default = ""
@@ -16,6 +28,12 @@ variable "spotify_client_id" {
 
 locals {
   env = var.env != "" ? var.env : terraform.workspace
+}
+
+# TFState module
+
+module "terraform_state" {
+  source = "./modules/terraform_state"
 }
 
 # Hosting module
