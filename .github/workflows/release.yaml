@@ -83,30 +83,15 @@ jobs:
       - name: Generate release notes
         id: release_notes
         run: |
-          # Get commits between the latest tag and the current 93-test-branch-2
-          if [ "$LATEST_TAG" = "v0.0.0" ]; then
-            COMMITS=$(git log --pretty=format:"- %s" 93-test-branch-2)
-          else
-            COMMITS=$(git log --pretty=format:"- %s" $LATEST_TAG..93-test-branch-2)
-          fi
-          
-          # Create release notes content
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          echo "## Release $NEW_VERSION" >> $GITHUB_ENV
-          if [ -n "${{ github.event.inputs.release_name }}" ]; then
-            echo "### ${{ github.event.inputs.release_name }}" >> $GITHUB_ENV
-          fi
-          echo "" >> $GITHUB_ENV
-          echo "### Changes" >> $GITHUB_ENV
-          echo "$COMMITS" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          # Let GitHub generate the default release notes
+          echo "Using GitHub's default release notes" >> /dev/null
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NEW_VERSION }}
-          name: Release ${{ env.NEW_VERSION }} ${{ github.event.inputs.release_name != '' && format('- {0}', github.event.inputs.release_name) || '' }}
-          body: ${{ env.RELEASE_NOTES }}
+          name: ${{ env.NEW_VERSION }} ${{ github.event.inputs.release_name != '' && format('- {0}', github.event.inputs.release_name) || '' }}
+          generate_release_notes: true
           draft: false
           prerelease: false
         env:
@@ -130,13 +115,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: `Release ${process.env.NEW_VERSION} to production`,
-                body: `## Release ${process.env.NEW_VERSION} to production
-                
-                This PR merges the changes from \`93-test-branch-2\` into \`93-test-branch-1\` for release ${process.env.NEW_VERSION}.
-                
-                ${process.env.RELEASE_NOTES}
-                
-                Please review and merge manually.`,
                 head: '93-test-branch-2',
                 base: '93-test-branch-1'
               });
