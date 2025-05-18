@@ -141,13 +141,6 @@ jobs:
                 base: '93-test-branch-1'
               });
               
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pullRequest.number,
-                labels: ['release']
-              });
-              
               console.log(`Created Pull Request #${pullRequest.number}`);
             } else {
               console.log(`Pull Request already exists: #${pullRequests[0].number}`);
