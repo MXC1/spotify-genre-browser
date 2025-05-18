@@ -28,7 +28,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          ref: 93-test-branch-2
+          ref: staging
           fetch-depth: 0
 
       - name: Setup Git
@@ -105,7 +105,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Pull Request from 93-test-branch-2 to 93-test-branch-1
+      - name: Create Pull Request from staging to main
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -113,8 +113,8 @@ jobs:
             const { data: pullRequests } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head: `${context.repo.owner}:93-test-branch-2`,
-              base: '93-test-branch-1',
+              head: `${context.repo.owner}:staging`,
+              base: 'main',
               state: 'open'
             });
 
@@ -125,8 +125,8 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: `Release ${process.env.NEW_VERSION} to production`,
-                head: '93-test-branch-2',
-                base: '93-test-branch-1',
+                head: 'staging',
+                base: 'main',
                 body: body
               });
               console.log(`Created Pull Request #${pullRequest.number}`);
@@ -136,7 +136,7 @@ jobs:
         env:
           RELEASE_NOTES: ${{ steps.release_notes.outputs.body }}
 
-      - name: Create Pull Request from 93-test-branch-2 to 93-test-branch-1
+      - name: Create Pull Request from staging to main
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -144,8 +144,8 @@ jobs:
             const { data: pullRequests } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head: `${context.repo.owner}:93-test-branch-2`,
-              base: '93-test-branch-1',
+              head: `${context.repo.owner}:staging`,
+              base: 'main',
               state: 'open'
             });
             
@@ -154,8 +154,8 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: `Release ${process.env.NEW_VERSION} to production`,
-                head: '93-test-branch-2',
-                base: '93-test-branch-1'
+                head: 'staging',
+                base: 'main'
               });
               
               console.log(`Created Pull Request #${pullRequest.number}`);
