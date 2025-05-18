@@ -48,8 +48,14 @@ jobs:
         draft: false
 
     - name: Merge the pull request
-      uses: peter-evans/pull-request-merge@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        pull-request: ${{ steps.create_pr.outputs.pull-request-url }}
-        merge-method: merge
+      if: steps.create_pr.outputs.pull-request-number
+      run: |
+        pr_number="${{ steps.create_pr.outputs.pull-request-number }}"
+        if [ -n "$pr_number" ]; then
+          echo "Merging pull request #$pr_number"
+          gh pr merge $pr_number --merge --admin
+        else
+          echo "No pull request was created. Possibly no changes between branches."
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
