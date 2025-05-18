@@ -41,8 +41,8 @@ jobs:
       uses: peter-evans/create-pull-request@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        source_branch: staging
-        target_branch: main
+        base: main
+        branch: staging
         title: "Merge staging into main for release ${{ github.event.inputs.tag }}"
         body: "Automated PR to merge staging into main for release ${{ github.event.inputs.tag }}"
         draft: false
