@@ -1,0 +1,61 @@
+name: Tag, Release, and Merge PR from staging to main
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name (e.g., v1.2.3)'
+        required: true
+        default: ''
+
+jobs:
+  release-and-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout staging branch
+      uses: actions/checkout@v3
+      with:
+        ref: staging
+        fetch-depth: 0  
+
+    - name: Create tag on staging
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git tag ${{ github.event.inputs.tag }}
+        git push origin ${{ github.event.inputs.tag }}
+
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.event.inputs.tag }}
+        name: Release ${{ github.event.inputs.tag }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create Pull Request from staging to main
+      id: create_pr
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        base: test-branch-2
+        branch: test-branch-1
+        title: "Merge staging into main for release ${{ github.event.inputs.tag }}"
+        body: "Automated PR to merge staging into main for release ${{ github.event.inputs.tag }}"
+        draft: true
+
+    # - name: Merge the pull request
+    #   if: steps.create_pr.outputs.pull-request-number
+    #   run: |
+    #     pr_number="${{ steps.create_pr.outputs.pull-request-number }}"
+    #     if [ -n "$pr_number" ]; then
+    #       echo "Merging pull request #$pr_number"
+    #       gh pr merge $pr_number --merge --admin
+    #     else
+    #       echo "No pull request was created. Possibly no changes between branches."
+    #     fi
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
