@@ -28,7 +28,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          ref: 93-test-branch-1
+          ref: 93-test-branch-2
           fetch-depth: 0
 
       - name: Setup Git
@@ -83,11 +83,11 @@ jobs:
       - name: Generate release notes
         id: release_notes
         run: |
-          # Get commits between the latest tag and the current 93-test-branch-1
+          # Get commits between the latest tag and the current 93-test-branch-2
           if [ "$LATEST_TAG" = "v0.0.0" ]; then
-            COMMITS=$(git log --pretty=format:"- %s" 93-test-branch-1)
+            COMMITS=$(git log --pretty=format:"- %s" 93-test-branch-2)
           else
-            COMMITS=$(git log --pretty=format:"- %s" $LATEST_TAG..93-test-branch-1)
+            COMMITS=$(git log --pretty=format:"- %s" $LATEST_TAG..93-test-branch-2)
           fi
           
           # Create release notes content
@@ -112,20 +112,43 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Pull Request from 93-test-branch-1 to 93-test-branch-2
-        uses: peter-evans/create-pull-request@v5
+      - name: Create Pull Request from 93-test-branch-2 to 93-test-branch-1
+        uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: 93-test-branch-2
-          branch: 93-test-branch-1
-          title: "Release ${{ env.NEW_VERSION }} to production"
-          body: |
-            ## Release ${{ env.NEW_VERSION }} to production
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:93-test-branch-2`,
+              base: '93-test-branch-1',
+              state: 'open'
+            });
             
-            This PR merges the changes from `93-test-branch-1` into `93-test-branch-2` for release ${{ env.NEW_VERSION }}.
-            
-            ${{ env.RELEASE_NOTES }}
-            
-            Please review and merge manually.
-          draft: false
-          labels: "release"
+            if (pullRequests.length === 0) {
+              const { data: pullRequest } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Release ${process.env.NEW_VERSION} to production`,
+                body: `## Release ${process.env.NEW_VERSION} to production
+                
+                This PR merges the changes from \`93-test-branch-2\` into \`93-test-branch-1\` for release ${process.env.NEW_VERSION}.
+                
+                ${process.env.RELEASE_NOTES}
+                
+                Please review and merge manually.`,
+                head: '93-test-branch-2',
+                base: '93-test-branch-1'
+              });
+              
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pullRequest.number,
+                labels: ['release']
+              });
+              
+              console.log(`Created Pull Request #${pullRequest.number}`);
+            } else {
+              console.log(`Pull Request already exists: #${pullRequests[0].number}`);
+            }
