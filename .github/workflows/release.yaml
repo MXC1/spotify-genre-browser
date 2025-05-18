@@ -45,17 +45,17 @@ jobs:
         branch: staging
         title: "Merge staging into main for release ${{ github.event.inputs.tag }}"
         body: "Automated PR to merge staging into main for release ${{ github.event.inputs.tag }}"
-        draft: false
+        draft: true
 
-    - name: Merge the pull request
-      if: steps.create_pr.outputs.pull-request-number
-      run: |
-        pr_number="${{ steps.create_pr.outputs.pull-request-number }}"
-        if [ -n "$pr_number" ]; then
-          echo "Merging pull request #$pr_number"
-          gh pr merge $pr_number --merge --admin
-        else
-          echo "No pull request was created. Possibly no changes between branches."
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Merge the pull request
+    #   if: steps.create_pr.outputs.pull-request-number
+    #   run: |
+    #     pr_number="${{ steps.create_pr.outputs.pull-request-number }}"
+    #     if [ -n "$pr_number" ]; then
+    #       echo "Merging pull request #$pr_number"
+    #       gh pr merge $pr_number --merge --admin
+    #     else
+    #       echo "No pull request was created. Possibly no changes between branches."
+    #     fi
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
