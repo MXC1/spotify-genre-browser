@@ -51,5 +51,5 @@ jobs:
       uses: peter-evans/pull-request-merge@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        pull-request-number: ${{ steps.create_pr.outputs.pull-request-number }}
+        pull-request: ${{ steps.create_pr.outputs.pull-request-url }}
         merge-method: merge
