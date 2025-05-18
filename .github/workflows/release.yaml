@@ -1,61 +1,131 @@
-name: Tag, Release, and Merge PR from staging to main
+name: Create Release and PR
 
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Tag name (e.g., v1.2.3)'
+      release_type:
+        description: 'Release type (major, minor, patch)'
         required: true
-        default: ''
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      release_name:
+        description: 'Release name (optional)'
+        required: false
+        type: string
 
 jobs:
-  release-and-pr:
+  create-release-and-pr:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+      pull-requests: write
+    
     steps:
-    - name: Checkout staging branch
-      uses: actions/checkout@v3
-      with:
-        ref: staging
-        fetch-depth: 0  
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: test-branch-2
+          fetch-depth: 0
 
-    - name: Create tag on staging
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git tag ${{ github.event.inputs.tag }}
-        git push origin ${{ github.event.inputs.tag }}
+      - name: Setup Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+      
+      - name: Get latest version
+        id: get_latest_version
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          
+          # Remove the 'v' prefix for version calculations
+          VERSION=${LATEST_TAG#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          
+          # Split the version into major, minor, and patch
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
+          
+          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
+          echo "MINOR=$MINOR" >> $GITHUB_ENV
+          echo "PATCH=$PATCH" >> $GITHUB_ENV
 
-    - name: Create GitHub release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.event.inputs.tag }}
-        name: Release ${{ github.event.inputs.tag }}
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Calculate new version
+        id: calculate_version
+        run: |
+          if [ "${{ github.event.inputs.release_type }}" == "major" ]; then
+            NEW_MAJOR=$((MAJOR + 1))
+            NEW_MINOR=0
+            NEW_PATCH=0
+          elif [ "${{ github.event.inputs.release_type }}" == "minor" ]; then
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$((MINOR + 1))
+            NEW_PATCH=0
+          else
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$MINOR
+            NEW_PATCH=$((PATCH + 1))
+          fi
+          
+          NEW_VERSION="v$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-    - name: Create Pull Request from staging to main
-      id: create_pr
-      uses: peter-evans/create-pull-request@v5
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        base: test-branch-2
-        branch: test-branch-1
-        title: "Merge staging into main for release ${{ github.event.inputs.tag }}"
-        body: "Automated PR to merge staging into main for release ${{ github.event.inputs.tag }}"
-        draft: true
+      - name: Create new tag
+        run: |
+          git tag $NEW_VERSION
+          git push origin $NEW_VERSION
 
-    # - name: Merge the pull request
-    #   if: steps.create_pr.outputs.pull-request-number
-    #   run: |
-    #     pr_number="${{ steps.create_pr.outputs.pull-request-number }}"
-    #     if [ -n "$pr_number" ]; then
-    #       echo "Merging pull request #$pr_number"
-    #       gh pr merge $pr_number --merge --admin
-    #     else
-    #       echo "No pull request was created. Possibly no changes between branches."
-    #     fi
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          # Get commits between the latest tag and the current test-branch-2
+          if [ "$LATEST_TAG" = "v0.0.0" ]; then
+            COMMITS=$(git log --pretty=format:"- %s" test-branch-2)
+          else
+            COMMITS=$(git log --pretty=format:"- %s" $LATEST_TAG..test-branch-2)
+          fi
+          
+          # Create release notes content
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "## Release $NEW_VERSION" >> $GITHUB_ENV
+          if [ -n "${{ github.event.inputs.release_name }}" ]; then
+            echo "### ${{ github.event.inputs.release_name }}" >> $GITHUB_ENV
+          fi
+          echo "" >> $GITHUB_ENV
+          echo "### Changes" >> $GITHUB_ENV
+          echo "$COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.NEW_VERSION }}
+          name: Release ${{ env.NEW_VERSION }} ${{ github.event.inputs.release_name != '' && format('- {0}', github.event.inputs.release_name) || '' }}
+          body: ${{ env.RELEASE_NOTES }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request from test-branch-2 to test-branch-1
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: test-branch-1
+          branch: test-branch-2
+          title: "Release ${{ env.NEW_VERSION }} to production"
+          body: |
+            ## Release ${{ env.NEW_VERSION }} to production
+            
+            This PR merges the changes from `test-branch-2` into `test-branch-1` for release ${{ env.NEW_VERSION }}.
+            
+            ${{ env.RELEASE_NOTES }}
+            
+            Please review and merge manually.
+          draft: false
+          labels: "release"
