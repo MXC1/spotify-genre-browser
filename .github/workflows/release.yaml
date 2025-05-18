@@ -28,7 +28,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          ref: test-branch-2
+          ref: 93-test-branch-2
           fetch-depth: 0
 
       - name: Setup Git
@@ -83,11 +83,11 @@ jobs:
       - name: Generate release notes
         id: release_notes
         run: |
-          # Get commits between the latest tag and the current test-branch-2
+          # Get commits between the latest tag and the current 93-test-branch-2
           if [ "$LATEST_TAG" = "v0.0.0" ]; then
-            COMMITS=$(git log --pretty=format:"- %s" test-branch-2)
+            COMMITS=$(git log --pretty=format:"- %s" 93-test-branch-2)
           else
-            COMMITS=$(git log --pretty=format:"- %s" $LATEST_TAG..test-branch-2)
+            COMMITS=$(git log --pretty=format:"- %s" $LATEST_TAG..93-test-branch-2)
           fi
           
           # Create release notes content
@@ -112,17 +112,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Pull Request from test-branch-2 to test-branch-1
+      - name: Create Pull Request from 93-test-branch-2 to 93-test-branch-1
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: test-branch-1
-          branch: test-branch-2
+          base: 93-test-branch-1
+          branch: 93-test-branch-2
           title: "Release ${{ env.NEW_VERSION }} to production"
           body: |
             ## Release ${{ env.NEW_VERSION }} to production
             
-            This PR merges the changes from `test-branch-2` into `test-branch-1` for release ${{ env.NEW_VERSION }}.
+            This PR merges the changes from `93-test-branch-2` into `93-test-branch-1` for release ${{ env.NEW_VERSION }}.
             
             ${{ env.RELEASE_NOTES }}
             
