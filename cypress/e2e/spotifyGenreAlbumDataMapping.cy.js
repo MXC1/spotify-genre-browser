@@ -42,6 +42,7 @@ describe('GIVEN I authenticate successfully', () => {
     });
     
     it('AND the album data should load', () => {
+        cy.get('.no-albums-message').should('not.exist');
         cy.get('.genre-grid .genre-section .genre-title').should('contain', 'slowcore, spoken word');
         cy.get('.genre-grid .genre-section .album-preview img').should('have.attr', 'src')
         .should('include', 'https://i.scdn.co/image/ab67616d00001e0226597c053b38c9cf93f8f3a9');

@@ -1,0 +1,12 @@
+.no-albums-message {
+  text-align: center;
+  margin-top: 40px;
+  color: #888;
+}
+.no-albums-message h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.no-albums-message p {
+  font-size: 1.1rem;
+}
