@@ -13,7 +13,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
   const [albumProgress, setAlbumProgress] = useState({ current: 0, total: 0 });
   const [artistProgress, setArtistProgress] = useState({ current: 0, total: 0 });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -65,6 +65,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         goTo("/authenticate");
         return;
       }
+      
+      setIsLoading(true);
 
       const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
       if (cachedGenreAlbumMap && Object.keys(cachedGenreAlbumMap).length > 0) {
@@ -248,17 +250,29 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     <div>
       {isLoading ? (
         <div style={{ maxWidth: 400, margin: '0 auto', padding: 20 }}>
-          {(
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontWeight: 500 }}>Fetching your saved albums...</label>
-              <progress className="genre-progress-bar" value={albumProgress.current} max={albumProgress.total} />
-              <div style={{ fontSize: 13, color: '#aaa' }}>{albumProgress.current} / {albumProgress.total}</div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ fontWeight: 500 }}>Fetching your saved albums...</label>
+            <div className="genre-progress-bar-outer">
+              <div
+                className="genre-progress-bar-inner"
+                style={{
+                  width: albumProgress.total > 0 ? `${(albumProgress.current / albumProgress.total) * 100}%` : '0%'
+                }}
+              />
             </div>
-          )}
+            <div style={{ fontSize: 13, color: '#aaa' }}>{albumProgress.current} / {albumProgress.total}</div>
+          </div>
           {artistProgress.total > 0 && (
             <div>
               <label style={{ fontWeight: 500 }}>Fetching genre information for artists...</label>
-              <progress className="genre-progress-bar" value={artistProgress.current} max={artistProgress.total} />
+              <div className="genre-progress-bar-outer">
+                <div
+                  className="genre-progress-bar-inner"
+                  style={{
+                    width: artistProgress.total > 0 ? `${(artistProgress.current / artistProgress.total) * 100}%` : '0%'
+                  }}
+                />
+              </div>
               <div style={{ fontSize: 13, color: '#aaa' }}>{artistProgress.current} / {artistProgress.total}</div>
             </div>
           )}
