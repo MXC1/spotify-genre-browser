@@ -17,7 +17,7 @@ describe("GIVEN I have no albums in my library", () => {
     cy.wait(["@authToken", "@getMySavedAlbums_noAlbums"]);
   });
 
-  it.only("THEN the no albums message should be shown", () => {
+  it("THEN the no albums message should be shown", () => {
     cy.get(".page-title").should("contain", "Your album library");
     cy.get(".refresh-button").should("exist");
 

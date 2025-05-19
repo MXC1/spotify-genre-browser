@@ -1,0 +1,5 @@
+{
+    "access_token": "newAccessToken",
+    "expires_in": 3600,
+    "refresh_token": "newRefreshToken"
+}
