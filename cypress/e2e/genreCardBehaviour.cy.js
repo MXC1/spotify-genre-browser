@@ -14,7 +14,7 @@ describe("GIVEN I have no albums in my library", () => {
 
     cy.visit("/genre-album-map?code=valid_token&state=valid_state");
 
-    // cy.wait(["@authToken", "@getMySavedAlbums", "@getArtists"]);
+    cy.wait(["@authToken", "@getMySavedAlbums_noAlbums"]);
   });
 
   it.only("THEN the no albums message should be shown", () => {
