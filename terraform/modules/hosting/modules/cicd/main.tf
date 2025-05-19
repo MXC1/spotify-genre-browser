@@ -296,7 +296,7 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         Action = [
           "codestar-connections:UseConnection"
         ],
-        Resource = aws_codestarconnections_connection.github[0].arn
+        Resource = aws_codestarconnections_connection.github.arn
       },
       {
         Effect = "Allow"
@@ -324,22 +324,8 @@ resource "aws_cloudwatch_log_group" "pipeline_logs" {
   }
 }
 
-# Determine if using CodeCommit or GitHub connection
-locals {
-  is_github_repo  = can(regex("^https://github.com", var.repository_name)) || can(regex("^github.com", var.repository_name))
-  source_provider = local.is_github_repo ? "CodeStarSourceConnection" : "CodeCommit"
-}
-
-# Create a CodeCommit repository if not using GitHub
-resource "aws_codecommit_repository" "app_repo" {
-  count           = local.is_github_repo ? 0 : 1
-  repository_name = var.repository_name
-  description     = "Repository for ${var.project_name} React application"
-}
-
 # GitHub connection (placeholder - you'll need to create this connection manually in the AWS console)
 resource "aws_codestarconnections_connection" "github" {
-  count         = local.is_github_repo ? 1 : 0
   name          = "${var.project_name}-github-connection"
   provider_type = "GitHub"
 }
@@ -362,22 +348,16 @@ resource "aws_codepipeline" "react_pipeline" {
       name             = "Source"
       category         = "Source"
       owner            = "AWS"
-      provider         = local.source_provider
+      provider         = "CodeStarSourceConnection"
       version          = "1"
       output_artifacts = ["source_output"]
 
-      configuration = local.is_github_repo ? {
-        ConnectionArn = aws_codestarconnections_connection.github[0].arn
-        # Extract just the owner/repo portion if a full URL is provided
+      configuration = {
+        ConnectionArn = aws_codestarconnections_connection.github.arn
         FullRepositoryId     = replace(replace(var.repository_name, "https://github.com/", ""), "github.com/", "")
         BranchName           = var.repository_branch
         OutputArtifactFormat = "CODE_ZIP" # Add this line for GitHub connections
-        } : {
-        RepositoryName = var.repository_name
-        BranchName     = var.repository_branch
-      }
-
-
+        }
     }
   }
 
@@ -432,7 +412,7 @@ output "codepipeline_name" {
 }
 
 output "source_repository" {
-  value       = local.is_github_repo ? var.repository_name : (length(aws_codecommit_repository.app_repo) > 0 ? aws_codecommit_repository.app_repo[0].clone_url_http : "")
+  value       = var.repository_name
   description = "Source code repository URL"
 }
 
@@ -442,12 +422,9 @@ output "deployment_role_arn" {
 }
 
 output "github_repo_config" {
-  value = local.is_github_repo ? {
+  value = {
     is_github      = true
     repo_name      = var.repository_name
-    connection_arn = length(aws_codestarconnections_connection.github) > 0 ? aws_codestarconnections_connection.github[0].arn : "none"
-    } : {
-    is_github = false
-    repo_name = var.repository_name
-  }
+    connection_arn = length(aws_codestarconnections_connection.github) > 0 ? aws_codestarconnections_connection.github.arn : "none"
+    }
 }
