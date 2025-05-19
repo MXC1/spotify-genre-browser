@@ -8,10 +8,14 @@ import './genreGridContainer.css';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 import SearchSortContainer from '../../components/SearchSortContainer';
+import ProgressBar from '../../components/ProgressBar/ProgressBar';
+import NoAlbums from '../../components/NoAlbums/NoAlbums';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
-  const [loadingMessage, setLoadingMessage] = useState('');
+  const [albumProgress, setAlbumProgress] = useState({ current: 0, total: 0 });
+  const [artistProgress, setArtistProgress] = useState({ current: 0, total: 0 });
+  const [isLoading, setIsLoading] = useState(false);
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -55,7 +59,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
     initializeData();
   }, []);
-  
+
   const fetchOrUpdateGenreAlbumMap = async () => {
     try {
       const token = await authenticateUser();
@@ -63,6 +67,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         goTo("/authenticate");
         return;
       }
+
+      setIsLoading(true);
 
       const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
       if (cachedGenreAlbumMap && Object.keys(cachedGenreAlbumMap).length > 0) {
@@ -86,38 +92,33 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       let offset = 0;
       const limit = 50; // Maximum items per request
 
-      // Call the API once to get the total value
+      setAlbumProgress({ current: 0, total: 0 });
+      setArtistProgress({ current: 0, total: 0 });
 
-      setLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`);
       logger.info('MAP001', 'Fetching saved albums...');
 
       const [albums, numberOfAlbums] = await getReducedAlbumsAndTotal(limit, offset);
       allAlbums = [...allAlbums, ...albums];
       allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
+      setAlbumProgress({ current: Math.min(offset + limit, numberOfAlbums), total: numberOfAlbums });
 
       // Calculate the remaining batches
-
       const albumsToProcess = numberOfAlbums - limit;
       const batchesToProcess = Math.ceil(albumsToProcess / limit);
-
       offset += limit;
 
       // Collect the remaining batches
-
       for (offset; offset <= batchesToProcess * limit; offset += limit) {
-        setLoadingMessage(`Requesting saved albums (${Math.min(offset + limit, numberOfAlbums)} / ${numberOfAlbums})...`);
-
+        setAlbumProgress({ current: Math.min(offset + limit, numberOfAlbums), total: numberOfAlbums });
         const [albums] = await getReducedAlbumsAndTotal(limit, offset);
         allAlbums = [...allAlbums, ...albums];
         allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
       }
-
+      setAlbumProgress({ current: numberOfAlbums, total: numberOfAlbums });
       logger.debug('MAP002', 'Fetched all saved albums');
-
       return allAlbums;
     } catch (error) {
       logger.error('MAP095', 'Error fetching saved albums', { location: "fetchAllSavedAlbums", error });
-      setLoadingMessage('Error fetching albums.');
       showBoundary(error);
     }
   }, []);
@@ -139,13 +140,14 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
     if (!albums || albums.length === 0) {
       logger.info('MAP011', 'No albums to group');
+      setIsLoading(false);
       return {};
     }
 
     const genreAlbumMap = {};
     const artistIds = [...new Set(albums.map(album => album.artists[0].id))];
 
-    setLoadingMessage('Grouping albums by artist genre...');
+    setArtistProgress({ current: 0, total: artistIds.length });
     logger.info('MAP020', 'Grouping albums by artist genre');
 
     for (let i = 0; i < artistIds.length; i += 50) {
@@ -162,6 +164,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         });
       });
 
+      setArtistProgress(prev => ({ current: Math.min(i + 50, artistIds.length), total: artistIds.length }));
       await delay(delayTimeMs);
     }
 
@@ -187,7 +190,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       );
     });
 
-    setLoadingMessage('');
+    setArtistProgress({ current: artistIds.length, total: artistIds.length });
+    setIsLoading(false);
     logger.info('MAP021', 'Finished grouping albums by artist genre');
     return finalGenreAlbumMap;
   }, []);
@@ -199,6 +203,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     },
 
     updateGenreAlbumMap: async () => {
+      setIsLoading(true);
       logger.debug('MAP013', 'Updating genre album map from scratch');
       const allAlbums = await fetchAllSavedAlbums();
 
@@ -208,23 +213,13 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     },
     getCachedGenreAlbumMap: async () => {
       logger.debug('MAP012', 'Fetching genre album map from cache');
-      setLoadingMessage(`Loading saved albums...`);
       const cachedGroupedAlbums = await getCachedEntry('data', 'grouped_albums');
       setGroupedAlbums(cachedGroupedAlbums);
-      setLoadingMessage('');
     },
     clearGenreAlbumMap: async () => {
       setGroupedAlbums(null);
     }
   }))
-
-  const handleSearch = (event) => {
-    setSearchQuery(event.target.value.toLowerCase());
-  };
-
-  const handleSortChange = (event) => {
-    setSortOption(event.target.value);
-  };
 
   const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
     genre.toLowerCase().includes(searchQuery) ||
@@ -256,30 +251,47 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
   return (
     <div>
-      {loadingMessage ? (
-        <p className="loading-message">{loadingMessage}</p>
-      ) : (
-        <div>
-          <SearchSortContainer
-            onSearchQueryChange={setSearchQuery}
-            onSortOptionChange={setSortOption}
-            selectedSortOption={sortOption}
-            placeholderText="Search genres, albums, and artists..."
-            sortOptions={sortOptions}
-            searchQuery={searchQuery} 
+      {isLoading ? (
+        <div style={{ maxWidth: 400, margin: '0 auto', padding: 20 }}>
+          <ProgressBar
+            label="Fetching your saved albums..."
+            current={albumProgress.current}
+            total={albumProgress.total}
           />
-          <div className="genre-grid">
-            {sortedGenres.map(([genre, albums], index) => (
-              <GenreCard
-                key={genre}
-                genre={genre}
-                albums={albums}
-                index={index}
-                onClick={() => goTo(`/genre`, { genre, genreSearch: searchQuery })}
-              />
-            ))}
-          </div>
+          {artistProgress.total > 0 && (
+            <ProgressBar
+              label="Fetching genre information for artists..."
+              current={artistProgress.current}
+              total={artistProgress.total}
+            />
+          )}
         </div>
+      ) : (
+        Object.keys(groupedAlbums || {}).length === 0 ? (
+          <NoAlbums />
+        ) : (
+          <div>
+            <SearchSortContainer
+              onSearchQueryChange={setSearchQuery}
+              onSortOptionChange={setSortOption}
+              selectedSortOption={sortOption}
+              placeholderText="Search genres, albums, and artists..."
+              sortOptions={sortOptions}
+              searchQuery={searchQuery}
+            />
+            <div className="genre-grid">
+              {sortedGenres.map(([genre, albums], index) => (
+                <GenreCard
+                  key={genre}
+                  genre={genre}
+                  albums={albums}
+                  index={index}
+                  onClick={() => goTo(`/genre`, { genre, genreSearch: searchQuery })}
+                />
+              ))}
+            </div>
+          </div>
+        )
       )}
     </div>
   );
