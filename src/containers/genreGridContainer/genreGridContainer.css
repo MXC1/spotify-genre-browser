@@ -59,3 +59,53 @@
   grid-column: span 2;
   grid-row: span 2;
 }
+
+.genre-progress-bar {
+  width: 100%;
+  height: 12px;
+  border-radius: 8px;
+  background-color: #232323;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  overflow: hidden;
+  appearance: none;
+  accent-color: #1db954;
+}
+
+.genre-progress-bar::-webkit-progress-bar {
+  background-color: #232323;
+  border-radius: 8px;
+}
+
+.genre-progress-bar::-webkit-progress-value {
+  background-color: #1db954;
+  border-radius: 8px;
+}
+
+.genre-progress-bar::-moz-progress-bar {
+  background-color: #1db954;
+  border-radius: 8px;
+}
+
+.genre-progress-bar::-ms-fill {
+  background-color: #1db954;
+  border-radius: 8px;
+}
+
+.genre-progress-bar-outer {
+  width: 100%;
+  height: 12px;
+  background: #232323;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  margin: 6px 0 2px 0;
+}
+
+.genre-progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #1db954 60%, #1ed760 100%);
+  border-radius: 8px 0 0 8px;
+  /* transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); */
+  transition: width 500ms ease-in-out;
+  will-change: width;
+}

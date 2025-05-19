@@ -58,6 +58,12 @@ variable "spotify_client_id" {
   sensitive   = true
 }
 
+variable "github_token" {
+  description = "GitHub token for accessing the repository"
+  type        = string
+  sensitive   = true
+}
+
 # IAM role for CodeBuild
 resource "aws_iam_role" "codebuild_role" {
   name = "${var.project_name}-${var.environment}-codebuild-role"
@@ -296,7 +302,7 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         Action = [
           "codestar-connections:UseConnection"
         ],
-        Resource = aws_codestarconnections_connection.github[0].arn
+        Resource = aws_codestarconnections_connection.github.arn
       },
       {
         Effect = "Allow"
@@ -324,23 +330,9 @@ resource "aws_cloudwatch_log_group" "pipeline_logs" {
   }
 }
 
-# Determine if using CodeCommit or GitHub connection
-locals {
-  is_github_repo  = can(regex("^https://github.com", var.repository_name)) || can(regex("^github.com", var.repository_name))
-  source_provider = local.is_github_repo ? "CodeStarSourceConnection" : "CodeCommit"
-}
-
-# Create a CodeCommit repository if not using GitHub
-resource "aws_codecommit_repository" "app_repo" {
-  count           = local.is_github_repo ? 0 : 1
-  repository_name = var.repository_name
-  description     = "Repository for ${var.project_name} React application"
-}
-
 # GitHub connection (placeholder - you'll need to create this connection manually in the AWS console)
 resource "aws_codestarconnections_connection" "github" {
-  count         = local.is_github_repo ? 1 : 0
-  name          = "${var.project_name}-github-connection"
+  name          = "github-connection-${var.environment}"
   provider_type = "GitHub"
 }
 
@@ -351,7 +343,7 @@ resource "aws_codepipeline" "react_pipeline" {
 
   artifact_store {
     location = aws_s3_bucket.pipeline_artifacts.bucket
-    type     = "S3"
+    type     = "S3" 
   }
 
   # Source stage
@@ -362,22 +354,17 @@ resource "aws_codepipeline" "react_pipeline" {
       name             = "Source"
       category         = "Source"
       owner            = "AWS"
-      provider         = local.source_provider
+      provider         = "CodeStarSourceConnection"
       version          = "1"
       output_artifacts = ["source_output"]
 
-      configuration = local.is_github_repo ? {
-        ConnectionArn = aws_codestarconnections_connection.github[0].arn
-        # Extract just the owner/repo portion if a full URL is provided
-        FullRepositoryId     = replace(replace(var.repository_name, "https://github.com/", ""), "github.com/", "")
+      configuration = {
+        ConnectionArn = aws_codestarconnections_connection.github.arn
+        FullRepositoryId     = var.repository_name
         BranchName           = var.repository_branch
-        OutputArtifactFormat = "CODE_ZIP" # Add this line for GitHub connections
-        } : {
-        RepositoryName = var.repository_name
-        BranchName     = var.repository_branch
-      }
-
-
+        OutputArtifactFormat = "CODE_ZIP" 
+        DetectChanges        = "true"
+        }
     }
   }
 
@@ -406,6 +393,47 @@ resource "aws_codepipeline" "react_pipeline" {
   }
 }
 
+provider "github" {
+  token = var.github_token
+  owner = "MXC1"
+}
+
+# Explicitly create a webhook for the repository
+resource "aws_codepipeline_webhook" "github_webhook" {
+  name            = "${var.project_name}-${var.environment}-webhook"
+  authentication  = "GITHUB_HMAC"
+  target_action   = "Source"
+  target_pipeline = aws_codepipeline.react_pipeline.name
+
+  authentication_configuration {
+    secret_token = random_string.webhook_secret.result
+  }
+
+  filter {
+    json_path    = "$.ref"
+    match_equals = "refs/heads/${var.repository_branch}"
+  }
+}
+
+resource "random_string" "webhook_secret" {
+  length  = 32
+  special = false
+}
+
+# GitHub webhook configuration
+resource "github_repository_webhook" "webhook" {
+  repository = split("/", var.repository_name)[1]
+
+  configuration {
+    url          = aws_codepipeline_webhook.github_webhook.url
+    content_type = "json"
+    insecure_ssl = true
+    secret       = random_string.webhook_secret.result
+  }
+
+  events = ["push"]
+}
+
 # S3 bucket for pipeline artifacts
 resource "aws_s3_bucket" "pipeline_artifacts" {
   bucket = "${var.project_name}-${var.environment}-pipeline-artifacts"
@@ -432,7 +460,7 @@ output "codepipeline_name" {
 }
 
 output "source_repository" {
-  value       = local.is_github_repo ? var.repository_name : (length(aws_codecommit_repository.app_repo) > 0 ? aws_codecommit_repository.app_repo[0].clone_url_http : "")
+  value       = var.repository_name
   description = "Source code repository URL"
 }
 
@@ -442,12 +470,8 @@ output "deployment_role_arn" {
 }
 
 output "github_repo_config" {
-  value = local.is_github_repo ? {
-    is_github      = true
+  value = {
     repo_name      = var.repository_name
-    connection_arn = length(aws_codestarconnections_connection.github) > 0 ? aws_codestarconnections_connection.github[0].arn : "none"
-    } : {
-    is_github = false
-    repo_name = var.repository_name
-  }
+    connection_arn = aws_codestarconnections_connection.github.arn
+    }
 }

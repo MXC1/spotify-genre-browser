@@ -1,0 +1,34 @@
+/* ProgressBar styles modularized from genreGridContainer.css */
+.progress-bar-block {
+  margin-bottom: 16px;
+}
+
+.progress-bar-label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.genre-progress-bar-outer {
+  width: 100%;
+  height: 12px;
+  background: #232323;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  margin: 6px 0 2px 0;
+}
+
+.genre-progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #1db954 60%, #1ed760 100%);
+  border-radius: 8px 0 0 8px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: width;
+}
+
+.progress-bar-count {
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 2px;
+}

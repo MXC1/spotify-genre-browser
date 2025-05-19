@@ -1,4 +1,3 @@
-// Helper functions
 const assertErrorMessage = () => {
     cy.get('.error-title').should('contain', 'Something went wrong.')
         .and('contain', 'This has been reported to the developers.');
@@ -20,7 +19,6 @@ const interceptSuccessfulAuth = () => {
     cy.intercept('GET', 'https://api.spotify.com/v1/artists*', { fixture: "mockGetArtistsResponse.json" }).as('getArtists');
 };
 
-// Test cases
 describe('GIVEN I authenticate successfully', () => {
     beforeEach(() => {
         cy.mockAPIResponsesAndInitialiseAuthenticatedState();
@@ -31,6 +29,12 @@ describe('GIVEN I authenticate successfully', () => {
         cy.get('.menu-button').should('exist');
         cy.get('.refresh-button').should('exist');
         cy.get('.search-sort-container').should('exist');
+    });
+
+    it('THEN the progress bar should load', () => {
+        cy.get('.progress-bar-block').should('exist');
+        cy.get('.progress-bar-label').should('contain', 'Fetching your saved albums...');
+        cy.get('.progress-bar-count').contains('3 / 3');
     });
     
     it('AND the genre grid should load', () => {

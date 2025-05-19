@@ -82,6 +82,13 @@ variable "spotify_client_id" {
   sensitive   = true
 }
 
+variable "github_token" {
+  description = "GitHub token"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 ##################################################
 # Module Invocations
 ##################################################
@@ -114,6 +121,8 @@ module "cicd" {
   feedback_endpoint = var.feedback_endpoint
   pkce_endpoint     = var.pkce_endpoint
   log_endpoint      = var.log_endpoint
+
+  github_token = var.github_token
 }
 
 ##################################################
