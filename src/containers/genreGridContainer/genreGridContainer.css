@@ -59,3 +59,45 @@
   grid-column: span 2;
   grid-row: span 2;
 }
+
+.genre-progress-bar {
+  width: 100%;
+  height: 12px;
+  border-radius: 8px;
+  background-color: #232323;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  overflow: hidden;
+  appearance: none;
+  accent-color: #1db954;
+}
+
+.genre-progress-bar::-webkit-progress-bar {
+  background-color: #232323;
+  border-radius: 8px;
+}
+
+.genre-progress-bar::-webkit-progress-value {
+  background-color: #1db954;
+  border-radius: 8px;
+}
+
+.genre-progress-bar::-moz-progress-bar {
+  background-color: #1db954;
+  border-radius: 8px;
+}
+
+.genre-progress-bar::-ms-fill {
+  background-color: #1db954;
+  border-radius: 8px;
+}
+
+.genre-progress-bar:indeterminate {
+  background-image: linear-gradient(90deg, #232323 25%, #1db954 50%, #232323 75%);
+  background-size: 200% 100%;
+  animation: progress-indeterminate 1.5s linear infinite;
+}
+
+@keyframes progress-indeterminate {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

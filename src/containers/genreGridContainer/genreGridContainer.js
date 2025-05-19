@@ -11,7 +11,9 @@ import SearchSortContainer from '../../components/SearchSortContainer';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
-  const [loadingMessage, setLoadingMessage] = useState('');
+  const [albumProgress, setAlbumProgress] = useState({ current: 0, total: 0 });
+  const [artistProgress, setArtistProgress] = useState({ current: 0, total: 0 });
+  const [isLoading, setIsLoading] = useState(true);
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -86,38 +88,33 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       let offset = 0;
       const limit = 50; // Maximum items per request
 
-      // Call the API once to get the total value
+      setAlbumProgress({ current: 0, total: 0 });
+      setArtistProgress({ current: 0, total: 0 });
 
-      setLoadingMessage(`Requesting saved albums (${offset + limit} / ?)...`);
       logger.info('MAP001', 'Fetching saved albums...');
 
       const [albums, numberOfAlbums] = await getReducedAlbumsAndTotal(limit, offset);
       allAlbums = [...allAlbums, ...albums];
       allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
+      setAlbumProgress({ current: Math.min(offset + limit, numberOfAlbums), total: numberOfAlbums });
 
       // Calculate the remaining batches
-
       const albumsToProcess = numberOfAlbums - limit;
       const batchesToProcess = Math.ceil(albumsToProcess / limit);
-
       offset += limit;
 
       // Collect the remaining batches
-
       for (offset; offset <= batchesToProcess * limit; offset += limit) {
-        setLoadingMessage(`Requesting saved albums (${Math.min(offset + limit, numberOfAlbums)} / ${numberOfAlbums})...`);
-
+        setAlbumProgress({ current: Math.min(offset + limit, numberOfAlbums), total: numberOfAlbums });
         const [albums] = await getReducedAlbumsAndTotal(limit, offset);
         allAlbums = [...allAlbums, ...albums];
         allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
       }
-
+      setAlbumProgress({ current: numberOfAlbums, total: numberOfAlbums });
       logger.debug('MAP002', 'Fetched all saved albums');
-
       return allAlbums;
     } catch (error) {
       logger.error('MAP095', 'Error fetching saved albums', { location: "fetchAllSavedAlbums", error });
-      setLoadingMessage('Error fetching albums.');
       showBoundary(error);
     }
   }, []);
@@ -145,7 +142,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     const genreAlbumMap = {};
     const artistIds = [...new Set(albums.map(album => album.artists[0].id))];
 
-    setLoadingMessage('Grouping albums by artist genre...');
+    setArtistProgress({ current: 0, total: artistIds.length });
     logger.info('MAP020', 'Grouping albums by artist genre');
 
     for (let i = 0; i < artistIds.length; i += 50) {
@@ -162,6 +159,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         });
       });
 
+      setArtistProgress(prev => ({ current: Math.min(i + 50, artistIds.length), total: artistIds.length }));
       await delay(delayTimeMs);
     }
 
@@ -187,7 +185,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       );
     });
 
-    setLoadingMessage('');
+    setArtistProgress({ current: artistIds.length, total: artistIds.length });
+    setIsLoading(false);
     logger.info('MAP021', 'Finished grouping albums by artist genre');
     return finalGenreAlbumMap;
   }, []);
@@ -199,6 +198,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     },
 
     updateGenreAlbumMap: async () => {
+      setIsLoading(true);
       logger.debug('MAP013', 'Updating genre album map from scratch');
       const allAlbums = await fetchAllSavedAlbums();
 
@@ -208,23 +208,13 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     },
     getCachedGenreAlbumMap: async () => {
       logger.debug('MAP012', 'Fetching genre album map from cache');
-      setLoadingMessage(`Loading saved albums...`);
       const cachedGroupedAlbums = await getCachedEntry('data', 'grouped_albums');
       setGroupedAlbums(cachedGroupedAlbums);
-      setLoadingMessage('');
     },
     clearGenreAlbumMap: async () => {
       setGroupedAlbums(null);
     }
   }))
-
-  const handleSearch = (event) => {
-    setSearchQuery(event.target.value.toLowerCase());
-  };
-
-  const handleSortChange = (event) => {
-    setSortOption(event.target.value);
-  };
 
   const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
     genre.toLowerCase().includes(searchQuery) ||
@@ -256,8 +246,23 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
   return (
     <div>
-      {loadingMessage ? (
-        <p className="loading-message">{loadingMessage}</p>
+      {isLoading ? (
+        <div style={{ maxWidth: 400, margin: '0 auto', padding: 20 }}>
+          {(
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontWeight: 500 }}>Fetching your saved albums...</label>
+              <progress className="genre-progress-bar" value={albumProgress.current} max={albumProgress.total} />
+              <div style={{ fontSize: 13, color: '#aaa' }}>{albumProgress.current} / {albumProgress.total}</div>
+            </div>
+          )}
+          {artistProgress.total > 0 && (
+            <div>
+              <label style={{ fontWeight: 500 }}>Fetching genre information for artists...</label>
+              <progress className="genre-progress-bar" value={artistProgress.current} max={artistProgress.total} />
+              <div style={{ fontSize: 13, color: '#aaa' }}>{artistProgress.current} / {artistProgress.total}</div>
+            </div>
+          )}
+        </div>
       ) : (
         <div>
           <SearchSortContainer
