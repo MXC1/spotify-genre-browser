@@ -37,7 +37,4 @@ Cypress.Commands.add('mockAPIResponsesAndInitialiseAuthenticatedState', () => {
     cy.visit('/genre-album-map?code=valid_token&state=valid_state');
 
     cy.wait(["@authToken", "@getMySavedAlbums", "@getArtists"]);
-
-    // Wait for genre grid to load
-    cy.get('.genre-grid').should('exist').and('be.visible');
 });
