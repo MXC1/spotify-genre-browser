@@ -57,3 +57,43 @@ describe('GIVEN I visit the app', () => {
     });
   });
 });
+
+describe('GIVEN I am logged in', () => {
+  beforeEach(() => {
+    cy.intercept('POST', 'https://kb2nmvou7h.execute-api.eu-west-2.amazonaws.com/dev/auth', { fixture: "mockAuthTokenResponse_fastExpiry.json" }).as('authToken');
+    cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { fixture: "mockGetMySavedAlbumsResponse.json" }).as('getMySavedAlbums');
+    cy.intercept('GET', 'https://api.spotify.com/v1/artists*', { fixture: "mockGetArtistsResponse.json" }).as('getArtists');
+    cy.intercept('POST', 'https://accounts.spotify.com/api/token*', { fixture: "mockRefreshTokenResponse.json" }).as('refreshToken');
+
+    cy.resetIndexedDb();
+    cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
+
+    cy.visit('/genre-album-map?code=valid_token&state=valid_state', {
+      onBeforeLoad(win) {
+        cy.stub(win.console, 'log').as('consoleLog')
+        cy.stub(win.console, 'error').as('consoleError')
+      }
+    });
+
+    cy.wait(["@authToken", "@getMySavedAlbums", "@getArtists"]);
+
+  });
+
+  describe.only('AND my auth token expires', () => {
+    beforeEach(() => {
+      cy.get('.refresh-button').click();
+    });
+
+    it('THEN a new auth token is fetched', () => {
+      cy.get('@consoleLog').should('have.been.calledWithMatch',
+        /Environment is/);
+      cy.get('@consoleLog').should('have.been.calledWithMatch',
+        /Refreshing access token/);
+        
+      cy.get('@consoleError').should('not.have.been.calledWithMatch',
+        /No refresh token found/);
+      cy.get('@consoleError').should('not.have.been.calledWithMatch',
+        /Error refreshing access token/);
+    });
+  });
+});
