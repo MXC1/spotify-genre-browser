@@ -1,4 +1,4 @@
-const CACHE_NAME = 'spotify-genre-browser-cache-v1';
+const CACHE_NAME = 'genre-browser-cache-v0.26.1';
 const urlsToCache = [
   '/',
   '/index.html',
