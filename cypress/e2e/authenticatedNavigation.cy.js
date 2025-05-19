@@ -62,7 +62,7 @@ describe('GIVEN I am on the homepage', () => {
             cy.get('.overlay-menu').click('bottomRight', { force: true });
         });
         
-        it.only('THEN the hamburger menu should stay open', () => {
+        it('THEN the hamburger menu should stay open', () => {
             cy.get('.overlay-menu').should('be.visible');
             cy.get('.overlay-background').should('be.visible');
             cy.get('.close-menu-button').click();

@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 import SearchSortContainer from '../../components/SearchSortContainer';
 import ProgressBar from '../../components/ProgressBar/ProgressBar';
+import NoAlbums from '../../components/NoAlbums/NoAlbums';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
@@ -139,6 +140,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const groupAlbumsByArtistGenre = useCallback(async (albums) => {
     if (!albums || albums.length === 0) {
       logger.info('MAP011', 'No albums to group');
+      setIsLoading(false);
       return {};
     }
 
@@ -265,27 +267,31 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
           )}
         </div>
       ) : (
-        <div>
-          <SearchSortContainer
-            onSearchQueryChange={setSearchQuery}
-            onSortOptionChange={setSortOption}
-            selectedSortOption={sortOption}
-            placeholderText="Search genres, albums, and artists..."
-            sortOptions={sortOptions}
-            searchQuery={searchQuery}
-          />
-          <div className="genre-grid">
-            {sortedGenres.map(([genre, albums], index) => (
-              <GenreCard
-                key={genre}
-                genre={genre}
-                albums={albums}
-                index={index}
-                onClick={() => goTo(`/genre`, { genre, genreSearch: searchQuery })}
-              />
-            ))}
+        Object.keys(groupedAlbums || {}).length === 0 ? (
+          <NoAlbums />
+        ) : (
+          <div>
+            <SearchSortContainer
+              onSearchQueryChange={setSearchQuery}
+              onSortOptionChange={setSortOption}
+              selectedSortOption={sortOption}
+              placeholderText="Search genres, albums, and artists..."
+              sortOptions={sortOptions}
+              searchQuery={searchQuery}
+            />
+            <div className="genre-grid">
+              {sortedGenres.map(([genre, albums], index) => (
+                <GenreCard
+                  key={genre}
+                  genre={genre}
+                  albums={albums}
+                  index={index}
+                  onClick={() => goTo(`/genre`, { genre, genreSearch: searchQuery })}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )
       )}
     </div>
   );
