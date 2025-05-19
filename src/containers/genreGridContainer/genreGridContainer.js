@@ -8,6 +8,7 @@ import './genreGridContainer.css';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 import SearchSortContainer from '../../components/SearchSortContainer';
+import ProgressBar from '../../components/ProgressBar/ProgressBar';
 
 const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [groupedAlbums, setGroupedAlbums] = useState({});
@@ -57,7 +58,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
 
     initializeData();
   }, []);
-  
+
   const fetchOrUpdateGenreAlbumMap = async () => {
     try {
       const token = await authenticateUser();
@@ -65,7 +66,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         goTo("/authenticate");
         return;
       }
-      
+
       setIsLoading(true);
 
       const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
@@ -250,31 +251,17 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     <div>
       {isLoading ? (
         <div style={{ maxWidth: 400, margin: '0 auto', padding: 20 }}>
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ fontWeight: 500 }}>Fetching your saved albums...</label>
-            <div className="genre-progress-bar-outer">
-              <div
-                className="genre-progress-bar-inner"
-                style={{
-                  width: albumProgress.total > 0 ? `${(albumProgress.current / albumProgress.total) * 100}%` : '0%'
-                }}
-              />
-            </div>
-            <div style={{ fontSize: 13, color: '#aaa' }}>{albumProgress.current} / {albumProgress.total}</div>
-          </div>
+          <ProgressBar
+            label="Fetching your saved albums..."
+            current={albumProgress.current}
+            total={albumProgress.total}
+          />
           {artistProgress.total > 0 && (
-            <div>
-              <label style={{ fontWeight: 500 }}>Fetching genre information for artists...</label>
-              <div className="genre-progress-bar-outer">
-                <div
-                  className="genre-progress-bar-inner"
-                  style={{
-                    width: artistProgress.total > 0 ? `${(artistProgress.current / artistProgress.total) * 100}%` : '0%'
-                  }}
-                />
-              </div>
-              <div style={{ fontSize: 13, color: '#aaa' }}>{artistProgress.current} / {artistProgress.total}</div>
-            </div>
+            <ProgressBar
+              label="Fetching genre information for artists..."
+              current={artistProgress.current}
+              total={artistProgress.total}
+            />
           )}
         </div>
       ) : (
@@ -285,7 +272,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
             selectedSortOption={sortOption}
             placeholderText="Search genres, albums, and artists..."
             sortOptions={sortOptions}
-            searchQuery={searchQuery} 
+            searchQuery={searchQuery}
           />
           <div className="genre-grid">
             {sortedGenres.map(([genre, albums], index) => (
