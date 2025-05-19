@@ -26,6 +26,12 @@ variable "spotify_client_id" {
   sensitive   = true
 }
 
+variable "github_token" {
+  description = "GitHub token"
+  type        = string
+  sensitive   = true
+}
+
 locals {
   env = var.env != "" ? var.env : terraform.workspace
 }
@@ -44,7 +50,7 @@ module "hosting" {
   # Required parameters
   project_name      = "genre-browser"
   env               = local.env
-  repository_name   = "https://github.com/MXC1/spotify-genre-browser"
+  repository_name   = "MXC1/spotify-genre-browser"
   repository_branch = local.env
 
   spotify_client_id = var.spotify_client_id
@@ -52,9 +58,7 @@ module "hosting" {
   pkce_endpoint     = module.pkce_proxy.api_url
   log_endpoint      = module.write_log.api_url
 
-  # Optional with defaults
-  # domain_name      = ""
-  # use_existing_domain = false
+  github_token = var.github_token
 }
 
 output "website_endpoint" {
