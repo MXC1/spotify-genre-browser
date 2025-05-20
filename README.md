@@ -1,8 +1,10 @@
 ## Environment URLs
 
-[Genre Browser for Spotify (main)](https://main.dgutam4ouh3e7.amplifyapp.com/)
+[Genre Browser for Spotify (main)](https://d3f5rwuxerjftx.cloudfront.net/)
 
-[Genre Browser for Spotify (staging)](https://staging.dgutam4ouh3e7.amplifyapp.com/)
+[Genre Browser for Spotify (staging)](https://d3vmn7hy1avbwa.cloudfront.net/)
+
+[Genre Browser for Spotify (dev)](https://d32znmj1ft1rl1.cloudfront.net/)
 
 
 ## Cypress Testing
@@ -10,6 +12,8 @@
 ### `npx cypress run`
 
 Runs all Cypress tests (cypress\e2e\*.cy.js)
+
+Nb. Some of the Cypress test suite require a production build to pass. See `npm run build; serve -s build`
 
 ### `npx cypress open`
 
@@ -33,9 +37,13 @@ You may also see any lint errors in the console.
 
 Nb. You will not be able to run the app without .env variables, which are not deployed to git.
 
+### `npm run build; serve -s build`
+
+Creates and serves a production build on localhost.
+
 ## Deployment and Release
 
-AWS Amplify watches the `main` branch for changes and automatically deploys.
+CodePipeline watches the `staging` and `main` branches for changes and automatically deploys.
 
 Branch rules:
 * Do not commit or merge directly to `main`.
@@ -47,23 +55,13 @@ Branch rules:
 
 1. Create feature branches based from `staging` (branch name should be the same as the URL of the Trello ticket e.g. `7-write-privacy-policy`).
 2. When features are complete, create a pull request to merge your branch into `staging`.
-3. Assert that the latest build has deployed successfully to the `staging` environment in AWS Amplify.
+3. Assert that the latest build has deployed successfully to the `staging` environment in CodePipeline.
 
 ### Deployment Process 
 
-1. Create a new release from staging:
-
-    1. Go to the GitHub web interface.
-    2. Navigate to Releases → Draft a new release.
-    3. Choose the latest commit from staging.
-
-2. Create a tag (e.g., v1.2.3) and publish the release.
-
-3. Open a pull request from the tag to main:
-
-    1. Go to Pull Requests → New Pull Request.
-    2. Set base as main and compare as staging.
-    3. GitHub will show the changes.
-    4. Confirm that everything looks correct.
-
-4. AWS Amplify will automatically detect changes and deploy.
+1. Run the 'Create Release and PR' GitHub action
+   It will create a Pull Request from staging to main.
+2. Check that the Pull Request contains the content you expect.
+3. Approve and merge.
+4. CodePipeline will automatically detect changes and deploy.
+5. Verify that the CodePipeline succeeded.
