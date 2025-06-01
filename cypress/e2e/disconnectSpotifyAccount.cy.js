@@ -1,6 +1,7 @@
 describe("GIVEN I have authenticated with Spotify", () => {
     beforeEach(() => {
         cy.mockAPIResponsesAndInitialiseAuthenticatedState();
+        cy.get('.genre-grid').should('exist').and('be.visible');
     });
 
     describe("WHEN I click the disconnect Spotify account link", () => {
