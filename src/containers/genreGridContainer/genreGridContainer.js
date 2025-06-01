@@ -58,6 +58,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     };
 
     initializeData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchOrUpdateGenreAlbumMap = async () => {
@@ -121,6 +123,8 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       logger.error('MAP095', 'Error fetching saved albums', { location: "fetchAllSavedAlbums", error });
       showBoundary(error);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function getReducedAlbumsAndTotal(limit, offset) {

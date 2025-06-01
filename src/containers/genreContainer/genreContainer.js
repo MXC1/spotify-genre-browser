@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import SearchSortContainer from "../../components/SearchSortContainer";
-import AlbumContainer from "../albumContainer/albumContainer";
 import "./genreContainer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { getCachedEntry } from "../../utilities/indexedDb";
 import { logger } from "../../utilities/logger";
 
 function GenreContainer() {
     const location = useLocation();
-    const navigate = useNavigate();
     const { goTo } = useNavigationHelpers();
 
     const params = new URLSearchParams(location.search);

@@ -1,6 +1,7 @@
 describe("GIVEN I have authenticated with Spotify", () => {
     beforeEach(() => {
         cy.mockAPIResponsesAndInitialiseAuthenticatedState();
+        cy.get('.genre-grid').should('exist').and('be.visible');
     });
 
     describe("WHEN I click the disconnect Spotify account link", () => {
@@ -26,6 +27,7 @@ describe("GIVEN I have authenticated with Spotify", () => {
         });
 
         it("THEN my saved albums are removed", () => {
+            cy.get('@consoleLog').should('have.been.calledWithMatch', /AUTH081/);
             cy.getIndexedDbData('data', 'grouped_albums').should('be.undefined');
         }); 
     });

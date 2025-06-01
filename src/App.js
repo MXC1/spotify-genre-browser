@@ -40,6 +40,8 @@ function App() {
     if (code && state) {
       goTo(`/genre-album-map`, {code: code, state: state});
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleGenreAlbumMapRefresh = async () => {
@@ -54,7 +56,7 @@ function App() {
   }
 
   const handleDisconnect = async () => {
-    logger.info('AUTH080','Disconnecting Spotify account...', {});
+    logger.info('AUTH081','Disconnecting Spotify account...', {});
     await clearAllData();
     clearAccessToken();
     if (genreGridRef.current) {
