@@ -27,7 +27,12 @@ function LoginContainer() {
 
   return (
     <div className="login-container">
-      <a onClick={() => window.redirectToSpotifyAuth()} className="login-button">Login with Spotify</a>
+      <button 
+        onClick={() => window.redirectToSpotifyAuth()} 
+        className="login-button"
+      >
+        Login with Spotify
+      </button>
     </div>
   )
 }

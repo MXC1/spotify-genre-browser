@@ -1,17 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
 import './headerContainer.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSyncAlt, faBars, faHouse, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from "react-router-dom";
 import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 
-function HeaderContainer({ onRefresh, onOpenDisconnectModal, toggleMenu }) {
+function HeaderContainer({ onRefresh, toggleMenu }) {
     const location = useLocation();
     const { goTo, checkAuthAndNavigate } = useNavigationHelpers();
-
-    const handleOpenDisconnectModal = () => {
-        onOpenDisconnectModal();
-    };
 
     if (location.pathname === '/privacy-policy') {
         return (

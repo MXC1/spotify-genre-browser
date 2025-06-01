@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import { forwardRef } from 'react';
 import './overlayMenu.css';
 import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
