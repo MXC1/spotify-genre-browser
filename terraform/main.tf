@@ -135,4 +135,3 @@ module "pkce_proxy" {
 output "pkce_proxy_endpoint" {
   value = module.pkce_proxy.api_url
 }
-
