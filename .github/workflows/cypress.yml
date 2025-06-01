@@ -24,8 +24,11 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Start application
-        run: npm start &
+      - name: Install serve
+        run: npm install -g serve
+
+      - name: Start app
+        run: serve -s build -l 3000 &
         
       - name: Wait for application to be ready
         run: npx wait-on http://localhost:3000 --timeout 60000
