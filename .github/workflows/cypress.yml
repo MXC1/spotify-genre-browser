@@ -7,6 +7,13 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    env:
+      REACT_APP_ENV: ${{ secrets.REACT_APP_ENV }}
+      REACT_APP_SPOTIFY_CLIENT_ID: ${{ secrets.REACT_APP_SPOTIFY_CLIENT_ID }}
+      REACT_APP_FEEDBACK_ENDPOINT: ${{ secrets.REACT_APP_FEEDBACK_ENDPOINT }}
+      REACT_APP_PKCE_ENDPOINT: ${{ secrets.REACT_APP_PKCE_ENDPOINT }}
+      REACT_APP_LOG_ENDPOINT: ${{ secrets.REACT_APP_LOG_ENDPOINT }}
+      CI: true
     
     steps:
       - name: Checkout code
