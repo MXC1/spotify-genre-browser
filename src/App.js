@@ -40,6 +40,8 @@ function App() {
     if (code && state) {
       goTo(`/genre-album-map`, {code: code, state: state});
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleGenreAlbumMapRefresh = async () => {
