@@ -29,7 +29,7 @@ Cypress.Commands.add("getIndexedDbData", (store, key) => {
 Cypress.Commands.add("mockAPIResponsesAndInitialiseAuthenticatedState", () => {
     cy.intercept(
         "POST",
-        "https://kb2nmvou7h.execute-api.eu-west-2.amazonaws.com/dev/auth",
+        /https:\/\/.*\.execute-api\.eu-west-2\.amazonaws\.com\/dev\/auth/,
         { fixture: "mockAuthTokenResponse.json" }
     ).as("authToken");
     cy.intercept("GET", "https://api.spotify.com/v1/me/albums*", {

@@ -2,7 +2,7 @@ describe("GIVEN I have no albums in my library", () => {
   beforeEach(() => {
     cy.intercept(
       "POST",
-      "https://kb2nmvou7h.execute-api.eu-west-2.amazonaws.com/dev/auth",
+      /https:\/\/.*\.execute-api\.eu-west-2\.amazonaws\.com\/dev\/auth/,
       { fixture: "mockAuthTokenResponse.json" }
     ).as("authToken");
     cy.intercept("GET", "https://api.spotify.com/v1/me/albums*", {

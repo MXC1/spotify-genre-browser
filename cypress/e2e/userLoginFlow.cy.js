@@ -60,7 +60,7 @@ describe('GIVEN I visit the app', () => {
 
 describe('GIVEN I am logged in', () => {
   beforeEach(() => {
-    cy.intercept('POST', 'https://kb2nmvou7h.execute-api.eu-west-2.amazonaws.com/dev/auth', { fixture: "mockAuthTokenResponse_fastExpiry.json" }).as('authToken');
+    cy.intercept('POST', /https:\/\/.*\.execute-api\.eu-west-2\.amazonaws\.com\/dev\/auth/, { fixture: "mockAuthTokenResponse_fastExpiry.json" }).as('authToken');
     cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { fixture: "mockGetMySavedAlbumsResponse.json" }).as('getMySavedAlbums');
     cy.intercept('GET', 'https://api.spotify.com/v1/artists*', { fixture: "mockGetArtistsResponse.json" }).as('getArtists');
     cy.intercept('POST', 'https://accounts.spotify.com/api/token*', { fixture: "mockRefreshTokenResponse.json" }).as('refreshToken');
