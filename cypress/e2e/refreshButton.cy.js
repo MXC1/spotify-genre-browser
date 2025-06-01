@@ -3,7 +3,7 @@ describe('GIVEN I am on the genre grid page', () => {
         // Note: single album and artist responses are used to test the refresh button functionality
         cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { fixture: "mockGetMySavedAlbumsResponse_oneAlbum.json" }).as('getMySavedAlbums');
         cy.intercept('GET', 'https://api.spotify.com/v1/artists*', { fixture: "mockGetArtistsResponse_oneArtist.json" }).as('getArtists');
-        cy.intercept('POST', /https:\/\/.*\.execute-api\.eu-west-2\.amazonaws\.com\/dev\/auth/, { fixture: "mockAuthTokenResponse.json" }).as('authToken');
+        cy.intercept('POST', "https://kb2nmvou7h.execute-api.eu-west-2.amazonaws.com/dev/auth", { fixture: "mockAuthTokenResponse.json" }).as('authToken');
         
         cy.resetIndexedDb();
         cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
