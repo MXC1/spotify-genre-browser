@@ -26,6 +26,7 @@ describe("GIVEN I have authenticated with Spotify", () => {
         });
 
         it("THEN my saved albums are removed", () => {
+            cy.get('@consoleLog').should('have.been.calledWithMatch', /AUTH081/);
             cy.getIndexedDbData('data', 'grouped_albums').should('be.undefined');
         }); 
     });
