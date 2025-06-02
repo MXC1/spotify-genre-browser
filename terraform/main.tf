@@ -30,6 +30,12 @@ variable "github_token" {
   sensitive   = true
 }
 
+variable "email_address" {
+  description = "Email address for budget alerts"
+  type        = string
+  sensitive   = true
+}
+
 locals {
   env = var.env != "" ? var.env : terraform.workspace
 }
@@ -57,6 +63,7 @@ module "hosting" {
   log_endpoint      = module.write_log.api_url
 
   github_token = var.github_token
+  email_address = var.email_address
 }
 
 output "website_endpoint" {
@@ -141,13 +148,4 @@ module "dashboards" {
 
   log_group_name = module.write_log.log_group_name
   env            = local.env
-}
-
-# Parameter Store module
-
-module "parameter_store" {
-  source = "./modules/parameter_store"
-
-  github_token_value      = var.github_token
-  spotify_client_id_value = var.spotify_client_id
 }

@@ -38,3 +38,13 @@ module "budget_alerts" {
   monthly_budget_amount = 10
   email_address         = var.email_address
 }
+
+# Parameter Store module
+
+module "parameter_store" {
+  source = "./modules/parameter_store"
+
+  github_token_value      = var.github_token
+  spotify_client_id_value = var.spotify_client_id
+  email_address_value     = var.email_address
+}
