@@ -23,11 +23,18 @@ function LoginContainer() {
     }
 
     checkAuthAndRedirect();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className="login-container">
-      <a onClick={() => window.redirectToSpotifyAuth()} className="login-button">Login with Spotify</a>
+      <button 
+        onClick={() => window.redirectToSpotifyAuth()} 
+        className="login-button"
+      >
+        Login with Spotify
+      </button>
     </div>
   )
 }
