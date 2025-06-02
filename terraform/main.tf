@@ -13,11 +13,6 @@ terraform {
   }
 }
 
-variable "aws_profile" {
-  type    = string
-  default = ""
-}
-
 variable "env" {
   type    = string
   default = ""
@@ -146,13 +141,4 @@ module "dashboards" {
 
   log_group_name = module.write_log.log_group_name
   env            = local.env
-}
-
-# Parameter Store module
-
-module "parameter_store" {
-  source = "./modules/parameter_store"
-
-  github_token_value      = var.github_token
-  spotify_client_id_value = var.spotify_client_id
 }
