@@ -50,6 +50,19 @@ resource "aws_cloudwatch_dashboard" "main" {
           title  = "Global Errors (Daily)"
           view   = "table"
         }
+      },
+      {
+        type   = "log"
+        x      = 0
+        y      = 6
+        width  = 12
+        height = 6
+        properties = {
+          query = "SOURCE '${var.log_group_name}'\n| filter event_id = \"NAV001\"\n| stats count(*) as count by bin(1d) as timestamp, path\n| sort by timestamp desc, count desc\n| limit 100"
+          region = "eu-west-2"
+          title  = "Most Visited Pages (Daily)"
+          view   = "table"
+        }
       }
     ]
   })
