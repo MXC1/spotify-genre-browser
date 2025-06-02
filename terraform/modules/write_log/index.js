@@ -17,7 +17,7 @@ exports.handler = async (event) => {
     }
 
     // Log only the payload as-is for CloudWatch
-    console.log(JSON.stringify(logPayload));
+    process.stdout.write(JSON.stringify(logPayload) + '\n');
     
     // Optionally, add logic to store logs in a database or another service here
     
