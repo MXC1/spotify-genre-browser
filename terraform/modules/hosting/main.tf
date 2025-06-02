@@ -89,13 +89,6 @@ variable "github_token" {
   sensitive   = true
 }
 
-variable "email_address" {
-  description = "Email address for budget alerts"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
 ##################################################
 # Module Invocations
 ##################################################
@@ -130,7 +123,6 @@ module "cicd" {
   log_endpoint      = var.log_endpoint
 
   github_token = var.github_token
-  email_address = var.email_address
 }
 
 ##################################################

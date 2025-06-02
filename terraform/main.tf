@@ -30,12 +30,6 @@ variable "github_token" {
   sensitive   = true
 }
 
-variable "email_address" {
-  description = "Email address for budget alerts"
-  type        = string
-  sensitive   = true
-}
-
 locals {
   env = var.env != "" ? var.env : terraform.workspace
 }
@@ -63,7 +57,6 @@ module "hosting" {
   log_endpoint      = module.write_log.api_url
 
   github_token = var.github_token
-  email_address = var.email_address
 }
 
 output "website_endpoint" {
