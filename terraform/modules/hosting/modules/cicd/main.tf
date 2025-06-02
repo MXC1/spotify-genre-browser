@@ -171,6 +171,23 @@ resource "aws_iam_role_policy" "codebuild_policy" {
           "budgets:ListTagsForResource"
         ],
         "Resource": "arn:aws:budgets::976193252222:budget/monthly-budget"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "sns:SetTopicAttributes",
+          "sns:Unsubscribe",
+          "budgets:ModifyBudget",
+          "dynamodb:CreateTable",
+          "logs:PutRetentionPolicy",
+          "iam:CreateRole",
+          "iam:PassRole",
+          "ssm:PutParameter",
+          "s3:CreateBucket",
+          "cloudfront:CreateCloudFrontOriginAccessIdentity",
+          "codeconnections:CreateConnection"
+        ],
+        Resource = "*"
       }
     ]
   })
@@ -265,8 +282,11 @@ phases:
       - export GITHUB_TOKEN=$(aws ssm get-parameter --name "/github_token" --with-decryption --query Parameter.Value --output text)
       - export SPOTIFY_CLIENT_ID=$(aws ssm get-parameter --name "/spotify_client_id" --with-decryption --query Parameter.Value --output text)
 
+      - echo "Setting workspace to match Git branch"
+      - export BRANCH_NAME=$(echo $CODEBUILD_SOURCE_VERSION | sed 's/refs\/heads\///')
       - cd terraform
       - terraform init
+      - terraform workspace select "$BRANCH_NAME"
       - terraform plan -var="github_token=$GITHUB_TOKEN" -var="spotify_client_id=$SPOTIFY_CLIENT_ID"
 
   build:
