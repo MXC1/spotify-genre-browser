@@ -1,11 +1,9 @@
 provider "aws" {
   region  = "eu-west-2"
-  profile = "genrebrowser"
 }
 
 terraform {
   backend "s3" {
-    profile = "genrebrowser"
     bucket  = "genrebrowser-tf-state"
     key     = "global/s3/terraform.tfstate"
     region  = "eu-west-2"
@@ -20,6 +18,18 @@ terraform {
 variable "email_address" {
   description = "Email address to send budget alerts to"
   type        = string
+}
+
+variable "spotify_client_id" {
+  description = "Spotify client ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "github_token" {
+  description = "GitHub token"
+  type        = string
+  sensitive   = true
 }
 
 module "budget_alerts" {
