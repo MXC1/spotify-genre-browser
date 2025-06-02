@@ -14,7 +14,7 @@ const makeSpotifyRequestWithRetries = async (url, options, maxRetries = 3) => {
     } catch (error) {
       if (error.response?.status === 429 && retries < maxRetries) {
         const retryAfterSeconds = parseInt(error.response.headers['retry-after'], 10) || 1;
-        logger.error('SPOT003', 'Rate limited, retrying', { retryAfterSeconds, retries });
+        logger.warn('SPOT003', 'Rate limited, retrying', { retryAfterSeconds, retries });
         await delay(retryAfterSeconds * 1000);
         retries++;
       } else {
