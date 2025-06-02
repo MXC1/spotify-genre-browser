@@ -15,11 +15,14 @@ async function fetchOrGenerateSessionID() {
   return sessionID;
 }
 
+function isRunningLocally() {
+  return window.location.hostname === 'localhost' || 
+         window.location.hostname === '127.0.0.1';
+}
+
 async function logToCloudWatch(logPayload) {
-  if (
-    process.env.REACT_APP_ENV !== 'main' &&
-    process.env.REACT_APP_ENV !== 'staging'
-  ) {
+  if (!['main', 'staging', 'dev'].includes(process.env.REACT_APP_ENV) || isRunningLocally()) {
+    console.warn('[CloudWatch] Logging is disabled in this environment:', process.env.REACT_APP_ENV);
     return;
   }
 
