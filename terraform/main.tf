@@ -121,9 +121,9 @@ output "feedback_api_url" {
 # PKCE module
 
 module "pkce_proxy" {
-  source         = "./modules/pkceProxy"
+  source         = "./modules/pkce_proxy"
   env            = local.env
-  lambda_zip     = "./modules/pkceProxy/pkce_proxy_lambda.zip"
+  lambda_zip     = "./modules/pkce_proxy/pkce_proxy_lambda.zip"
   lambda_handler = "index.handler"
   lambda_runtime = "nodejs18.x"
   allowed_origins = concat(
