@@ -135,3 +135,12 @@ module "pkce_proxy" {
 output "pkce_proxy_endpoint" {
   value = module.pkce_proxy.api_url
 }
+
+# Dashboards module
+
+module "dashboards" {
+  source = "./modules/dashboards"
+
+  log_group_name = module.write_log.log_group_name
+  env            = local.env
+}
