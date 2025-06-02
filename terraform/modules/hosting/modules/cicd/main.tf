@@ -82,115 +82,15 @@ resource "aws_iam_role" "codebuild_role" {
   })
 }
 
-# IAM policy for CodeBuild
-resource "aws_iam_role_policy" "codebuild_policy" {
-  name = "${var.project_name}-${var.environment}-codebuild-policy"
-  role = aws_iam_role.codebuild_role.id
+# IAM policies for CodeBuild
+resource "aws_iam_role_policy_attachment" "codebuild_poweruser" {
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
+}
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:GetLogEvents",
-          "logs:GetLogGroupFields",
-          "logs:GetLogRecord",
-          "logs:GetQueryResults",
-          "logs:DescribeLogGroups",
-          "logs:DescribeLogStreams"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:GetObjectVersion",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          "${var.website_bucket.arn}",
-          "${var.website_bucket.arn}/*",
-          "${aws_s3_bucket.pipeline_artifacts.arn}",
-          "${aws_s3_bucket.pipeline_artifacts.arn}/*",
-          "arn:aws:s3:::genrebrowser-tf-state",
-          "arn:aws:s3:::genrebrowser-tf-state/*"
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "cloudfront:CreateInvalidation"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:DeleteItem",
-          "dynamodb:UpdateItem",
-          "dynamodb:GetRecords",
-          "dynamodb:GetShardIterator",
-          "dynamodb:DescribeTable",
-          "dynamodb:UpdateTable"
-        ],
-        Resource = "*"
-      },
-      {
-        "Effect": "Allow",
-        "Action": [
-          "ssm:GetParameter",
-          "ssm:GetParameters"
-        ],
-        "Resource": [
-          "arn:aws:ssm:eu-west-2:976193252222:parameter/github_token",
-          "arn:aws:ssm:eu-west-2:976193252222:parameter/spotify_client_id"
-        ]
-      },
-      {
-        "Effect": "Allow",
-        "Action": [
-          "sns:GetTopicAttributes",
-          "sns:GetSubscriptionAttributes",
-          "sns:ListTagsForResource"
-        ],
-        "Resource": "arn:aws:sns:eu-west-2:976193252222:budget-alerts"
-      },
-      {
-        "Effect": "Allow",
-        "Action": [
-          "budgets:ViewBudget",
-          "budgets:ListTagsForResource"
-        ],
-        "Resource": "arn:aws:budgets::976193252222:budget/monthly-budget"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "sns:SetTopicAttributes",
-          "sns:Unsubscribe",
-          "budgets:ModifyBudget",
-          "dynamodb:CreateTable",
-          "logs:PutRetentionPolicy",
-          "iam:CreateRole",
-          "iam:PassRole",
-          "ssm:PutParameter",
-          "s3:CreateBucket",
-          "cloudfront:CreateCloudFrontOriginAccessIdentity",
-          "codeconnections:CreateConnection"
-        ],
-        Resource = "*"
-      }
-    ]
-  })
+resource "aws_iam_role_policy_attachment" "codebuild_iam" {
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = "arn:aws:iam::aws:policy/IAMFullAccess"
 }
 
 # CodeBuild project for React build
@@ -282,11 +182,9 @@ phases:
       - export GITHUB_TOKEN=$(aws ssm get-parameter --name "/github_token" --with-decryption --query Parameter.Value --output text)
       - export SPOTIFY_CLIENT_ID=$(aws ssm get-parameter --name "/spotify_client_id" --with-decryption --query Parameter.Value --output text)
 
-      - echo "Setting workspace to match Git branch"
-      - export BRANCH_NAME=$(echo $CODEBUILD_SOURCE_VERSION | sed 's/refs\/heads\///')
       - cd terraform
       - terraform init
-      - terraform workspace select "$BRANCH_NAME"
+      - terraform workspace select "$ENVIRONMENT"
       - terraform plan -var="github_token=$GITHUB_TOKEN" -var="spotify_client_id=$SPOTIFY_CLIENT_ID"
 
   build:
@@ -295,6 +193,7 @@ phases:
       - terraform apply -auto-approve -var="github_token=$GITHUB_TOKEN" -var="spotify_client_id=$SPOTIFY_CLIENT_ID"
       - cd ..
       - echo Building React application...
+      - npm install
       - npm run build
 
   post_build:
