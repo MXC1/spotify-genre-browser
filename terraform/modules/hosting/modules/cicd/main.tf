@@ -118,7 +118,9 @@ resource "aws_iam_role_policy" "codebuild_policy" {
           "${var.website_bucket.arn}",
           "${var.website_bucket.arn}/*",
           "${aws_s3_bucket.pipeline_artifacts.arn}",
-          "${aws_s3_bucket.pipeline_artifacts.arn}/*"
+          "${aws_s3_bucket.pipeline_artifacts.arn}/*",
+          "arn:aws:s3:::genrebrowser-tf-state",
+          "arn:aws:s3:::genrebrowser-tf-state/*"
         ]
       },
       {
@@ -141,6 +143,34 @@ resource "aws_iam_role_policy" "codebuild_policy" {
           "dynamodb:UpdateTable"
         ],
         Resource = "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ],
+        "Resource": [
+          "arn:aws:ssm:eu-west-2:976193252222:parameter/github_token",
+          "arn:aws:ssm:eu-west-2:976193252222:parameter/spotify_client_id"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "sns:GetTopicAttributes",
+          "sns:GetSubscriptionAttributes",
+          "sns:ListTagsForResource"
+        ],
+        "Resource": "arn:aws:sns:eu-west-2:976193252222:budget-alerts"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "budgets:ViewBudget",
+          "budgets:ListTagsForResource"
+        ],
+        "Resource": "arn:aws:budgets::976193252222:budget/monthly-budget"
       }
     ]
   })
@@ -231,14 +261,18 @@ phases:
 
   pre_build:
     commands:
+      - echo "Fetching sensitive variables from Parameter Store"
+      - export GITHUB_TOKEN=$(aws ssm get-parameter --name "/github_token" --with-decryption --query Parameter.Value --output text)
+      - export SPOTIFY_CLIENT_ID=$(aws ssm get-parameter --name "/spotify_client_id" --with-decryption --query Parameter.Value --output text)
+
       - cd terraform
       - terraform init
-      - terraform plan
+      - terraform plan -var="github_token=$GITHUB_TOKEN" -var="spotify_client_id=$SPOTIFY_CLIENT_ID"
 
   build:
     commands:
       - echo Applying Terraform changes...
-      - terraform apply -auto-approve
+      - terraform apply -auto-approve -var="github_token=$GITHUB_TOKEN" -var="spotify_client_id=$SPOTIFY_CLIENT_ID"
       - cd ..
       - echo Building React application...
       - npm run build
