@@ -127,6 +127,20 @@ resource "aws_iam_role_policy" "codebuild_policy" {
           "cloudfront:CreateInvalidation"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:DescribeTable",
+          "dynamodb:UpdateTable"
+        ],
+        Resource = "*"
       }
     ]
   })
@@ -189,6 +203,11 @@ resource "aws_codebuild_project" "react_build" {
       name  = "REACT_APP_LOG_ENDPOINT"
       value = var.log_endpoint
     }
+
+    environment_variable {
+      name  = "TF_VERSION"
+      value = "1.12.0"
+    }
   }
 
   source {
@@ -201,11 +220,26 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
-      - echo Installing dependencies...
-      - npm install
+      - echo Installing Terraform $${TF_VERSION}
+      - mkdir -p tf-bin
+      - cd tf-bin
+      - wget https://releases.hashicorp.com/terraform/$${TF_VERSION}/terraform_$${TF_VERSION}_linux_amd64.zip
+      - unzip -o terraform_$${TF_VERSION}_linux_amd64.zip
+      - chmod +x terraform
+      - mv terraform /usr/local/bin/
+      - cd ..
+
+  pre_build:
+    commands:
+      - cd terraform
+      - terraform init
+      - terraform plan
 
   build:
     commands:
+      - echo Applying Terraform changes...
+      - terraform apply -auto-approve
+      - cd ..
       - echo Building React application...
       - npm run build
 

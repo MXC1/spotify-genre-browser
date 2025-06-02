@@ -1,6 +1,6 @@
 provider "aws" {
   region  = "eu-west-2"
-  profile = "genrebrowser"
+  profile = var.aws_profile != "" ? var.aws_profile : null
 }
 
 terraform {
@@ -13,6 +13,11 @@ terraform {
 
     use_lockfile = true
   }
+}
+
+variable "aws_profile" {
+  type    = string
+  default = ""
 }
 
 variable "env" {
