@@ -13,11 +13,6 @@ terraform {
   }
 }
 
-variable "aws_profile" {
-  type    = string
-  default = ""
-}
-
 variable "env" {
   type    = string
   default = ""
