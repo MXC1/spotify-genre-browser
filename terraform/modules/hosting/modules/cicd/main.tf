@@ -64,12 +64,6 @@ variable "github_token" {
   sensitive   = true
 }
 
-variable "email_address" {
-  description = "Email address for notifications"
-  type        = string
-  sensitive   = true
-}
-
 # IAM role for CodeBuild
 resource "aws_iam_role" "codebuild_role" {
   name = "${var.project_name}-${var.environment}-codebuild-role"
