@@ -64,6 +64,12 @@ variable "github_token" {
   sensitive   = true
 }
 
+variable "email_address" {
+  description = "Email address for notifications"
+  type        = string
+  sensitive   = true
+}
+
 # IAM role for CodeBuild
 resource "aws_iam_role" "codebuild_role" {
   name = "${var.project_name}-${var.environment}-codebuild-role"
@@ -181,7 +187,16 @@ phases:
       - echo "Fetching sensitive variables from Parameter Store"
       - export GITHUB_TOKEN=$(aws ssm get-parameter --name "/github_token" --with-decryption --query Parameter.Value --output text)
       - export SPOTIFY_CLIENT_ID=$(aws ssm get-parameter --name "/spotify_client_id" --with-decryption --query Parameter.Value --output text)
+      - export EMAIL_ADDRESS=$(aws ssm get-parameter --name "/email_address" --with-decryption --query Parameter.Value --output text)
 
+      - echo "Applying global Terraform configuration..."
+      - cd terraform-global
+      - terraform init
+      - terraform plan -var="github_token=$GITHUB_TOKEN" -var="spotify_client_id=$SPOTIFY_CLIENT_ID" -var="email_address=$EMAIL_ADDRESS"
+      - terraform apply -auto-approve -var="github_token=$GITHUB_TOKEN" -var="spotify_client_id=$SPOTIFY_CLIENT_ID" -var="email_address=$EMAIL_ADDRESS"
+      - cd ..
+
+      - echo "Applying environment-specific Terraform configuration..."
       - cd terraform
       - terraform init
       - terraform workspace select "$ENVIRONMENT"
