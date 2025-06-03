@@ -25,8 +25,10 @@ self.addEventListener('fetch', (event) => {
       const fetchRequest = event.request.clone();
 
       return fetch(fetchRequest).catch((error) => {
-        // Only return index.html for navigation requests
-        if (event.request.mode === 'navigate') {
+        // Only return index.html for navigation and document requests
+        if (event.request.mode === 'navigate' ||
+            (event.request.method === 'GET' &&
+             event.request.headers.get('accept').includes('text/html'))) {
           return caches.match('/index.html');
         }
         // For other requests (like .js files), let the error propagate
