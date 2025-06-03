@@ -189,20 +189,13 @@ resource "aws_cloudfront_distribution" "website" {
 
   # Custom error responses
   custom_error_response {
-    error_code         = 404
-    response_code      = 404
-    error_caching_min_ttl = 300
-    # Don't specify response_page_path for JS/CSS files
-  }
-
-  custom_error_response {
     error_code         = 403
     response_code      = 200
     response_page_path = "/index.html"
     error_caching_min_ttl = 300
   }
 
-  # This needs to come after the 404->404 response to catch non-asset routes
+  # Single 404 response for both assets and routes
   custom_error_response {
     error_code         = 404
     response_code      = 200
