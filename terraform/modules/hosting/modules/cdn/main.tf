@@ -59,7 +59,7 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
-  # Default cache behavior
+  # Default cache behavior for HTML files
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD"]
@@ -68,36 +68,105 @@ resource "aws_cloudfront_distribution" "website" {
     compress               = true
 
     forwarded_values {
-      query_string = false
+      query_string = true  # Enable query string forwarding
       cookies {
         forward = "none"
       }
     }
 
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    # Reduced TTL for HTML files
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 31536000  # 1 year
   }
 
-  # Cache behavior for React router
+  # Cache behavior for static assets
   ordered_cache_behavior {
-    path_pattern           = "/*"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "S3-${var.website_bucket.name}"
+    path_pattern     = "/static/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "S3-${var.website_bucket.name}"
+
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "none"
+      }
+    }
+
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
 
+    # Long cache for versioned static assets
+    min_ttl     = 0
+    default_ttl = 31536000  # 1 year
+    max_ttl     = 31536000  # 1 year
+  }
+
+  # Cache behavior for service worker
+  ordered_cache_behavior {
+    path_pattern     = "/service-worker.js"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "S3-${var.website_bucket.name}"
+
     forwarded_values {
-      query_string = false
+      query_string = true
       cookies {
         forward = "none"
       }
     }
 
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = true
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 1
+  }
+
+  # Cache behavior for manifest.json
+  ordered_cache_behavior {
+    path_pattern     = "/manifest.json"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "S3-${var.website_bucket.name}"
+
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = true
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 1
+  }
+
+  # Cache behavior for asset-manifest.json
+  ordered_cache_behavior {
+    path_pattern     = "/asset-manifest.json"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "S3-${var.website_bucket.name}"
+
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = true
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 1
   }
 
   # Geo restrictions
@@ -118,19 +187,27 @@ resource "aws_cloudfront_distribution" "website" {
     cloudfront_default_certificate = var.domain_name == "" || !var.use_existing_domain ? true : false
   }
 
-  # SPA routing - all paths route to index.html
+  # Custom error responses
   custom_error_response {
-    error_code            = 403
-    response_code         = 200
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 10
+    error_code         = 404
+    response_code      = 404
+    error_caching_min_ttl = 300
+    # Don't specify response_page_path for JS/CSS files
   }
 
   custom_error_response {
-    error_code            = 404
-    response_code         = 200
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 10
+    error_code         = 403
+    response_code      = 200
+    response_page_path = "/index.html"
+    error_caching_min_ttl = 300
+  }
+
+  # This needs to come after the 404->404 response to catch non-asset routes
+  custom_error_response {
+    error_code         = 404
+    response_code      = 200
+    response_page_path = "/index.html"
+    error_caching_min_ttl = 300
   }
 
   tags = {
