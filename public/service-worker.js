@@ -36,8 +36,10 @@ self.addEventListener('fetch', (event) => {
       const fetchRequest = event.request.clone();
 
       return fetch(fetchRequest).catch((error) => {
-        // Only return index.html for navigation requests
-        if (event.request.mode === 'navigate') {
+        // Only return index.html for navigation and document requests
+        if (event.request.mode === 'navigate' ||
+            (event.request.method === 'GET' &&
+             event.request.headers.get('accept').includes('text/html'))) {
           return caches.match('/index.html');
         }
         // For other requests (like .js files), let the error propagate
@@ -66,80 +68,8 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch handler with different strategies based on request type
-self.addEventListener('fetch', event => {
-  // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
-    return;
-  }
-
-  // Handle API calls with network-first strategy
-  if (event.request.url.includes('/api/')) {
-    event.respondWith(networkFirstStrategy(event.request));
-    return;
-  }
-
-  // Handle static assets with cache-first strategy
-  event.respondWith(cacheFirstStrategy(event.request));
-});
-
-// Cache-first strategy for static assets
-async function cacheFirstStrategy(request) {
-  const cachedResponse = await caches.match(request);
-  
-  if (cachedResponse) {
-    return cachedResponse;
-  }
-
-  try {
-    // If not in cache, fetch from network
-    const networkResponse = await fetch(request);
-    
-    // Cache the new resource if it's a valid response
-    if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-      const cache = await caches.open(RUNTIME_CACHE);
-      cache.put(request, networkResponse.clone());
-    }
-    
-    return networkResponse;
-  } catch (error) {
-    // Return the offline page for navigation requests
-    if (request.mode === 'navigate') {
-      const cache = await caches.open(CACHE_NAME);
-      return cache.match('/index.html');
-    }
-    
-    throw error;
-  }
-}
-
-// Network-first strategy for API calls
-async function networkFirstStrategy(request) {
-  try {
-    // Try network first
-    const networkResponse = await fetch(request);
-    
-    // Cache the response for offline use
-    if (networkResponse && networkResponse.status === 200) {
-      const cache = await caches.open(RUNTIME_CACHE);
-      cache.put(request, networkResponse.clone());
-    }
-    
-    return networkResponse;
-  } catch (error) {
-    // If network fails, try cache
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    
-    // If not in cache either, fail gracefully
-    throw error;
-  }
-}
-
-// This allows the service worker to be updated from the main thread
-self.addEventListener('message', event => {
+// Add message handler to skip waiting
+self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
