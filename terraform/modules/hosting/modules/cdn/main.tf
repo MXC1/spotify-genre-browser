@@ -149,7 +149,6 @@ data "aws_acm_certificate" "cert" {
 
 # Provider alias for us-east-1 region (for ACM)
 provider "aws" {
-  profile = "genrebrowser"
   alias  = "us-east-1"
   region = "us-east-1"
 }
