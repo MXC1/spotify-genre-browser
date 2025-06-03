@@ -4,7 +4,7 @@ import { faSyncAlt, faBars, faHouse, faCircleInfo } from '@fortawesome/free-soli
 import { useLocation } from "react-router-dom";
 import { useNavigationHelpers } from '../../utilities/navigationHelpers';
 
-function HeaderContainer({ onRefresh, toggleMenu }) {
+function HeaderContainer({ onRefresh, toggleMenu, isRefreshing }) {
     const location = useLocation();
     const { goTo, checkAuthAndNavigate } = useNavigationHelpers();
 
@@ -31,8 +31,8 @@ function HeaderContainer({ onRefresh, toggleMenu }) {
                         <FontAwesomeIcon icon={faBars} />
                     </button>
                     <h1 className="page-title">Your album library</h1>
-                    <button className="refresh-button" onClick={onRefresh}>
-                        <FontAwesomeIcon icon={faSyncAlt} />
+                    <button className="refresh-button" onClick={onRefresh} disabled={isRefreshing}>
+                        <FontAwesomeIcon icon={faSyncAlt} className={isRefreshing ? 'rotating' : ''} />
                     </button>
                 </div>
             </div>

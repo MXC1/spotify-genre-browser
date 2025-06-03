@@ -24,11 +24,13 @@ import FeedbackContainer from './containers/feedbackContainer/feedbackContainer'
 function App() {
   const { showBoundary } = useErrorBoundary()
   const genreGridRef = useRef();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
   const { showInstallPrompt, installPromptEvent } = usePWAInstall();
   const { goTo } = useNavigationHelpers();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     logger.debug('SYS001','Environment is', { env: process.env.REACT_APP_ENV });
@@ -47,8 +49,11 @@ function App() {
   const handleGenreAlbumMapRefresh = async () => {
     if (genreGridRef.current) {
       try {
+        setIsRefreshing(true);
         await genreGridRef.current.updateGenreAlbumMap();
+        setIsRefreshing(false);
       } catch (error) {
+        setIsRefreshing(false);
         logger.error('MAP001','Error refreshing genre album map', error);
         showBoundary(error);
       }
@@ -117,6 +122,7 @@ function App() {
           onRefresh={handleGenreAlbumMapRefresh}
           onOpenDisconnectModal={handleOpenDisconnectModal}
           toggleMenu={toggleMenu}
+          isRefreshing={isRefreshing || isSyncing}
         />
       </ErrorBoundary>
 
@@ -124,7 +130,10 @@ function App() {
         <Routes>
           <Route path="*" element={<LoginContainer />} />
           <Route path="/authenticate" element={<LoginContainer />} />
-          <Route path="/genre-album-map" element={<GenreGridContainer ref={genreGridRef} />} />
+          <Route 
+            path="/genre-album-map" 
+            element={<GenreGridContainer ref={genreGridRef} onSyncingChange={setIsSyncing} />} 
+          />
           <Route path="/genre" element={<GenreContainer />} />
           <Route path="/album" element={<AlbumContainer />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyContainer />} />

@@ -16,6 +16,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   const [albumProgress, setAlbumProgress] = useState({ current: 0, total: 0 });
   const [artistProgress, setArtistProgress] = useState({ current: 0, total: 0 });
   const [isLoading, setIsLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -37,22 +38,37 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   }, [navigate]);
 
   useEffect(() => {
+    props.onSyncingChange?.(isSyncing);
+  }, [isSyncing, props]);
+
+  useEffect(() => {
     const initializeData = async () => {
       try {
         if (Object.keys(groupedAlbums).length > 0) {
-          logger.debug('MAP014', 'Using cached genre album map');
+          logger.debug("MAP014", "Using cached genre album map");
           return;
         }
-        const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
+        const cachedGenreAlbumMap = await getCachedEntry("data", "grouped_albums");
         if (cachedGenreAlbumMap && Object.keys(cachedGenreAlbumMap).length > 0) {
-          logger.debug('MAP014', 'Using cached genre album map');
+          logger.debug("MAP014", "Using cached genre album map and refreshing in background");
           setGroupedAlbums(cachedGenreAlbumMap);
+          setIsSyncing(true);
+          await fetchGenreAlbumMap();
+          setIsSyncing(false);
         } else {
-          logger.debug('MAP016', 'No cached data found. Fetching from scratch...');
-          await fetchOrUpdateGenreAlbumMap();
+          logger.debug(
+            "MAP016",
+            "No cached data found. Fetching from scratch..."
+          );
+          setIsLoading(true);
+          await fetchGenreAlbumMap();
         }
       } catch (error) {
-        logger.error('MAP094', 'Error initializing data', { location: "initializeData", error });
+        setIsSyncing(false);
+        logger.error("MAP094", "Error initializing data", {
+          location: "initializeData",
+          error,
+        });
         showBoundary(error);
       }
     };
@@ -62,7 +78,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchOrUpdateGenreAlbumMap = async () => {
+  const fetchGenreAlbumMap = async () => {
     try {
       const token = await authenticateUser();
       if (!token) {
@@ -70,19 +86,15 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
         return;
       }
 
-      setIsLoading(true);
-
-      const cachedGenreAlbumMap = await getCachedEntry('data', 'grouped_albums');
-      if (cachedGenreAlbumMap && Object.keys(cachedGenreAlbumMap).length > 0) {
-        setGroupedAlbums(cachedGenreAlbumMap);
-      } else {
         const allAlbums = await fetchAllSavedAlbums();
         const grouped = await groupAlbumsByArtistGenre(allAlbums);
         setGroupedAlbums(grouped);
-        await setCachedEntry('data', grouped, 'grouped_albums');
-      }
+      await setCachedEntry("data", grouped, "grouped_albums");
     } catch (error) {
-      logger.error('MAP094', 'Error initializing data', { location: "fetchOrUpdateGenreAlbumMap", error });
+      logger.error("MAP094", "Error initializing data", {
+        location: "fetchGenreAlbumMap",
+        error,
+      });
       showBoundary(error);
     }
   };

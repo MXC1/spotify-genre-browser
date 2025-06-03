@@ -47,7 +47,7 @@ describe('GIVEN I am on the genre grid page', () => {
             cy.reload();
         });
 
-        it.only("THEN the genre grid refreshes and finds the new albums", () => {
+        it("THEN the genre grid refreshes and finds the new albums", () => {
             cy.get('.refresh-button svg').should('have.class', 'rotating');
             cy.get('.refresh-button').should('be.disabled');
 
