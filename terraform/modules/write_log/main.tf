@@ -111,3 +111,7 @@ resource "aws_lambda_permission" "apigw_invoke" {
 output "api_url" {
   value = "${aws_apigatewayv2_api.log_api.api_endpoint}/${var.env}"
 }
+
+output "log_group_name" {
+  value = "/aws/lambda/${aws_lambda_function.write_log.function_name}"
+}
