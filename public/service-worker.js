@@ -17,7 +17,23 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+      if (response) {
+        return response;
+      }
+
+      // Clone the request because it's a one-time-use stream
+      const fetchRequest = event.request.clone();
+
+      return fetch(fetchRequest).catch((error) => {
+        // Only return index.html for navigation and document requests
+        if (event.request.mode === 'navigate' ||
+            (event.request.method === 'GET' &&
+             event.request.headers.get('accept').includes('text/html'))) {
+          return caches.match('/index.html');
+        }
+        // For other requests (like .js files), let the error propagate
+        throw error;
+      });
     })
   );
 });
@@ -35,4 +51,11 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+});
+
+// Add message handler to skip waiting
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
