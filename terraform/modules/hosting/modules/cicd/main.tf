@@ -208,7 +208,31 @@ phases:
   post_build:
     commands:
       - echo Deploying to S3...
-      - aws s3 sync build/ s3://$S3_BUCKET/ --delete
+      # Set cache headers for different file types
+      - |
+        aws s3 sync build/ s3://$S3_BUCKET/ \
+          --delete \
+          --cache-control "public, max-age=0, must-revalidate" \
+          --exclude "*" \
+          --include "*.html" \
+          --include "service-worker.js" \
+          --include "manifest.json" \
+          --include "asset-manifest.json"
+      - |
+        aws s3 sync build/ s3://$S3_BUCKET/ \
+          --delete \
+          --cache-control "public, max-age=31536000, immutable" \
+          --exclude "*" \
+          --include "static/*"
+      - |
+        aws s3 sync build/ s3://$S3_BUCKET/ \
+          --delete \
+          --cache-control "public, max-age=3600" \
+          --exclude "*.html" \
+          --exclude "static/*" \
+          --exclude "service-worker.js" \
+          --exclude "manifest.json" \
+          --exclude "asset-manifest.json"
       - echo Creating CloudFront invalidation...
       - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
 
