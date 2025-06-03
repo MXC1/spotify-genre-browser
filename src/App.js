@@ -32,6 +32,7 @@ function App() {
 
   useEffect(() => {
     logger.debug('SYS001','Environment is', { env: process.env.REACT_APP_ENV });
+    logger.debug('TEST001','Meaningless log addition to test new caching behaviour');
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
