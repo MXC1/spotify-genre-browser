@@ -1,11 +1,9 @@
 provider "aws" {
   region  = "eu-west-2"
-  profile = "genrebrowser"
 }
 
 terraform {
   backend "s3" {
-    profile = "genrebrowser"
     bucket  = "genrebrowser-tf-state"
     key     = "global/s3/terraform.tfstate"
     region  = "eu-west-2"
