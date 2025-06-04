@@ -175,8 +175,10 @@ export const useAlbumData = () => {
                 await fetchGenreAlbumMap();
                 setIsSyncing(false);
             } else {
+                setIsLoading(true);
                 logger.debug("MAP016", "No cached data found. Fetching from scratch...");
                 await fetchGenreAlbumMap();
+                setIsLoading(false);
             }
         } catch (error) {
             setIsSyncing(false);
