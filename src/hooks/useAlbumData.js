@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useErrorBoundary } from "react-error-boundary";
 import { setCachedEntry, getCachedEntry } from '../utilities/indexedDb';
-import { getMySavedAlbums, getArtists } from '../services/spotifyAPI';
+import { getArtists, fetchAllSavedAlbums } from '../services/spotifyAPI';
 import { authenticateUser } from "../services/spotifyAuth";
 import { logger } from "../utilities/logger";
 import { useNavigationHelpers } from '../utilities/navigationHelpers';
@@ -18,18 +18,6 @@ const DELAY_MS = 500;
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const fetchAlbumBatch = async (limit, offset) => {
-    const response = await getMySavedAlbums(limit, offset);
-    const albums = response.items.map(({ album }) => ({
-        id: album.id,
-        name: album.name,
-        artists: album.artists.map(({ id, name }) => ({ id, name })),
-        external_urls: { spotify: album.external_urls?.spotify || null },
-        images: album.images.slice(0, 2).map(image => ({ url: image?.url || null })),
-    }));
-    return [albums, response.total];
-};
-
 export const useAlbumData = () => {
     const [groupedAlbums, setGroupedAlbums] = useGroupedAlbums();
     const [isLoading, setIsLoading] = useIsLoading();
@@ -39,28 +27,10 @@ export const useAlbumData = () => {
     const { showBoundary } = useErrorBoundary();
     const { goTo } = useNavigationHelpers();
 
-    const fetchAllSavedAlbums = useCallback(async () => {
+    const fetchAllAlbumsWithProgress = useCallback(async () => {
         try {
-            let allAlbums = [];
-            let offset = 0;
-            setAlbumProgress({ current: 0, total: 0 });
-            
-            logger.info('MAP001', 'Fetching saved albums...');
-            const [firstBatch, total] = await fetchAlbumBatch(BATCH_SIZE, offset);
-            allAlbums = firstBatch;
-            setAlbumProgress({ current: Math.min(BATCH_SIZE, total), total });
-
-            while (offset + BATCH_SIZE < total) {
-                offset += BATCH_SIZE;
-                const [batch] = await fetchAlbumBatch(BATCH_SIZE, offset);
-                allAlbums.push(...batch);
-                setAlbumProgress({ current: Math.min(offset + BATCH_SIZE, total), total });
-            }
-
-            logger.debug('MAP002', 'Fetched all saved albums');
-            return allAlbums;
+            return await fetchAllSavedAlbums(setAlbumProgress);
         } catch (error) {
-            logger.error('MAP095', 'Error fetching saved albums', { error });
             showBoundary(error);
             return [];
         }
@@ -135,7 +105,7 @@ export const useAlbumData = () => {
                 return;
             }
 
-            const allAlbums = await fetchAllSavedAlbums();
+            const allAlbums = await fetchAllAlbumsWithProgress();
             const grouped = await groupAlbumsByArtistGenre(allAlbums);
             setGroupedAlbums(grouped);
             await setCachedEntry("data", grouped, "grouped_albums");
