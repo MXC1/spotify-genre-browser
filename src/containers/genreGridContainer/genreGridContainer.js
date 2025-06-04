@@ -17,6 +17,17 @@ const GenreGridContainer = () => {
   const { goTo } = useNavigationHelpers();
   const navigate = useNavigate();
 
+  const handleSearchChange = (query) => {
+    setSearchQuery(query);
+    const params = new URLSearchParams(location.search);
+    if (query) {
+      params.set('genreSearch', query);
+    } else {
+      params.delete('genreSearch');
+    }
+    navigate({ search: params.toString() });
+  };
+
   useEffect(() => {
     const url = new URL(window.location.href);
     if (url.pathname === '/genre-album-map') {
@@ -75,7 +86,7 @@ const GenreGridContainer = () => {
         ) : (
           <div>
             <SearchSortContainer
-              onSearchQueryChange={setSearchQuery}
+              onSearchQueryChange={handleSearchChange}
               onSortOptionChange={setSortOption}
               selectedSortOption={sortOption}
               placeholderText="Search genres, albums, and artists..."
