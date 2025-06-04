@@ -81,8 +81,10 @@ export const useAlbumData = () => {
             logger.error('MAP095', 'Error fetching saved albums', { error });
             showBoundary(error);
         }
-    }, [showBoundary]);
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showBoundary]);
+    
     const groupAlbumsByArtistGenre = useCallback(async (albums) => {
         if (!albums || albums.length === 0) {
             logger.info('MAP011', 'No albums to group');
@@ -109,7 +111,7 @@ export const useAlbumData = () => {
                     genreAlbumMap[genre].push(...albums.filter(album => album.artists[0].id === artist.id));
                 });
             });
-
+            
             setArtistProgress(prev => ({ current: Math.min(i + 50, artistIds.length), total: artistIds.length }));
             await delay(delayTimeMs);
         }
@@ -127,7 +129,7 @@ export const useAlbumData = () => {
                 combinedGenreAlbumMap.set(albumIds, genre);
             }
         });
-
+        
         const finalGenreAlbumMap = {};
         combinedGenreAlbumMap.forEach((genres, albumIds) => {
             finalGenreAlbumMap[genres] = Object.values(genreAlbumMap).find(
@@ -139,8 +141,10 @@ export const useAlbumData = () => {
         setIsLoading(false);
         logger.info('MAP021', 'Finished grouping albums by artist genre');
         return finalGenreAlbumMap;
+        
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
+    
     const fetchGenreAlbumMap = async () => {
         try {
             const token = await authenticateUser();
@@ -186,6 +190,8 @@ export const useAlbumData = () => {
             logger.error("MAP094", "Error initializing data", { error });
             showBoundary(error);
         }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showBoundary]);
 
     const updateGenreAlbumMap = async () => {
