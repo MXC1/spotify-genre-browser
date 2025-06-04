@@ -10,6 +10,10 @@
 <!---Please give a brief description of your solution--->
 <!---A bullet-pointed list is ideal--->
 
+### Also included in this PR
+
+<!-- Did you fix anything else while you were there? -->
+
 ## PR Review Checklist 📋
 
 <!---We can put Definition of Done type stuff in here if we like--->
@@ -17,5 +21,4 @@
 
 - [ ] Appropriate logging has been added
 - [ ] Appropriate tests have been written
-- [ ] The full test suite is passing
 - [ ] There are no TODOs in the code without a very good reason
