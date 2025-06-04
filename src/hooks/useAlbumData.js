@@ -134,6 +134,8 @@ export const useAlbumData = () => {
      * Fetches and processes all album data from Spotify
      */
     const fetchGenreAlbumMap = async () => {
+        setAlbumProgress({ current: 0, total: 0 });
+        setArtistProgress({ current: 0, total: 0 });
         try {
             const token = await authenticateUser();
             if (!token) {
