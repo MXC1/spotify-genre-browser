@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 import { useAlbumData } from "../../hooks/useAlbumData";
 import './genreGridContainer.css';
@@ -9,8 +9,10 @@ import NoAlbums from '../../components/NoAlbums/NoAlbums';
 
 const GenreGridContainer = () => {
   const { groupedAlbums, isLoading, albumProgress, artistProgress, 
-          initializeData } = useAlbumData();
-  const [searchQuery, setSearchQuery] = useState('');
+          initializeData } = useAlbumData();const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const genreSearch = params.get("genreSearch") || '';
+  const [searchQuery, setSearchQuery] = useState(genreSearch || '');
   const [sortOption, setSortOption] = useState('number-desc');
   const { goTo } = useNavigationHelpers();
   const navigate = useNavigate();
