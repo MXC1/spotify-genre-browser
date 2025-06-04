@@ -135,6 +135,8 @@ export const useAlbumData = () => {
         } catch (error) {
             logger.error("MAP094", "Error initializing data", { error });
             showBoundary(error);
+        } finally {
+            setIsLoading(false); 
         }
     };
 
@@ -153,11 +155,11 @@ export const useAlbumData = () => {
                 setIsSyncing(false);
             } else {
                 logger.debug("MAP016", "No cached data found. Fetching from scratch...");
-                setIsLoading(true);
                 await fetchGenreAlbumMap();
             }
         } catch (error) {
             setIsSyncing(false);
+            setIsLoading(false);
             logger.error("MAP094", "Error initializing data", { error });
             showBoundary(error);
         }

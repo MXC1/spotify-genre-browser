@@ -1,4 +1,4 @@
-import React, { useState, useImperativeHandle, forwardRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 import { useAlbumData } from "../../hooks/useAlbumData";
@@ -7,17 +7,13 @@ import SearchSortContainer from '../../components/SearchSortContainer';
 import ProgressBar from '../../components/ProgressBar/ProgressBar';
 import NoAlbums from '../../components/NoAlbums/NoAlbums';
 
-const GenreGridContainer = forwardRef((props, genreGridRef) => {
-  const { groupedAlbums, isLoading, isSyncing, albumProgress, artistProgress, 
-          initializeData, updateGenreAlbumMap, clearGenreAlbumMap } = useAlbumData();
+const GenreGridContainer = () => {
+  const { groupedAlbums, isLoading, albumProgress, artistProgress, 
+          initializeData } = useAlbumData();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('number-desc');
   const { goTo } = useNavigationHelpers();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    props.onSyncingChange?.(isSyncing);
-  }, [isSyncing, props]);
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -29,12 +25,6 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
   useEffect(() => {
     initializeData();
   }, [initializeData]);
-
-  // Allow these methods to be called from the parent element
-  useImperativeHandle(genreGridRef, () => ({
-    updateGenreAlbumMap,
-    clearGenreAlbumMap
-  }));
 
   const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
     genre.toLowerCase().includes(searchQuery) ||
@@ -110,7 +100,7 @@ const GenreGridContainer = forwardRef((props, genreGridRef) => {
       )}
     </div>
   );
-});
+};
 
 function GenreCard({ genre, albums, onClick }) {
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ErrorBoundary, useErrorBoundary } from "react-error-boundary";
 import { ErrorFallback, handleError } from './utilities/errorHandling';
 import { clearAccessToken } from './services/spotifyAuth';
@@ -20,17 +20,15 @@ import { useNavigationHelpers } from './utilities/navigationHelpers';
 import OverlayMenu from './containers/overlayMenu/overlayMenu';
 import { logger } from './utilities/logger';
 import FeedbackContainer from './containers/feedbackContainer/feedbackContainer';
+import { useAlbumData } from './hooks/useAlbumData';
 
 function App() {
-  const { showBoundary } = useErrorBoundary()
-  const genreGridRef = useRef();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { showBoundary } = useErrorBoundary();
+  const { clearGenreAlbumMap } = useAlbumData();
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
   const { showInstallPrompt, installPromptEvent } = usePWAInstall();
   const { goTo } = useNavigationHelpers();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     logger.debug('SYS001','Environment is', { env: process.env.REACT_APP_ENV });
@@ -46,27 +44,11 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleGenreAlbumMapRefresh = async () => {
-    if (genreGridRef.current) {
-      try {
-        setIsRefreshing(true);
-        await genreGridRef.current.updateGenreAlbumMap();
-        setIsRefreshing(false);
-      } catch (error) {
-        setIsRefreshing(false);
-        logger.error('MAP001','Error refreshing genre album map', error);
-        showBoundary(error);
-      }
-    }
-  }
-
   const handleDisconnect = async () => {
     logger.info('AUTH081','Disconnecting Spotify account...', {});
     await clearAllData();
     clearAccessToken();
-    if (genreGridRef.current) {
-      await genreGridRef.current.clearGenreAlbumMap();
-    }
+    await clearGenreAlbumMap();
     closeModal();
     goTo('/authenticate');
     openModal({
@@ -119,10 +101,7 @@ function App() {
     <div className="App">
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
         <HeaderContainer
-          onRefresh={handleGenreAlbumMapRefresh}
-          onOpenDisconnectModal={handleOpenDisconnectModal}
           toggleMenu={toggleMenu}
-          isRefreshing={isRefreshing || isSyncing}
         />
       </ErrorBoundary>
 
@@ -132,7 +111,7 @@ function App() {
           <Route path="/authenticate" element={<LoginContainer />} />
           <Route 
             path="/genre-album-map" 
-            element={<GenreGridContainer ref={genreGridRef} onSyncingChange={setIsSyncing} />} 
+            element={<GenreGridContainer />} 
           />
           <Route path="/genre" element={<GenreContainer />} />
           <Route path="/album" element={<AlbumContainer />} />
@@ -145,7 +124,6 @@ function App() {
 
       <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
         <OverlayMenu
-          ref={menuRef}
           isOpen={isMenuOpen}
           toggleMenu={toggleMenu}
           onDisconnect={handleOpenDisconnectModal}
