@@ -23,7 +23,7 @@ import FeedbackContainer from './containers/feedbackContainer/feedbackContainer'
 import { useAlbumData } from './hooks/useAlbumData';
 
 function App() {
-  const { clearGenreAlbumMap } = useAlbumData();
+  const { clearGenreAlbumMap, initializeData } = useAlbumData();
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
   const { showInstallPrompt, installPromptEvent } = usePWAInstall();
   const { goTo } = useNavigationHelpers();
@@ -31,6 +31,7 @@ function App() {
 
   useEffect(() => {
     logger.debug('SYS001','Environment is', { env: process.env.REACT_APP_ENV });
+    initializeData();
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
