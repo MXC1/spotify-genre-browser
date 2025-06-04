@@ -76,7 +76,7 @@ describe('GIVEN I am on the feedback page', () => {
         cy.visit('/feedback');
     });
 
-    it('THEN the donate page should be displayed', () => {    
+    it('THEN the feedback page should be displayed', () => {    
         cy.get('.page-title').should('contain', 'Give Feedback');
         cy.get('.home-button').should('exist');
         cy.get('.feedback-container').should('exist');
