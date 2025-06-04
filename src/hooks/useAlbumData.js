@@ -1,41 +1,34 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useErrorBoundary } from "react-error-boundary";
 import { setCachedEntry, getCachedEntry } from '../utilities/indexedDb';
 import { getMySavedAlbums, getArtists } from '../services/spotifyAPI';
 import { authenticateUser } from "../services/spotifyAuth";
 import { logger } from "../utilities/logger";
 import { useNavigationHelpers } from '../utilities/navigationHelpers';
+import { 
+    useGroupedAlbums, 
+    useIsLoading, 
+    useIsSyncing,
+    useAlbumProgress,
+    useArtistProgress 
+} from './globalState';
 
-const createGlobalStateHook = (initialValue) => {
-    const store = {
-        value: initialValue,
-        setters: new Set()
-    };
+const BATCH_SIZE = 50;
+const DELAY_MS = 500;
 
-    return function useGlobalState() {
-        const [value, setValue] = useState(store.value);
-        
-        const setGlobalValue = useCallback((newValue) => {
-            store.value = newValue;
-            store.setters.forEach(setter => setter(newValue));
-        }, []);
-
-        useEffect(() => {
-            store.setters.add(setValue);
-            return () => store.setters.delete(setValue);
-        }, []);
-
-        return [value, setGlobalValue];
-    };
-};
-
-const useGroupedAlbums = createGlobalStateHook({});
-const useIsLoading = createGlobalStateHook(false);
-const useIsSyncing = createGlobalStateHook(false);
-const useAlbumProgress = createGlobalStateHook({ current: 0, total: 0 });
-const useArtistProgress = createGlobalStateHook({ current: 0, total: 0 });
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-const delayTimeMs = 500;
+
+const fetchAlbumBatch = async (limit, offset) => {
+    const response = await getMySavedAlbums(limit, offset);
+    const albums = response.items.map(({ album }) => ({
+        id: album.id,
+        name: album.name,
+        artists: album.artists.map(({ id, name }) => ({ id, name })),
+        external_urls: { spotify: album.external_urls?.spotify || null },
+        images: album.images.slice(0, 2).map(image => ({ url: image?.url || null })),
+    }));
+    return [albums, response.total];
+};
 
 export const useAlbumData = () => {
     const [groupedAlbums, setGroupedAlbums] = useGroupedAlbums();
@@ -43,50 +36,38 @@ export const useAlbumData = () => {
     const [isSyncing, setIsSyncing] = useIsSyncing();
     const [albumProgress, setAlbumProgress] = useAlbumProgress();
     const [artistProgress, setArtistProgress] = useArtistProgress();
-
     const { showBoundary } = useErrorBoundary();
     const { goTo } = useNavigationHelpers();
 
     const fetchAllSavedAlbums = useCallback(async () => {
         try {
             let allAlbums = [];
-            let allAlbumIds = [];
             let offset = 0;
-            const limit = 50;
-
             setAlbumProgress({ current: 0, total: 0 });
-            setArtistProgress({ current: 0, total: 0 });
-
+            
             logger.info('MAP001', 'Fetching saved albums...');
+            const [firstBatch, total] = await fetchAlbumBatch(BATCH_SIZE, offset);
+            allAlbums = firstBatch;
+            setAlbumProgress({ current: Math.min(BATCH_SIZE, total), total });
 
-            const [albums, numberOfAlbums] = await getReducedAlbumsAndTotal(limit, offset);
-            allAlbums = [...allAlbums, ...albums];
-            allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
-            setAlbumProgress({ current: Math.min(offset + limit, numberOfAlbums), total: numberOfAlbums });
-
-            const albumsToProcess = numberOfAlbums - limit;
-            const batchesToProcess = Math.ceil(albumsToProcess / limit);
-            offset += limit;
-
-            for (offset; offset <= batchesToProcess * limit; offset += limit) {
-                setAlbumProgress({ current: Math.min(offset + limit, numberOfAlbums), total: numberOfAlbums });
-                const [albums] = await getReducedAlbumsAndTotal(limit, offset);
-                allAlbums = [...allAlbums, ...albums];
-                allAlbumIds = [...allAlbumIds, ...albums.map(album => album.id)];
+            while (offset + BATCH_SIZE < total) {
+                offset += BATCH_SIZE;
+                const [batch] = await fetchAlbumBatch(BATCH_SIZE, offset);
+                allAlbums.push(...batch);
+                setAlbumProgress({ current: Math.min(offset + BATCH_SIZE, total), total });
             }
-            setAlbumProgress({ current: numberOfAlbums, total: numberOfAlbums });
+
             logger.debug('MAP002', 'Fetched all saved albums');
             return allAlbums;
         } catch (error) {
             logger.error('MAP095', 'Error fetching saved albums', { error });
             showBoundary(error);
+            return [];
         }
+    }, [showBoundary, setAlbumProgress]);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [showBoundary]);
-    
     const groupAlbumsByArtistGenre = useCallback(async (albums) => {
-        if (!albums || albums.length === 0) {
+        if (!albums?.length) {
             logger.info('MAP011', 'No albums to group');
             setIsLoading(false);
             return {};
@@ -98,22 +79,27 @@ export const useAlbumData = () => {
         setArtistProgress({ current: 0, total: artistIds.length });
         logger.info('MAP020', 'Grouping albums by artist genre');
 
-        for (let i = 0; i < artistIds.length; i += 50) {
-            const batch = artistIds.slice(i, i + 50);
-            const artists = await getArtists(batch);
+        for (let i = 0; i < artistIds.length; i += BATCH_SIZE) {
+            const batch = artistIds.slice(i, i + BATCH_SIZE);
+            const { artists } = await getArtists(batch);
 
-            artists.artists.forEach(artist => {
+            artists.forEach(artist => {
                 const genres = artist.genres.length > 0 ? artist.genres : ['[Unknown Genre]'];
+                const artistAlbums = albums.filter(album => album.artists[0].id === artist.id);
+                
                 genres.forEach(genre => {
                     if (!genreAlbumMap[genre]) {
                         genreAlbumMap[genre] = [];
                     }
-                    genreAlbumMap[genre].push(...albums.filter(album => album.artists[0].id === artist.id));
+                    genreAlbumMap[genre].push(...artistAlbums);
                 });
             });
             
-            setArtistProgress(prev => ({ current: Math.min(i + 50, artistIds.length), total: artistIds.length }));
-            await delay(delayTimeMs);
+            setArtistProgress({ 
+                current: Math.min(i + BATCH_SIZE, artistIds.length), 
+                total: artistIds.length 
+            });
+            await delay(DELAY_MS);
         }
 
         const combinedGenreAlbumMap = new Map();
@@ -132,19 +118,15 @@ export const useAlbumData = () => {
         
         const finalGenreAlbumMap = {};
         combinedGenreAlbumMap.forEach((genres, albumIds) => {
-            finalGenreAlbumMap[genres] = Object.values(genreAlbumMap).find(
-                albums => albums.map(album => album.id).sort().join(',') === albumIds
+            finalGenreAlbumMap[genres] = genreAlbumMap[genres.split(', ')[0]].filter(
+                album => albumIds.includes(album.id)
             );
         });
 
-        setArtistProgress({ current: artistIds.length, total: artistIds.length });
-        setIsLoading(false);
         logger.info('MAP021', 'Finished grouping albums by artist genre');
         return finalGenreAlbumMap;
-        
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    
+    }, [setArtistProgress, setIsLoading]);
+
     const fetchGenreAlbumMap = async () => {
         try {
             const token = await authenticateUser();
@@ -216,17 +198,3 @@ export const useAlbumData = () => {
         clearGenreAlbumMap
     };
 };
-
-async function getReducedAlbumsAndTotal(limit, offset) {
-    const response = await getMySavedAlbums(limit, offset);
-
-    const reducedAlbums = response.items.map(({ album }) => ({
-        id: album.id,
-        name: album.name,
-        artists: album.artists.map(({ id, name }) => ({ id, name })),
-        external_urls: { spotify: album.external_urls?.spotify || null },
-        images: album.images.slice(0, 2).map(image => ({ url: image?.url || null })),
-    }));
-
-    return [reducedAlbums, response.total];
-}
