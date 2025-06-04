@@ -4,13 +4,14 @@ import "./genreContainer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAlbumData } from "../../hooks/useAlbumData";
 
 function GenreContainer() {
     const location = useLocation();
     const { goTo } = useNavigationHelpers();
     const { groupedAlbums } = useAlbumData();
+    const navigate = useNavigate();
 
     const params = new URLSearchParams(location.search);
     const genre = params.get("genre");
@@ -50,12 +51,23 @@ function GenreContainer() {
         return 0;
     });
 
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        const params = new URLSearchParams(location.search);
+        if (query) {
+            params.set('albumSearch', query);
+        } else {
+            params.delete('albumSearch');
+        }
+        navigate({ search: params.toString() });
+    };
+
     if (!genre || !albums.length) return <div className="genre-container">No albums found for this genre.</div>;
 
     return (
         <div className="genre-container">
             <SearchSortContainer
-                onSearchQueryChange={setSearchQuery}
+                onSearchQueryChange={handleSearchChange}
                 onSortOptionChange={setSortOption}
                 selectedSortOption={sortOption}
                 placeholderText="Search albums or artists..."
