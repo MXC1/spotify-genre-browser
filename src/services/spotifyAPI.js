@@ -48,3 +48,46 @@ export const getArtists = async (ids) => {
   };
   return await makeSpotifyRequestWithRetries('https://api.spotify.com/v1/artists', options);
 };
+
+const BATCH_SIZE = 50;
+
+export const fetchAllSavedAlbums = async (onProgress) => {
+    try {
+        let allAlbums = [];
+        let offset = 0;
+        onProgress?.({ current: 0, total: 0 });
+        
+        logger.info('MAP001', 'Fetching saved albums...');
+        const response = await getMySavedAlbums(BATCH_SIZE, offset);
+        const firstBatch = response.items.map(({ album }) => ({
+            id: album.id,
+            name: album.name,
+            artists: album.artists.map(({ id, name }) => ({ id, name })),
+            external_urls: { spotify: album.external_urls?.spotify || null },
+            images: album.images.slice(0, 2).map(image => ({ url: image?.url || null })),
+        }));
+        const total = response.total;
+        allAlbums = firstBatch;
+        onProgress?.({ current: Math.min(BATCH_SIZE, total), total });
+
+        while (offset + BATCH_SIZE < total) {
+            offset += BATCH_SIZE;
+            const nextResponse = await getMySavedAlbums(BATCH_SIZE, offset);
+            const batch = nextResponse.items.map(({ album }) => ({
+                id: album.id,
+                name: album.name,
+                artists: album.artists.map(({ id, name }) => ({ id, name })),
+                external_urls: { spotify: album.external_urls?.spotify || null },
+                images: album.images.slice(0, 2).map(image => ({ url: image?.url || null })),
+            }));
+            allAlbums.push(...batch);
+            onProgress?.({ current: Math.min(offset + BATCH_SIZE, total), total });
+        }
+
+        logger.debug('MAP002', 'Fetched all saved albums');
+        return allAlbums;
+    } catch (error) {
+        logger.error('MAP095', 'Error fetching saved albums', { error });
+        throw error;
+    }
+};
