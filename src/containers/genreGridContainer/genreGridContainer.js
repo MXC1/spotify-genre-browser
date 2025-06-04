@@ -8,8 +8,7 @@ import ProgressBar from '../../components/ProgressBar/ProgressBar';
 import NoAlbums from '../../components/NoAlbums/NoAlbums';
 
 const GenreGridContainer = () => {
-  const { groupedAlbums, isLoading, albumProgress, artistProgress, 
-          initializeData } = useAlbumData();
+  const { groupedAlbums, isLoading, albumProgress, artistProgress } = useAlbumData();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const genreSearch = params.get("genreSearch") || '';
@@ -24,10 +23,6 @@ const GenreGridContainer = () => {
       setSortOption('number-desc');
     }
   }, [navigate]);
-
-  useEffect(() => {
-    initializeData();
-  }, [initializeData]);
 
   const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
     genre.toLowerCase().includes(searchQuery) ||
