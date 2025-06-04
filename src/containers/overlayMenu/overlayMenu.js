@@ -1,15 +1,16 @@
 import { forwardRef } from 'react';
 import './overlayMenu.css';
 import { useNavigationHelpers } from '../../utilities/navigationHelpers';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayInstallModal, installPromptEvent }, ref) => {
-    const { goTo } = useNavigationHelpers();
+    const { goTo, checkAuthAndNavigate } = useNavigationHelpers();
 
     const handleNavigation = (path) => {
         toggleMenu();
-        goTo(path);
+        path ? goTo(path) : checkAuthAndNavigate();
     };
 
     return (
@@ -22,7 +23,7 @@ const OverlayMenu = forwardRef(({ isOpen, toggleMenu, onDisconnect, onDisplayIns
                 </button>
                 <ul className="menu-items">
                     <li className="menu-item">
-                        <button className="menu-item-button" onClick={() => handleNavigation("/genre-album-map")}>
+                        <button className="menu-item-button" onClick={() => handleNavigation()}>
                             Home
                         </button>
                     </li>
