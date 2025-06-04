@@ -6,25 +6,46 @@ import { authenticateUser } from "../services/spotifyAuth";
 import { logger } from "../utilities/logger";
 import { useNavigationHelpers } from '../utilities/navigationHelpers';
 
-let globalGroupedAlbums = {};
-let globalSetters = new Set();
+const createGlobalStateHook = (initialValue) => {
+    const store = {
+        value: initialValue,
+        setters: new Set()
+    };
+
+    return function useGlobalState() {
+        const [value, setValue] = useState(store.value);
+        
+        const setGlobalValue = useCallback((newValue) => {
+            store.value = newValue;
+            store.setters.forEach(setter => setter(newValue));
+        }, []);
+
+        useEffect(() => {
+            store.setters.add(setValue);
+            return () => store.setters.delete(setValue);
+        }, []);
+
+        return [value, setGlobalValue];
+    };
+};
+
+const useGroupedAlbums = createGlobalStateHook({});
+const useIsLoading = createGlobalStateHook(false);
+const useIsSyncing = createGlobalStateHook(false);
+const useAlbumProgress = createGlobalStateHook({ current: 0, total: 0 });
+const useArtistProgress = createGlobalStateHook({ current: 0, total: 0 });
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const delayTimeMs = 500;
 
 export const useAlbumData = () => {
-    const [groupedAlbums, setLocalGroupedAlbums] = useState(globalGroupedAlbums);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isSyncing, setIsSyncing] = useState(false);
-    const [albumProgress, setAlbumProgress] = useState({ current: 0, total: 0 });
-    const [artistProgress, setArtistProgress] = useState({ current: 0, total: 0 });
+    const [groupedAlbums, setGroupedAlbums] = useGroupedAlbums();
+    const [isLoading, setIsLoading] = useIsLoading();
+    const [isSyncing, setIsSyncing] = useIsSyncing();
+    const [albumProgress, setAlbumProgress] = useAlbumProgress();
+    const [artistProgress, setArtistProgress] = useArtistProgress();
 
     const { showBoundary } = useErrorBoundary();
     const { goTo } = useNavigationHelpers();
-
-    const setGroupedAlbums = useCallback((newAlbums) => {
-        globalGroupedAlbums = newAlbums;
-        globalSetters.forEach(setter => setter(newAlbums));
-    }, []);
 
     const fetchAllSavedAlbums = useCallback(async () => {
         try {
@@ -163,7 +184,7 @@ export const useAlbumData = () => {
             logger.error("MAP094", "Error initializing data", { error });
             showBoundary(error);
         }
-    }, [groupedAlbums, showBoundary]);
+    }, [showBoundary]);
 
     const updateGenreAlbumMap = async () => {
         setIsLoading(true);
@@ -175,11 +196,6 @@ export const useAlbumData = () => {
     const clearGenreAlbumMap = async () => {
         setGroupedAlbums({});
     };
-
-    useEffect(() => {
-        globalSetters.add(setLocalGroupedAlbums);
-        return () => globalSetters.delete(setLocalGroupedAlbums);
-    }, []);
 
     return {
         groupedAlbums,

@@ -9,7 +9,8 @@ import NoAlbums from '../../components/NoAlbums/NoAlbums';
 
 const GenreGridContainer = () => {
   const { groupedAlbums, isLoading, albumProgress, artistProgress, 
-          initializeData } = useAlbumData();const location = useLocation();
+          initializeData } = useAlbumData();
+  const location = useLocation();
   const params = new URLSearchParams(location.search);
   const genreSearch = params.get("genreSearch") || '';
   const [searchQuery, setSearchQuery] = useState(genreSearch || '');
