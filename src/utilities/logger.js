@@ -22,7 +22,6 @@ function isRunningLocally() {
 
 async function logToCloudWatch(logPayload) {
   if (!['main', 'staging', 'dev'].includes(process.env.REACT_APP_ENV) || isRunningLocally()) {
-    console.warn('[CloudWatch] Logging is disabled in this environment:', process.env.REACT_APP_ENV);
     return;
   }
 

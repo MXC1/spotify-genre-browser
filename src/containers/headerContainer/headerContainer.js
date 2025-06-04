@@ -3,10 +3,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSyncAlt, faBars, faHouse, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from "react-router-dom";
 import { useNavigationHelpers } from '../../utilities/navigationHelpers';
+import { useAlbumData } from '../../hooks/useAlbumData';
 
-function HeaderContainer({ onRefresh, toggleMenu }) {
+function HeaderContainer({ toggleMenu }) {
     const location = useLocation();
     const { goTo, checkAuthAndNavigate } = useNavigationHelpers();
+    const { updateGenreAlbumMap, isLoading, isSyncing } = useAlbumData();
+
+    const handleRefresh = async () => {
+        await updateGenreAlbumMap();
+    };
 
     if (location.pathname === '/privacy-policy') {
         return (
@@ -31,8 +37,8 @@ function HeaderContainer({ onRefresh, toggleMenu }) {
                         <FontAwesomeIcon icon={faBars} />
                     </button>
                     <h1 className="page-title">Your album library</h1>
-                    <button className="refresh-button" onClick={onRefresh}>
-                        <FontAwesomeIcon icon={faSyncAlt} />
+                    <button className="refresh-button" onClick={handleRefresh} disabled={isLoading || isSyncing}>
+                        <FontAwesomeIcon icon={faSyncAlt} className={(isLoading || isSyncing) ? 'rotating' : ''} />
                     </button>
                 </div>
             </div>
