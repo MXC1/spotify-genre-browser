@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./albumContainer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import spotifyLogo from "../../assets/spotify_Primary_Logo_White_RGB.svg";
 import { useLocation } from "react-router-dom";
 import { useAlbumData } from "../../hooks/useAlbumData";
-import { logger } from "../../utilities/logger";
 import { useNavigationHelpers } from "../../utilities/navigationHelpers";
 
 function AlbumContainer() {

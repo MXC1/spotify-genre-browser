@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ErrorBoundary, useErrorBoundary } from "react-error-boundary";
+import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback, handleError } from './utilities/errorHandling';
 import { clearAccessToken } from './services/spotifyAuth';
 import { clearAllData } from './utilities/indexedDb';
@@ -23,7 +23,6 @@ import FeedbackContainer from './containers/feedbackContainer/feedbackContainer'
 import { useAlbumData } from './hooks/useAlbumData';
 
 function App() {
-  const { showBoundary } = useErrorBoundary();
   const { clearGenreAlbumMap } = useAlbumData();
   const { isModalOpen, modalParams, openModal, closeModal } = useModal();
   const { showInstallPrompt, installPromptEvent } = usePWAInstall();
