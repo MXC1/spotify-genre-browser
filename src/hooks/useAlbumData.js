@@ -18,6 +18,9 @@ const DELAY_MS = 500;
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+/**
+ * Custom hook to manage album data fetching and genre grouping
+ */
 export const useAlbumData = () => {
     const [groupedAlbums, setGroupedAlbums] = useGroupedAlbums();
     const [isLoading, setIsLoading] = useIsLoading();
@@ -27,6 +30,10 @@ export const useAlbumData = () => {
     const { showBoundary } = useErrorBoundary();
     const { goTo } = useNavigationHelpers();
 
+    /**
+     * Fetches all saved albums from Spotify with progress tracking
+     * @returns {Promise<Array>} Array of album objects
+     */
     const fetchAllAlbumsWithProgress = useCallback(async () => {
         try {
             return await fetchAllSavedAlbums(setAlbumProgress);
@@ -36,6 +43,12 @@ export const useAlbumData = () => {
         }
     }, [showBoundary, setAlbumProgress]);
 
+    /**
+     * Processes artists in batches to get their genres and map albums
+     * @param {Array} albums - List of albums to process
+     * @param {Array} artistIds - List of unique artist IDs
+     * @returns {Object} Map of genres to their respective albums
+     */
     const fetchAndProcessArtistBatches = useCallback(async (albums, artistIds) => {
         const genreAlbumMap = {};
         setArtistProgress({ current: 0, total: artistIds.length });
@@ -67,6 +80,11 @@ export const useAlbumData = () => {
         return genreAlbumMap;
     }, [setArtistProgress]);
 
+    /**
+     * Combines genres that have the exact same albums into a single genre
+     * @param {Object} genreAlbumMap - Initial map of genres to albums
+     * @returns {Object} Optimized map with combined genres
+     */
     const combineGenresWithSameAlbums = (genreAlbumMap) => {
         const combinedGenreAlbumMap = new Map();
 
@@ -92,6 +110,11 @@ export const useAlbumData = () => {
         return finalGenreAlbumMap;
     };
 
+    /**
+     * Groups albums by their artists' genres
+     * @param {Array} albums - List of albums to group
+     * @returns {Promise<Object>} Map of genres to their respective albums
+     */
     const groupAlbumsByArtistGenre = useCallback(async (albums) => {
         if (!albums?.length) {
             logger.info('MAP011', 'No albums to group');
@@ -107,6 +130,9 @@ export const useAlbumData = () => {
         return finalGenreAlbumMap;
     }, [fetchAndProcessArtistBatches, setIsLoading]);
 
+    /**
+     * Fetches and processes all album data from Spotify
+     */
     const fetchGenreAlbumMap = async () => {
         try {
             const token = await authenticateUser();
@@ -127,6 +153,9 @@ export const useAlbumData = () => {
         }
     };
 
+    /**
+     * Initializes the album data from cache or fetches it from Spotify
+     */
     const initializeData = useCallback(async () => {
         try {
             if (Object.keys(groupedAlbums).length > 0) {
@@ -156,6 +185,9 @@ export const useAlbumData = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showBoundary]);
 
+    /**
+     * Forces a refresh of all album data from Spotify
+     */
     const updateGenreAlbumMap = async () => {
         setIsLoading(true);
         logger.debug('MAP013', 'Updating genre album map from scratch');
@@ -163,6 +195,9 @@ export const useAlbumData = () => {
         setIsLoading(false);
     };
 
+    /**
+     * Clears all cached album data
+     */
     const clearGenreAlbumMap = async () => {
         setGroupedAlbums({});
     };
