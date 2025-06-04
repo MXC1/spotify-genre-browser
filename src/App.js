@@ -21,6 +21,7 @@ import OverlayMenu from './containers/overlayMenu/overlayMenu';
 import { logger } from './utilities/logger';
 import FeedbackContainer from './containers/feedbackContainer/feedbackContainer';
 import { useAlbumData } from './hooks/useAlbumData';
+import { isPublicPath } from './utilities/routeHelpers';
 
 function App() {
   const { clearGenreAlbumMap, initializeData } = useAlbumData();
@@ -31,14 +32,18 @@ function App() {
 
   useEffect(() => {
     logger.debug('SYS001','Environment is', { env: process.env.REACT_APP_ENV });
-    initializeData();
-
+    
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     const state = params.get('state');
-
+    
     if (code && state) {
       goTo(`/genre-album-map`, {code: code, state: state});
+    }
+    
+    // Only initialize data if we're not on a public path
+    if (!isPublicPath(window.location.pathname)) {
+      initializeData();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
