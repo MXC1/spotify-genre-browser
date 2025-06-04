@@ -36,16 +36,8 @@ export const useAlbumData = () => {
         }
     }, [showBoundary, setAlbumProgress]);
 
-    const groupAlbumsByArtistGenre = useCallback(async (albums) => {
-        if (!albums?.length) {
-            logger.info('MAP011', 'No albums to group');
-            setIsLoading(false);
-            return {};
-        }
-
+    const fetchAndProcessArtistBatches = useCallback(async (albums, artistIds) => {
         const genreAlbumMap = {};
-        const artistIds = [...new Set(albums.map(album => album.artists[0].id))];
-
         setArtistProgress({ current: 0, total: artistIds.length });
         logger.info('MAP020', 'Grouping albums by artist genre');
 
@@ -72,6 +64,10 @@ export const useAlbumData = () => {
             await delay(DELAY_MS);
         }
 
+        return genreAlbumMap;
+    }, [setArtistProgress]);
+
+    const combineGenresWithSameAlbums = (genreAlbumMap) => {
         const combinedGenreAlbumMap = new Map();
 
         Object.entries(genreAlbumMap).forEach(([genre, albums]) => {
@@ -93,9 +89,23 @@ export const useAlbumData = () => {
             );
         });
 
+        return finalGenreAlbumMap;
+    };
+
+    const groupAlbumsByArtistGenre = useCallback(async (albums) => {
+        if (!albums?.length) {
+            logger.info('MAP011', 'No albums to group');
+            setIsLoading(false);
+            return {};
+        }
+
+        const artistIds = [...new Set(albums.map(album => album.artists[0].id))];
+        const genreAlbumMap = await fetchAndProcessArtistBatches(albums, artistIds);
+        const finalGenreAlbumMap = combineGenresWithSameAlbums(genreAlbumMap);
+
         logger.info('MAP021', 'Finished grouping albums by artist genre');
         return finalGenreAlbumMap;
-    }, [setArtistProgress, setIsLoading]);
+    }, [fetchAndProcessArtistBatches, setIsLoading]);
 
     const fetchGenreAlbumMap = async () => {
         try {
