@@ -23,6 +23,10 @@ describe('GIVEN I am on the genre grid page', () => {
             cy.get('.genre-grid .genre-section').eq(0).click();
             cy.get('.album-name').eq(0).should('contain.text', 'Test Album Two');
         });
+
+        it('THEN the URL should contain the search parameter', () => {
+            cy.url().should('include', 'genreSearch=rock');
+        });
     });
 
     describe('WHEN I clear the search box', () => {
@@ -38,6 +42,10 @@ describe('GIVEN I am on the genre grid page', () => {
 
             cy.get('.genre-grid .genre-section').eq(0).click();
             cy.get('.album-name').eq(0).should('contain.text', 'Test Album One');
+        });
+
+        it('THEN the URL should not contain the search parameter', () => {
+            cy.url().should('not.include', 'genreSearch=');
         });
     });
 
@@ -71,6 +79,40 @@ describe('GIVEN I am on the genre grid page', () => {
             cy.get('.genre-grid .genre-section').first()
                 .find('.genre-title')
                 .should('have.text', 'slowcore, spoken word');
+        });
+    });
+
+    describe('WHEN I navigate to a genre page with a search', () => {
+        beforeEach(() => {
+            cy.get(`[placeholder="${searchBoxPlaceholder}"]`).click();
+            cy.get(`[placeholder="${searchBoxPlaceholder}"]`).type("rock").should('have.value', "rock");
+            cy.get('.genre-grid .genre-section').eq(0).click();
+        });
+
+        it('THEN the genre page should maintain the search parameter', () => {
+            cy.url().should('include', 'genreSearch=rock');
+        });
+
+        describe('AND I search for an album', () => {
+            beforeEach(() => {
+                cy.get(`[placeholder="Search albums or artists..."]`).type("album");
+            });
+
+            it('THEN the URL should contain both search parameters', () => {
+                cy.url().should('include', 'genreSearch=rock');
+                cy.url().should('include', 'albumSearch=album');
+            });
+
+            describe('AND I clear the album search', () => {
+                beforeEach(() => {
+                    cy.get('.clear-search-button').click();
+                });
+
+                it('THEN only the genre search parameter should remain', () => {
+                    cy.url().should('include', 'genreSearch=rock');
+                    cy.url().should('not.include', 'albumSearch=');
+                });
+            });
         });
     });
 });
