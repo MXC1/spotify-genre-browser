@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useErrorBoundary } from "react-error-boundary";
-import { setCachedEntry, getCachedEntry } from '../utilities/indexedDb';
+import { setCachedEntry, getCachedEntry, clearAllData } from '../utilities/indexedDb';
 import { getArtists, fetchAllSavedAlbums } from '../services/spotifyAPI';
 import { authenticateUser } from "../services/spotifyAuth";
 import { logger } from "../utilities/logger";
@@ -33,15 +33,16 @@ export const useAlbumData = () => {
     /**
      * Fetches all saved albums from Spotify with progress tracking
      * @returns {Promise<Array>} Array of album objects
-     */
-    const fetchAllAlbumsWithProgress = useCallback(async () => {
+     */    const fetchAllAlbumsWithProgress = useCallback(async () => {
         try {
             return await fetchAllSavedAlbums(setAlbumProgress);
         } catch (error) {
-            showBoundary(error);
+            logger.error('MAP012', 'Error fetching saved albums, redirecting to authenticate', { error });
+            await clearAllData();
+            goTo('/authenticate');
             return [];
         }
-    }, [showBoundary, setAlbumProgress]);
+    }, [goTo, setAlbumProgress]);
 
     /**
      * Processes artists in batches to get their genres and map albums
