@@ -12,6 +12,7 @@ async function fetchOrGenerateSessionID() {
 
   sessionID = uuidv4();
   await setCachedEntry('auth', sessionID, 'session_id');
+  logger.info("SYS002", "Generated new session ID", { sessionID });
   return sessionID;
 }
 
