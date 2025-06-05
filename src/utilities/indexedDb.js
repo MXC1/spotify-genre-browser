@@ -22,6 +22,11 @@ export const setCachedEntry = async (store, val, key) => {
   return db.put(store, val, key);
 };
 
+export const removeCachedEntry = async (store, key) => {
+  const db = await dbPromise;
+  return db.delete(store, key);
+};
+
 export const getCachedEntry = async (store, key) => {
   const db = await dbPromise;
   return db.get(store, key);

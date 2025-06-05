@@ -26,27 +26,37 @@ const makeSpotifyRequestWithRetries = async (url, options, maxRetries = 3) => {
 };
 
 export const getMySavedAlbums = async (limit, offset) => {
-  const token = await getOrGenerateNewAccessToken();
-  if (!token) {
-    throw new Error('Access token not found.');
+  try {
+    const token = await getOrGenerateNewAccessToken();
+    if (!token) {
+      throw new Error('Access token not found.');
+    }
+    const options = {
+      params: { limit, offset, album_type: 'album' },
+      headers: { 'Authorization': `Bearer ${token}` },
+    };
+    return await makeSpotifyRequestWithRetries('https://api.spotify.com/v1/me/albums', options);
+  } catch (error) {
+    logger.error('SPOT006', 'Error fetching saved albums', { error, limit, offset });
+    throw error;
   }
-  const options = {
-    params: { limit, offset, album_type: 'album' },
-    headers: { 'Authorization': `Bearer ${token}` },
-  };
-  return await makeSpotifyRequestWithRetries('https://api.spotify.com/v1/me/albums', options);
 };
 
 export const getArtists = async (ids) => {
-  const token = await getOrGenerateNewAccessToken();
-  if (!token) {
-    throw new Error('Access token not found.');
+  try {
+    const token = await getOrGenerateNewAccessToken();
+    if (!token) {
+      throw new Error('Access token not found.');
+    }
+    const options = {
+      params: { ids: ids.join(',') },
+      headers: { 'Authorization': `Bearer ${token}` },
+    };
+    return await makeSpotifyRequestWithRetries('https://api.spotify.com/v1/artists', options);
+  } catch (error) {
+    logger.error('SPOT007', 'Error fetching artists', { error, ids });
+    throw error;
   }
-  const options = {
-    params: { ids: ids.join(',') },
-    headers: { 'Authorization': `Bearer ${token}` },
-  };
-  return await makeSpotifyRequestWithRetries('https://api.spotify.com/v1/artists', options);
 };
 
 const BATCH_SIZE = 50;

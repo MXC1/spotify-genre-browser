@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { setCachedEntry, getCachedEntry } from '../utilities/indexedDb';
+import { setCachedEntry, getCachedEntry, removeCachedEntry } from '../utilities/indexedDb';
 import { logger } from '../utilities/logger';
 
 const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
@@ -52,9 +52,23 @@ export const authenticateUser = async () => {
   if (cachedToken) {
     logger.debug('AUTH020', 'Using cached token', { cachedToken });
     setAccessToken(cachedToken);
+  } else {
+    // Check if we have a refresh token when no access token is found
+    const refreshToken = await getCachedEntry('auth', 'refresh_token');
+    if (refreshToken) {
+      logger.debug('AUTH021', 'No access token found, but refresh token exists. Attempting refresh...');
+      try {
+        const newAccessToken = await refreshAccessToken();
+        if (newAccessToken) {
+          setAccessToken(newAccessToken);
+        }
+      } catch (error) {
+        logger.error('AUTH092', 'Error refreshing token during authentication', { error });
+      }
+    }
   }
 
-  // Check if there’s already a codeVerifier saved in indexedDb
+  // Check if there's already a codeVerifier saved in indexedDb
   const existingCodeVerifier = await getCachedEntry('auth', 'spotify_code_verifier');
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
@@ -69,7 +83,7 @@ export const authenticateUser = async () => {
       throw error;
     }
       
-    await setCachedEntry('auth', null, 'spotify_code_verifier');
+    await removeCachedEntry('auth', 'spotify_code_verifier');
   }
 
   return !!accessToken;
