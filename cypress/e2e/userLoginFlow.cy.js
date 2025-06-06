@@ -10,12 +10,7 @@ describe('GIVEN I visit the app', () => {
 
   beforeEach(() => {
     cy.resetIndexedDb();
-    cy.visit('/', {
-      onBeforeLoad(win) {
-        cy.stub(win.console, 'log').as('consoleLog')
-        cy.stub(win.console, 'error').as('consoleError')
-      }
-    });
+    cy.visitWithConsoleStub('/')
   })
 
   it('THEN the login container should load', () => {
@@ -68,12 +63,7 @@ describe('GIVEN I am logged in', () => {
     cy.resetIndexedDb();
     cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
 
-    cy.visit('/genre-album-map?code=valid_token&state=valid_state', {
-      onBeforeLoad(win) {
-        cy.stub(win.console, 'log').as('consoleLog')
-        cy.stub(win.console, 'error').as('consoleError')
-      }
-    });
+    cy.visitWithConsoleStub('/genre-album-map?code=valid_token&state=valid_state')
 
     cy.wait(["@authToken", "@getMySavedAlbums", "@getArtists"]);
 
@@ -90,9 +80,9 @@ describe('GIVEN I am logged in', () => {
       cy.get('@consoleLog').should('have.been.calledWithMatch',
         /Refreshing access token/);
         
-      cy.get('@consoleError').should('not.have.been.calledWithMatch',
+      cy.get('@consoleLog').should('not.have.been.calledWithMatch',
         /No refresh token found/);
-      cy.get('@consoleError').should('not.have.been.calledWithMatch',
+      cy.get('@consoleLog').should('not.have.been.calledWithMatch',
         /Error refreshing access token/);
     });
   });

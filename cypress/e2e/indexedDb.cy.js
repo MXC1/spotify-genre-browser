@@ -30,11 +30,7 @@ describe("GIVEN /data/grouped_albums is deleted from indexedDb", () => {
         cy.resetIndexedDb();
         cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
 
-        cy.visit("/genre-album-map?code=valid_token&state=valid_state", {
-            onBeforeLoad: (win) => {
-                cy.stub(win.console, "log").as("consoleLog");
-            },
-        });
+        cy.visitWithConsoleStub("/genre-album-map?code=valid_token&state=valid_state");
 
         cy.wait(["@authToken", "@getMySavedAlbums_oneAlbum", "@getArtists_oneArtist"]);
         cy.deleteIndexedDbData("data", "grouped_albums")
@@ -42,7 +38,7 @@ describe("GIVEN /data/grouped_albums is deleted from indexedDb", () => {
         cy.intercept("GET", "https://api.spotify.com/v1/me/albums*", { fixture: "mockGetMySavedAlbumsResponse.json", }).as("getMySavedAlbums");
         cy.intercept("GET", "https://api.spotify.com/v1/artists*", { fixture: "mockGetArtistsResponse.json" }).as("getArtists");
 
-        cy.visit("/genre-album-map?code=valid_token&state=valid_state");
+        cy.visitWithConsoleStub("/genre-album-map?code=valid_token&state=valid_state");
     })
 
     it("THEN new data is fetched from Spotify", () => {
@@ -61,11 +57,7 @@ authFields.forEach((field) => {
             cy.intercept('POST', 'https://accounts.spotify.com/api/token*', { fixture: "mockRefreshTokenResponse.json" }).as('refreshToken');
             cy.deleteIndexedDbData("auth", field);
 
-            cy.visit("/genre-album-map?code=valid_token&state=valid_state", {
-                onBeforeLoad: (win) => {
-                    cy.stub(win.console, "log").as("consoleLog");
-                },
-            });
+            cy.visitWithConsoleStub("/genre-album-map?code=valid_token&state=valid_state");
         });
 
         it("THEN new access token is fetched from the API", () => {
@@ -82,11 +74,7 @@ describe("GIVEN /auth/refresh_token is deleted from indexedDb", () => {
         cy.deleteIndexedDbData("auth", "refresh_token");
         cy.intercept('GET', 'https://api.spotify.com/v1/me/albums*', { statusCode: 401, body: { error: { message: "Request failed with status code 401" } } }).as('getMySavedAlbumsExpired');
 
-        cy.visit("/genre-album-map?code=valid_token&state=valid_state", {
-            onBeforeLoad: (win) => {
-                cy.stub(win.console, "log").as("consoleLog");
-            },
-        });
+        cy.visitWithConsoleStub("/genre-album-map?code=valid_token&state=valid_state");
     })
 
     it("THEN the user is redirected to /authenticate", () => {
@@ -101,11 +89,7 @@ describe("GIVEN /auth/session_id is deleted from indexedDb", () => {
         cy.mockAPIResponsesAndInitialiseAuthenticatedState();
         cy.deleteIndexedDbData("auth", "session_id");
 
-        cy.visit("/genre-album-map?code=valid_token&state=valid_state", {
-            onBeforeLoad: (win) => {
-                cy.stub(win.console, "log").as("consoleLog");
-            },
-        });
+        cy.visitWithConsoleStub("/genre-album-map?code=valid_token&state=valid_state");
     })
 
     it("THEN a new session_id is generated", () => {
