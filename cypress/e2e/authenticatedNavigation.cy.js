@@ -146,11 +146,7 @@ describe('GIVEN I am on the donate page', () => {
 
 describe('GIVEN I am on the feedback page', () => {
     beforeEach(() => {
-        cy.visit('/feedback', {
-            onBeforeLoad: (win) => {
-                cy.stub(win.console, 'log').as('consoleLog');
-            },
-        });
+        cy.visitWithConsoleStub('/feedback');
     });
 
     it('THEN the feedback page should be shown', () => {

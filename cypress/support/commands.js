@@ -32,17 +32,27 @@ Cypress.Commands.add("deleteIndexedDbData", (store, key) => {
 
 Cypress.Commands.add("mockAPIResponsesAndInitialiseAuthenticatedState", () => {
     cy.intercept("POST", "https://kb2nmvou7h.execute-api.eu-west-2.amazonaws.com/dev/auth", { fixture: "mockAuthTokenResponse.json" }).as("authToken");
-    cy.intercept("GET", "https://api.spotify.com/v1/me/albums*", {fixture: "mockGetMySavedAlbumsResponse.json",}).as("getMySavedAlbums");
+    cy.intercept("GET", "https://api.spotify.com/v1/me/albums*", { fixture: "mockGetMySavedAlbumsResponse.json", }).as("getMySavedAlbums");
     cy.intercept("GET", "https://api.spotify.com/v1/artists*", { fixture: "mockGetArtistsResponse.json" }).as("getArtists");
 
     cy.resetIndexedDb();
     cy.setIndexedDbData("auth", "spotify_code_verifier", "valid_code_verifier");
 
-    cy.visit("/genre-album-map?code=valid_token&state=valid_state", {
-        onBeforeLoad: (win) => {
-            cy.stub(win.console, "log").as("consoleLog");
-        },
-    });
+    cy.visitWithConsoleStub("/genre-album-map?code=valid_token&state=valid_state");
 
     cy.wait(["@authToken", "@getMySavedAlbums", "@getArtists"]);
+});
+
+Cypress.Commands.add("visitWithConsoleStub", (url) => {
+    cy.visit(url, {
+        onBeforeLoad: (win) => {
+            const originalLog = win.console.log;
+
+            cy.stub(win.console, "log").callsFake(function (...args) {
+                originalLog.apply(win.console, args);
+
+                return undefined;
+            }).as("consoleLog");
+        }
+    });
 });

@@ -9,7 +9,13 @@ beforeEach(() => {
 function setupBeforeInstallPrompt(win, outcome) {
   // Spy on console.log
   cy.window().then((win) => {
-    cy.spy(win.console, 'log').as('consoleLog');
+    const originalLog = win.console.log;
+
+    cy.stub(win.console, "log").callsFake(function (...args) {
+      originalLog.apply(win.console, args);
+
+      return undefined;
+    }).as("consoleLog");
   });
 
   // Create a mock event with a `prompt` function
@@ -45,12 +51,11 @@ describe('GIVEN I visit the app on a PWA-enabled device', () => {
 
   describe('WHEN the user clicks the install button', () => {
     beforeEach(() => {
-
       cy.get('.menu-button').click();
       cy.get('.menu-item').contains('Install the app').click()
       cy.get('.modal-button').contains('Install').click();
     })
-    
+
     it('THEN the app should be installed', () => {
       cy.get('@consoleLog').should('have.been.calledWithMatch', /Showing install prompt/);
       cy.get('@consoleLog').should('have.been.calledWithMatch', /Install prompt decision/);
@@ -78,17 +83,17 @@ describe('GIVEN I visit the app on a PWA-enabled device', () => {
       cy.get('.menu-item').contains('Install the app').should('exist');
     });
   });
-  
+
   describe('WHEN the installation fails', () => {
     beforeEach(() => {
       cy.get('.menu-button').click();
       cy.get('.menu-item').contains('Install the app').click();
-    
+
       // Simulate an error during the installation process
       cy.get('@promptStub').then((promptStub) => {
         promptStub.throws(new Error('PWA Error'));
       });
-    
+
       cy.get('.modal-button').contains('Install').click();
     });
 
@@ -150,15 +155,15 @@ describe('GIVEN the user dismisses the beforeinstallprompt event', () => {
       cy.log(`beforeinstallprompt event dispatched: ${event.type}`);
     });
   });
-  
+
   it('THEN the app should log the dismissal', () => {
     cy.get('.menu-button').click();
     cy.get('.menu-item').contains('Install the app').click();
     cy.get('.modal-button').contains('Install').click();
-      cy.get('@consoleLog').should('have.been.calledWithMatch', /Showing install prompt/);
-      cy.get('@consoleLog').should('have.been.calledWithMatch', /Install prompt decision/);
-      cy.get('@consoleLog').should('have.been.calledWithMatch',
-        /Install prompt decision/,
-        Cypress.sinon.match.has('action', 'dismissed'));
+    cy.get('@consoleLog').should('have.been.calledWithMatch', /Showing install prompt/);
+    cy.get('@consoleLog').should('have.been.calledWithMatch', /Install prompt decision/);
+    cy.get('@consoleLog').should('have.been.calledWithMatch',
+      /Install prompt decision/,
+      Cypress.sinon.match.has('action', 'dismissed'));
   });
 });
