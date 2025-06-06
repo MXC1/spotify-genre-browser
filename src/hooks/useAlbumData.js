@@ -202,12 +202,11 @@ export const useAlbumData = () => {
         setIsLoading(true);
         logger.debug('MAP013', 'Updating genre album map from scratch');
         try {
-            await clearAllData();
+            await fetchGenreAlbumMap();
         } catch (error) {
-            logger.error('MAP015', 'Error clearing cached data', { error });
+            logger.error('MAP015', 'Error updating genre album map', { error });
             throw error;
         }
-        await fetchGenreAlbumMap();
         setIsLoading(false);
     };
 
