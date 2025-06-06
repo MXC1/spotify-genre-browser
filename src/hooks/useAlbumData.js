@@ -37,7 +37,7 @@ export const useAlbumData = () => {
         try {
             return await fetchAllSavedAlbums(setAlbumProgress);
         } catch (error) {
-            logger.error('MAP012', 'Error fetching saved albums, redirecting to authenticate', { error });
+            logger.error('MAP012', 'Error fetching saved albums, redirecting to auth', { error });
             await clearAllData();
             goTo('/authenticate');
             return [];
@@ -49,37 +49,43 @@ export const useAlbumData = () => {
      * @param {Array} albums - List of albums to process
      * @param {Array} artistIds - List of unique artist IDs
      * @returns {Object} Map of genres to their respective albums
-     */
-    const fetchAndProcessArtistBatches = useCallback(async (albums, artistIds) => {
+     */    const fetchAndProcessArtistBatches = useCallback(async (albums, artistIds) => {
         const genreAlbumMap = {};
         setArtistProgress({ current: 0, total: artistIds.length });
         logger.info('MAP020', 'Grouping albums by artist genre');
 
-        for (let i = 0; i < artistIds.length; i += BATCH_SIZE) {
-            const batch = artistIds.slice(i, i + BATCH_SIZE);
-            const { artists } = await getArtists(batch);
+        try {
+            for (let i = 0; i < artistIds.length; i += BATCH_SIZE) {
+                const batch = artistIds.slice(i, i + BATCH_SIZE);
+                const { artists } = await getArtists(batch);
 
-            artists.forEach(artist => {
-                const genres = artist.genres.length > 0 ? artist.genres : ['[Unknown Genre]'];
-                const artistAlbums = albums.filter(album => album.artists[0].id === artist.id);
-                
-                genres.forEach(genre => {
-                    if (!genreAlbumMap[genre]) {
-                        genreAlbumMap[genre] = [];
-                    }
-                    genreAlbumMap[genre].push(...artistAlbums);
+                artists.forEach(artist => {
+                    const genres = artist.genres.length > 0 ? artist.genres : ['[Unknown Genre]'];
+                    const artistAlbums = albums.filter(album => album.artists[0].id === artist.id);
+                    
+                    genres.forEach(genre => {
+                        if (!genreAlbumMap[genre]) {
+                            genreAlbumMap[genre] = [];
+                        }
+                        genreAlbumMap[genre].push(...artistAlbums);
+                    });
                 });
-            });
-            
-            setArtistProgress({ 
-                current: Math.min(i + BATCH_SIZE, artistIds.length), 
-                total: artistIds.length 
-            });
-            await delay(DELAY_MS);
-        }
+                
+                setArtistProgress({ 
+                    current: Math.min(i + BATCH_SIZE, artistIds.length), 
+                    total: artistIds.length 
+                });
+                await delay(DELAY_MS);
+            }
 
-        return genreAlbumMap;
-    }, [setArtistProgress]);
+            return genreAlbumMap;
+        } catch (error) {
+            logger.error('MAP012', 'Error fetching artist data, redirecting to authenticate', { error });
+            await clearAllData();
+            goTo('/authenticate');
+            return {};
+        }
+    }, [setArtistProgress, goTo]);
 
     /**
      * Combines genres that have the exact same albums into a single genre
@@ -149,8 +155,7 @@ export const useAlbumData = () => {
             setGroupedAlbums(grouped);
             await setCachedEntry("data", grouped, "grouped_albums");
         } catch (error) {
-            logger.error("MAP094", "Error initializing data", { error });
-            showBoundary(error);
+            throw error; 
         } finally {
             setIsLoading(false); 
         }
@@ -181,8 +186,10 @@ export const useAlbumData = () => {
         } catch (error) {
             setIsSyncing(false);
             setIsLoading(false);
-            logger.error("MAP094", "Error initializing data", { error });
-            showBoundary(error);
+            logger.error("MAP094", "Error initializing data, redirecting to auth", { error });
+            await clearAllData();
+            goTo('/authenticate');
+            return;
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -194,6 +201,12 @@ export const useAlbumData = () => {
     const updateGenreAlbumMap = async () => {
         setIsLoading(true);
         logger.debug('MAP013', 'Updating genre album map from scratch');
+        try {
+            await clearAllData();
+        } catch (error) {
+            logger.error('MAP015', 'Error clearing cached data', { error });
+            throw error;
+        }
         await fetchGenreAlbumMap();
         setIsLoading(false);
     };

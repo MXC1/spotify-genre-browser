@@ -97,7 +97,6 @@ export const fetchAllSavedAlbums = async (onProgress) => {
         logger.debug('MAP002', 'Fetched all saved albums');
         return allAlbums;
     } catch (error) {
-        logger.error('MAP095', 'Error fetching saved albums', { error });
         throw error;
     }
 };
