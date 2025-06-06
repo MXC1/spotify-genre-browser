@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useErrorBoundary } from "react-error-boundary";
 import { setCachedEntry, getCachedEntry, clearAllData } from '../utilities/indexedDb';
 import { getArtists, fetchAllSavedAlbums } from '../services/spotifyAPI';
 import { authenticateUser } from "../services/spotifyAuth";
