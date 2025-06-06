@@ -27,7 +27,6 @@ export const useAlbumData = () => {
     const [isSyncing, setIsSyncing] = useIsSyncing();
     const [albumProgress, setAlbumProgress] = useAlbumProgress();
     const [artistProgress, setArtistProgress] = useArtistProgress();
-    const { showBoundary } = useErrorBoundary();
     const { goTo } = useNavigationHelpers();
 
     /**
@@ -193,7 +192,7 @@ export const useAlbumData = () => {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [showBoundary]);
+    }, []);
 
     /**
      * Forces a refresh of all album data from Spotify
