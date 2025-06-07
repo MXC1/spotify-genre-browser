@@ -1,7 +1,6 @@
 import { getCachedEntry, setCachedEntry } from './indexedDb';
 import { v4 as uuidv4 } from 'uuid';
 import { LogLevel } from "./LogLevel";
-import { LogPayload } from "./logPayload";
 
 let sessionID: string;
 
@@ -62,6 +61,15 @@ async function logMessage(level: string, message: string, event_id: string | nul
 
   logToCloudWatch(logPayload);
 }
+
+type LogPayload = {
+  timestamp: string;
+  level: string;
+  session_id: string;
+  message: string;
+  event_id: string | null;
+  context?: Record<string, unknown>;
+};
 
 // -- Public API --
 export const logger = {
