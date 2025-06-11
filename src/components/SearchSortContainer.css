@@ -68,6 +68,17 @@
   color: #ffffff;
   font-size: 16px;
   white-space: nowrap;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.sort-filter-button.filter-active {
+  background-color: rgb(73, 73, 73);
+  transform: scale(1.05);
+}
+
+.sort-filter-button.filter-active:hover {
+  background-color: rgb(73, 73, 73);
 }
 
 .sort-filter-button:hover {

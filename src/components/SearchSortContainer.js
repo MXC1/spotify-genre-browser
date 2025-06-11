@@ -15,6 +15,12 @@ function SearchSortContainer({
   filterStrings = [], 
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('');
+
+  const handleFilterChange = (filterString) => {
+    setActiveFilter(filterString);
+    onFilterStringChange?.(filterString);
+  };
 
   return (
     <>
@@ -40,7 +46,7 @@ function SearchSortContainer({
           )}
         </div>
         <button
-          className="sort-filter-button"
+          className={`sort-filter-button ${activeFilter ? 'filter-active' : ''}`}
           onClick={() => setIsModalOpen(true)}
           aria-label="Open sort and filter options"
         >
@@ -53,7 +59,7 @@ function SearchSortContainer({
         sortOptions={sortOptions}
         selectedSortOption={selectedSortOption}
         onSortOptionChange={onSortOptionChange}
-        onFilterStringChange={onFilterStringChange}
+        onFilterStringChange={handleFilterChange}
         filterStrings={filterStrings}
       />
     </>
