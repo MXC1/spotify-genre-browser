@@ -114,4 +114,37 @@ describe('GIVEN I am on the genre grid page', () => {
             });
         });
     });
+
+    describe("WHEN I filter by tag", () => {
+        beforeEach(() => {
+            cy.get(".sort-filter-button").click();
+            cy.get(".tag").contains("three").click();
+            cy.get(".modal-button").contains("Apply").click();
+        })
+    
+        it("THEN the genre grid should be filtered by the selected tag", () => {
+            cy.get('.genre-section').should('have.length', 1);
+            cy.get('.genre-grid .genre-section').eq(0).find('.genre-title').should('contain.text', 'slowcore');
+            cy.get('.genre-grid .genre-section').eq(0).click();
+            cy.get('.album-name').eq(0).should('contain.text', 'Test Album One');
+        });
+
+        it("THEN the tag should be retained", () => {
+            cy.get(".sort-filter-button").click();
+            cy.get(".tag.selected").should('contain.text', 'three');
+        })
+
+        describe("AND I clear the tag filter", () => {
+            beforeEach(() => {
+                cy.get(".sort-filter-button").click();
+                cy.get(".tag.selected").click();
+                cy.get(".modal-button").contains("Apply").click();
+            });
+
+            it("THEN the genre grid should show all genres again", () => {
+                cy.get('.genre-section').should('have.length', 2);
+                cy.get('.genre-grid .genre-section').eq(1).find('.genre-title').should('contain.text', 'art rock, alternative rock');
+            });
+        });
+    });
 });
