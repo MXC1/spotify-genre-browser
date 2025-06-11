@@ -58,25 +58,21 @@
   color: #fff;
 }
 
-.sort-dropdown {
+.sort-filter-button {
   padding: 10px;
   border: none;
-  border-radius: 10px;
+  border-radius: 50px;
   background-color: #282828;
   color: #ffffff;
   font-size: 16px;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  transition: background-color 0.3s ease;
+  white-space: nowrap;
 }
 
-.sort-dropdown:focus {
+.sort-filter-button:hover {
   background-color: #3e3e3e;
+  transform: scale(1.05);
 }
 
-.sort-dropdown option {
-  background-color: #121212;
-  color: #ffffff;
+.sort-filter-button:active {
+  transform: scale(0.95);
 }

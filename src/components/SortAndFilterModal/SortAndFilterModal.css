@@ -1,0 +1,23 @@
+.sort-filter-content {
+    padding: 20px;
+    background-color: #282828;
+    border-radius: 30px;
+    margin: 20px 0;
+    min-height: 300px;
+    width: 100%;
+    max-width: 800px;
+    box-sizing: border-box;
+}
+
+/* Override some modal container styles */
+.modal-content {
+    background-color: #121212 !important;
+    max-width: 90vw !important;
+    width: 90vw !important;
+    max-height: 90vh !important;
+    overflow-y: auto;
+}
+
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
