@@ -14,8 +14,24 @@ const GenreGridContainer = () => {
   const genreSearch = params.get("genreSearch") || '';
   const [searchQuery, setSearchQuery] = useState(genreSearch || '');
   const [sortOption, setSortOption] = useState('number-desc');
+  const [filterString, setFilterString] = useState('');
   const { goTo } = useNavigationHelpers();
   const navigate = useNavigate();
+
+  // Extract all unique strings from groupedAlbums
+  const allStrings = React.useMemo(() => {
+    if (!groupedAlbums) return [];
+    
+    const strings = new Set();
+    Object.entries(groupedAlbums).forEach(([genre, albums]) => {
+      strings.add(genre.toLowerCase());
+      albums.forEach(album => {
+        strings.add(album.name.toLowerCase());
+        album.artists.forEach(artist => strings.add(artist.name.toLowerCase()));
+      });
+    });
+    return Array.from(strings);
+  }, [groupedAlbums]);
 
   const handleSearchChange = (query) => {
     setSearchQuery(query);
@@ -35,13 +51,22 @@ const GenreGridContainer = () => {
     }
   }, [navigate]);
 
-  const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) =>
-    genre.toLowerCase().includes(searchQuery) ||
-    albums.some(album =>
-      album.name.toLowerCase().includes(searchQuery) ||
-      album.artists.some(artist => artist.name.toLowerCase().includes(searchQuery))
-    )
-  );
+  const filteredGenres = Object.entries(groupedAlbums || {}).filter(([genre, albums]) => {
+    const matchesSearch = genre.toLowerCase().includes(searchQuery) ||
+      albums.some(album =>
+        album.name.toLowerCase().includes(searchQuery) ||
+        album.artists.some(artist => artist.name.toLowerCase().includes(searchQuery))
+      );
+    
+    const matchesFilter = !filterString || 
+      genre.toLowerCase().includes(filterString.toLowerCase()) ||
+      albums.some(album =>
+        album.name.toLowerCase().includes(filterString.toLowerCase()) ||
+        album.artists.some(artist => artist.name.toLowerCase().includes(filterString.toLowerCase()))
+      );
+
+    return matchesSearch && matchesFilter;
+  });
 
   const sortedGenres = filteredGenres.sort((a, b) => {
     if (sortOption === 'alphabetical-asc') {
@@ -88,10 +113,12 @@ const GenreGridContainer = () => {
             <SearchSortContainer
               onSearchQueryChange={handleSearchChange}
               onSortOptionChange={setSortOption}
+              onFilterStringChange={setFilterString}
               selectedSortOption={sortOption}
               placeholderText="Search genres, albums, and artists..."
               sortOptions={sortOptions}
               searchQuery={searchQuery}
+              filterStrings={allStrings}
             />
             <div className="genre-grid">
               {sortedGenres.map(([genre, albums], index) => (

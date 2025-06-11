@@ -49,14 +49,11 @@ describe('GIVEN I am on the genre grid page', () => {
         });
     });
 
-    it('THEN there should be a sorting dropdown', () => {
-        cy.get('.sort-dropdown').should('exist');
-        cy.get('.sort-dropdown').should('have.value', 'number-desc');
-    });
-
     describe('WHEN I sort alphabetically', () => {
         beforeEach(() => {
-            cy.get('.sort-dropdown').select('alphabetical-asc');
+            cy.get(".sort-filter-button").click();
+            cy.get(".sort-option").contains("A-Z (Genre)").click();
+            cy.get(".modal-button").contains("Apply").click();
         });
 
         it('THEN the genre grid should be sorted alphabetically', () => {
@@ -70,7 +67,9 @@ describe('GIVEN I am on the genre grid page', () => {
 
     describe('WHEN I sort reverse alphabetically', () => {
         beforeEach(() => {
-            cy.get('.sort-dropdown').select('alphabetical-desc');
+            cy.get(".sort-filter-button").click();
+            cy.get(".sort-option").contains("Z-A (Genre)").click();
+            cy.get(".modal-button").contains("Apply").click();
         });
 
         it('THEN the genre grid should be sorted reverse alphabetically', () => {
@@ -112,6 +111,39 @@ describe('GIVEN I am on the genre grid page', () => {
                     cy.url().should('include', 'genreSearch=rock');
                     cy.url().should('not.include', 'albumSearch=');
                 });
+            });
+        });
+    });
+
+    describe("WHEN I filter by tag", () => {
+        beforeEach(() => {
+            cy.get(".sort-filter-button").click();
+            cy.get(".tag").contains("three").click();
+            cy.get(".modal-button").contains("Apply").click();
+        })
+    
+        it("THEN the genre grid should be filtered by the selected tag", () => {
+            cy.get('.genre-section').should('have.length', 1);
+            cy.get('.genre-grid .genre-section').eq(0).find('.genre-title').should('contain.text', 'slowcore');
+            cy.get('.genre-grid .genre-section').eq(0).click();
+            cy.get('.album-name').eq(0).should('contain.text', 'Test Album One');
+        });
+
+        it("THEN the tag should be retained", () => {
+            cy.get(".sort-filter-button").click();
+            cy.get(".tag.selected").should('contain.text', 'three');
+        })
+
+        describe("AND I clear the tag filter", () => {
+            beforeEach(() => {
+                cy.get(".sort-filter-button").click();
+                cy.get(".tag.selected").click();
+                cy.get(".modal-button").contains("Apply").click();
+            });
+
+            it("THEN the genre grid should show all genres again", () => {
+                cy.get('.genre-section').should('have.length', 2);
+                cy.get('.genre-grid .genre-section').eq(1).find('.genre-title').should('contain.text', 'art rock, alternative rock');
             });
         });
     });

@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import SearchSortContainer from "../../components/SearchSortContainer";
 import "./genreContainer.css";
@@ -20,8 +21,22 @@ function GenreContainer() {
 
     const [searchQuery, setSearchQuery] = useState(albumSearch || "");
     const [sortOption, setSortOption] = useState("alphabetical-asc-artist");
+    const [filterString, setFilterString] = useState("");
 
     const albums = groupedAlbums?.[genre] || [];
+
+    // Extract all unique strings from albums
+    const allStrings = React.useMemo(() => {
+        const currentAlbums = groupedAlbums?.[genre] || [];
+        if (!currentAlbums.length) return [];
+        
+        const strings = new Set();
+        currentAlbums.forEach(album => {
+            strings.add(album.name.toLowerCase());
+            album.artists.forEach(artist => strings.add(artist.name.toLowerCase()));
+        });
+        return Array.from(strings);
+    }, [groupedAlbums, genre]);
 
     const sortOptions = [
         { value: "alphabetical-asc-album", label: "A-Z (Album)" },
@@ -31,11 +46,20 @@ function GenreContainer() {
     ];
 
     const filteredAlbums = albums.filter(
-        (album) =>
-            album.name.toLowerCase().includes(searchQuery) ||
-            album.artists.some((artist) =>
-                artist.name.toLowerCase().includes(searchQuery)
-            )
+        (album) => {
+            const matchesSearch = album.name.toLowerCase().includes(searchQuery) ||
+                album.artists.some((artist) =>
+                    artist.name.toLowerCase().includes(searchQuery)
+                );
+            
+            const matchesFilter = !filterString ||
+                album.name.toLowerCase().includes(filterString.toLowerCase()) ||
+                album.artists.some((artist) =>
+                    artist.name.toLowerCase().includes(filterString.toLowerCase())
+                );
+
+            return matchesSearch && matchesFilter;
+        }
     );
 
     const sortedAlbums = filteredAlbums.sort((a, b) => {
@@ -69,10 +93,12 @@ function GenreContainer() {
             <SearchSortContainer
                 onSearchQueryChange={handleSearchChange}
                 onSortOptionChange={setSortOption}
+                onFilterStringChange={setFilterString}
                 selectedSortOption={sortOption}
                 placeholderText="Search albums or artists..."
                 sortOptions={sortOptions}
-                searchQuery={searchQuery} 
+                searchQuery={searchQuery}
+                filterStrings={allStrings}
             />
             <div className="big-genre-title-container" onClick={() => goTo('/genre-album-map', { genreSearch })}>
                 <button className="back-button">

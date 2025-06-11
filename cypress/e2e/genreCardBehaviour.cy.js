@@ -70,7 +70,9 @@ describe("GIVEN I am on the genre grid page", () => {
 
     describe("WHEN I change the sort option", () => {
       beforeEach(() => {
-        cy.get(".sort-dropdown").select("alphabetical-desc-artist");
+        cy.get(".sort-filter-button").click();
+        cy.get(".sort-option").contains("Z-A (Album)").click();
+        cy.get(".modal-button").contains("Apply").click();
       });
 
       it("THEN the order of the albums changes", () => {
