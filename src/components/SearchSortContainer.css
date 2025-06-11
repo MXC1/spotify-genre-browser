@@ -59,6 +59,8 @@
 }
 
 .sort-filter-button {
+  width: 100%;
+  max-width: 70px;
   padding: 10px;
   border: none;
   border-radius: 50px;

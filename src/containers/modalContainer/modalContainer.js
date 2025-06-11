@@ -1,5 +1,6 @@
-import React from 'react';
 import './modalContainer.css';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function ModalContainer({ isOpen, onClose, title, description, button1Text, button1Action, button2Text, button2Action }) {
     if (!isOpen) return null;
@@ -7,7 +8,9 @@ function ModalContainer({ isOpen, onClose, title, description, button1Text, butt
     return (
         <div className="modal-overlay">
             <div className="modal-content">
-                <button className="close-modal-button" onClick={onClose}>X</button>
+                <button className="close-modal-button" onClick={onClose}>
+                    <FontAwesomeIcon icon={faXmark} />
+                </button>
                 <h2 className="modal-title">{title}</h2>
                 <p className="modal-description">{description}</p>
                 <div className="modal-buttons">

@@ -13,16 +13,16 @@
 
 .modal-content {
   background: black;
-  padding: 2rem;
-  margin: 0 2rem;
+  padding: 30px;
+  margin: 0 40px;
   border-radius: 30px;
   position: relative;
 }
 
 .close-modal-button {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 20px;
+  right: 20px;
   background: none;
   border: none;
   font-size: 1.5rem;

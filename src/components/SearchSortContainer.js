@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./SearchSortContainer.css";
 import SortAndFilterModal from "./SortAndFilterModal/SortAndFilterModal";
+import { faSliders } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function SearchSortContainer({
   onSearchQueryChange,
@@ -40,7 +42,7 @@ function SearchSortContainer({
           onClick={() => setIsModalOpen(true)}
           aria-label="Open sort and filter options"
         >
-          Sort & Filter
+          <FontAwesomeIcon icon={faSliders} size="lg"/>
         </button>
       </div>
       <SortAndFilterModal 
