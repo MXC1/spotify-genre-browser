@@ -49,14 +49,11 @@ describe('GIVEN I am on the genre grid page', () => {
         });
     });
 
-    it('THEN there should be a sorting dropdown', () => {
-        cy.get('.sort-dropdown').should('exist');
-        cy.get('.sort-dropdown').should('have.value', 'number-desc');
-    });
-
     describe('WHEN I sort alphabetically', () => {
         beforeEach(() => {
-            cy.get('.sort-dropdown').select('alphabetical-asc');
+            cy.get(".sort-filter-button").click();
+            cy.get(".sort-option").contains("A-Z (Genre)").click();
+            cy.get(".modal-button").contains("Apply").click();
         });
 
         it('THEN the genre grid should be sorted alphabetically', () => {
@@ -70,7 +67,9 @@ describe('GIVEN I am on the genre grid page', () => {
 
     describe('WHEN I sort reverse alphabetically', () => {
         beforeEach(() => {
-            cy.get('.sort-dropdown').select('alphabetical-desc');
+            cy.get(".sort-filter-button").click();
+            cy.get(".sort-option").contains("Z-A (Genre)").click();
+            cy.get(".modal-button").contains("Apply").click();
         });
 
         it('THEN the genre grid should be sorted reverse alphabetically', () => {

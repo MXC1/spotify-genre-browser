@@ -35,7 +35,7 @@ function SortAndFilterModal({
         'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know',
         'take', 'people', 'into', 'year', 'your', 'good', 'some',
         'could', 'them', 'see', 'other', 'than', 'then', 'now',
-        'look', 'only', 'come', 'its', 'over', 'think', 'also',
+        'look', 'only', 'come', 'its', 'it\'s', 'over', 'think', 'also',
         'back', 'after', 'use', 'two', 'how', 'our', 'work',
         'first', 'well', 'way', 'even', 'want', 'because',
         'any', 'these', 'give', 'day', 'most', 'us', 'don\'t', 'is'
@@ -47,7 +47,8 @@ function SortAndFilterModal({
             acc[curr] = (acc[curr] || 0) + 1;
             return acc;
         }, {});
-    };    // Get common phrases and words
+    };    
+
     const commonPhrases = React.useMemo(() => {
         // Function to generate n-grams from a string
         const generateNGrams = (str, n) => {
