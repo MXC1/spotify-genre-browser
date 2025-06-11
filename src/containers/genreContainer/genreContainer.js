@@ -27,15 +27,16 @@ function GenreContainer() {
 
     // Extract all unique strings from albums
     const allStrings = React.useMemo(() => {
-        if (!albums) return [];
+        const currentAlbums = groupedAlbums?.[genre] || [];
+        if (!currentAlbums.length) return [];
         
         const strings = new Set();
-        albums.forEach(album => {
+        currentAlbums.forEach(album => {
             strings.add(album.name.toLowerCase());
             album.artists.forEach(artist => strings.add(artist.name.toLowerCase()));
         });
         return Array.from(strings);
-    }, [albums]);
+    }, [groupedAlbums, genre]);
 
     const sortOptions = [
         { value: "alphabetical-asc-album", label: "A-Z (Album)" },

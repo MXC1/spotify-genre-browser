@@ -24,10 +24,8 @@ function SortAndFilterModal({
         if (onFilterStringChange) {
             onFilterStringChange(newTag || '');
         }
-    };
-
-    // List of common stop words to filter out
-    const stopWords = new Set([
+    };    // Memoize the stop words set
+    const stopWords = React.useMemo(() => new Set([
         'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have',
         'i', 'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you',
         'do', 'at', 'this', 'but', 'his', 'by', 'from', 'they',
@@ -39,27 +37,9 @@ function SortAndFilterModal({
         'could', 'them', 'see', 'other', 'than', 'then', 'now',
         'look', 'only', 'come', 'its', 'over', 'think', 'also',
         'back', 'after', 'use', 'two', 'how', 'our', 'work',
-        'first', 'well', 'way', 'even', 'new', 'want', 'because',
+        'first', 'well', 'way', 'even', 'want', 'because',
         'any', 'these', 'give', 'day', 'most', 'us', 'don\'t', 'is'
-    ]);
-
-    // Function to generate n-grams from a string
-    const generateNGrams = (str, n) => {
-        const words = str.toLowerCase()
-            .split(/[\s-]+/)
-            .filter(word => !stopWords.has(word) && word.length > 1);
-        
-        const ngrams = [];
-        for (let i = 0; i <= words.length - n; i++) {
-            const phrase = words.slice(i, i + n).join(' ');
-            // Only add phrase if it doesn't start or end with a stop word
-            const phraseWords = phrase.split(' ');
-            if (!stopWords.has(phraseWords[0]) && !stopWords.has(phraseWords[phraseWords.length - 1])) {
-                ngrams.push(phrase);
-            }
-        }
-        return ngrams;
-    };
+    ]), []);
 
     // Function to count occurrences
     const countOccurrences = (arr) => {
@@ -67,10 +47,26 @@ function SortAndFilterModal({
             acc[curr] = (acc[curr] || 0) + 1;
             return acc;
         }, {});
-    };
-
-    // Get common phrases and words
+    };    // Get common phrases and words
     const commonPhrases = React.useMemo(() => {
+        // Function to generate n-grams from a string
+        const generateNGrams = (str, n) => {
+            const words = str.toLowerCase()
+                .split(/[\s-]+/)
+                .filter(word => !stopWords.has(word) && word.length > 1);
+            
+            const ngrams = [];
+            for (let i = 0; i <= words.length - n; i++) {
+                const phrase = words.slice(i, i + n).join(' ');
+                // Only add phrase if it doesn't start or end with a stop word
+                const phraseWords = phrase.split(' ');
+                if (!stopWords.has(phraseWords[0]) && !stopWords.has(phraseWords[phraseWords.length - 1])) {
+                    ngrams.push(phrase);
+                }
+            }
+            return ngrams;
+        };
+
         // Process all strings
         const allWords = [];
         const bigrams = [];
@@ -109,7 +105,7 @@ function SortAndFilterModal({
         .map(([phrase]) => phrase);
 
         return allPhrases;
-    }, [filterStrings]);
+    }, [filterStrings, stopWords]);
 
     return (
         <ModalContainer
