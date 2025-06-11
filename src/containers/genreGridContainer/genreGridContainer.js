@@ -18,6 +18,21 @@ const GenreGridContainer = () => {
   const { goTo } = useNavigationHelpers();
   const navigate = useNavigate();
 
+  // Extract all unique strings from groupedAlbums
+  const allStrings = React.useMemo(() => {
+    if (!groupedAlbums) return [];
+    
+    const strings = new Set();
+    Object.entries(groupedAlbums).forEach(([genre, albums]) => {
+      strings.add(genre.toLowerCase());
+      albums.forEach(album => {
+        strings.add(album.name.toLowerCase());
+        album.artists.forEach(artist => strings.add(artist.name.toLowerCase()));
+      });
+    });
+    return Array.from(strings);
+  }, [groupedAlbums]);
+
   const handleSearchChange = (query) => {
     setSearchQuery(query);
     const params = new URLSearchParams(location.search);
@@ -103,6 +118,7 @@ const GenreGridContainer = () => {
               placeholderText="Search genres, albums, and artists..."
               sortOptions={sortOptions}
               searchQuery={searchQuery}
+              filterStrings={allStrings}
             />
             <div className="genre-grid">
               {sortedGenres.map(([genre, albums], index) => (

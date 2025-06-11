@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import SearchSortContainer from "../../components/SearchSortContainer";
 import "./genreContainer.css";
@@ -23,6 +24,18 @@ function GenreContainer() {
     const [filterString, setFilterString] = useState("");
 
     const albums = groupedAlbums?.[genre] || [];
+
+    // Extract all unique strings from albums
+    const allStrings = React.useMemo(() => {
+        if (!albums) return [];
+        
+        const strings = new Set();
+        albums.forEach(album => {
+            strings.add(album.name.toLowerCase());
+            album.artists.forEach(artist => strings.add(artist.name.toLowerCase()));
+        });
+        return Array.from(strings);
+    }, [albums]);
 
     const sortOptions = [
         { value: "alphabetical-asc-album", label: "A-Z (Album)" },
@@ -83,7 +96,8 @@ function GenreContainer() {
                 selectedSortOption={sortOption}
                 placeholderText="Search albums or artists..."
                 sortOptions={sortOptions}
-                searchQuery={searchQuery} 
+                searchQuery={searchQuery}
+                filterStrings={allStrings}
             />
             <div className="big-genre-title-container" onClick={() => goTo('/genre-album-map', { genreSearch })}>
                 <button className="back-button">

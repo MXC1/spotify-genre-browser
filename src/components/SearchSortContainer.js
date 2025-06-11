@@ -12,6 +12,7 @@ function SearchSortContainer({
   sortOptions,
   selectedSortOption,
   searchQuery, 
+  filterStrings = [], 
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -53,6 +54,7 @@ function SearchSortContainer({
         selectedSortOption={selectedSortOption}
         onSortOptionChange={onSortOptionChange}
         onFilterStringChange={onFilterStringChange}
+        filterStrings={filterStrings}
       />
     </>
   );
