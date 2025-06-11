@@ -48,6 +48,9 @@ function SearchSortContainer({
       <SortAndFilterModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        sortOptions={sortOptions}
+        selectedSortOption={selectedSortOption}
+        onSortOptionChange={onSortOptionChange}
       />
     </>
   );
