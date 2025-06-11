@@ -20,6 +20,7 @@ function GenreContainer() {
 
     const [searchQuery, setSearchQuery] = useState(albumSearch || "");
     const [sortOption, setSortOption] = useState("alphabetical-asc-artist");
+    const [filterString, setFilterString] = useState("");
 
     const albums = groupedAlbums?.[genre] || [];
 
@@ -31,11 +32,20 @@ function GenreContainer() {
     ];
 
     const filteredAlbums = albums.filter(
-        (album) =>
-            album.name.toLowerCase().includes(searchQuery) ||
-            album.artists.some((artist) =>
-                artist.name.toLowerCase().includes(searchQuery)
-            )
+        (album) => {
+            const matchesSearch = album.name.toLowerCase().includes(searchQuery) ||
+                album.artists.some((artist) =>
+                    artist.name.toLowerCase().includes(searchQuery)
+                );
+            
+            const matchesFilter = !filterString ||
+                album.name.toLowerCase().includes(filterString.toLowerCase()) ||
+                album.artists.some((artist) =>
+                    artist.name.toLowerCase().includes(filterString.toLowerCase())
+                );
+
+            return matchesSearch && matchesFilter;
+        }
     );
 
     const sortedAlbums = filteredAlbums.sort((a, b) => {
@@ -69,6 +79,7 @@ function GenreContainer() {
             <SearchSortContainer
                 onSearchQueryChange={handleSearchChange}
                 onSortOptionChange={setSortOption}
+                onFilterStringChange={setFilterString}
                 selectedSortOption={sortOption}
                 placeholderText="Search albums or artists..."
                 sortOptions={sortOptions}

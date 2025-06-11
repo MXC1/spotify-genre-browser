@@ -94,3 +94,27 @@
 .sort-option input[type="radio"]:checked + span {
     color: #ffffff;
 }
+
+.word-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1rem;
+}
+
+.tag {
+    background-color: #282828;
+    padding: 6px 12px;
+    border-radius: 16px;
+    color: #b3b3b3;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.tag.selected {
+    background-color: #3e3e3e;
+    color: #ffffff;
+    border-color: #1db954;
+}

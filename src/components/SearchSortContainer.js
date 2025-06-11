@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 function SearchSortContainer({
   onSearchQueryChange,
   onSortOptionChange,
+  onFilterStringChange,
   placeholderText,
   sortOptions,
   selectedSortOption,
@@ -51,6 +52,7 @@ function SearchSortContainer({
         sortOptions={sortOptions}
         selectedSortOption={selectedSortOption}
         onSortOptionChange={onSortOptionChange}
+        onFilterStringChange={onFilterStringChange}
       />
     </>
   );
