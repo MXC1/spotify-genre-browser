@@ -8,6 +8,7 @@ permissions:
   actions: read
 jobs:
   cypress-run:
+    name: cypress-run
     runs-on: ubuntu-latest
     env:
       REACT_APP_ENV: ${{ secrets.REACT_APP_ENV }}
