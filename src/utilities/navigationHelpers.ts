@@ -6,7 +6,7 @@ export const useNavigationHelpers = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const goTo = (path, params={}) => {
+  const goTo = (path: string, params: any = {}) => {
     if (location.pathname !== path || Object.keys(params).length > 0) {
       logger.info('NAV001', 'Navigating to:', { path, params });
       const queryString = new URLSearchParams(params).toString();

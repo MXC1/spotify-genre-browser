@@ -1,8 +1,9 @@
 import { openDB } from 'idb';
 import { logger } from './logger';
+import { IndexedDbKey, IndexedDbValue } from "./indexedDbTypes";
 
 const dbPromise = openDB('spotify-db', 3, {
-  upgrade(db, oldVersion, newVersion, transaction) {
+  upgrade(db, oldVersion, newVersion) {
     logger.debug('DB001', 'Upgrading indexedDb', { oldVersion, newVersion });
     if (!db.objectStoreNames.contains('auth')) {
       db.createObjectStore('auth');
@@ -17,17 +18,17 @@ const dbPromise = openDB('spotify-db', 3, {
   },
 });
 
-export const setCachedEntry = async (store, val, key) => {
+export const setCachedEntry = async (store: string, val: IndexedDbValue, key: IndexedDbKey) => {
   const db = await dbPromise;
   return db.put(store, val, key);
 };
 
-export const removeCachedEntry = async (store, key) => {
+export const removeCachedEntry = async (store: string, key: IndexedDbKey) => {
   const db = await dbPromise;
   return db.delete(store, key);
 };
 
-export const getCachedEntry = async (store, key) => {
+export const getCachedEntry = async (store: string, key: IndexedDbKey) => {
   const db = await dbPromise;
   return db.get(store, key);
 };

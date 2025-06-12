@@ -2,8 +2,9 @@ import './errorHandling.css'
 import React, { useState } from 'react';
 import StackTrace from 'stacktrace-js';
 import { logger } from './logger';
+import {ErrorFallbackProps} from "./ErrorFallbackProps";
 
-export function ErrorFallback({ error, resetErrorBoundary }) {
+export function ErrorFallback({ error, resetErrorBoundary } : ErrorFallbackProps ) {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
@@ -20,8 +21,8 @@ export function ErrorFallback({ error, resetErrorBoundary }) {
         {error?.message || ''} <br/>
         {error?.response?.data?.message || ''}
       </p>
-      <button 
-        className="error-button" 
+      <button
+        className="error-button"
         onClick={async () => {
           if (!isLoading) {
             setIsLoading(true);
@@ -38,7 +39,7 @@ export function ErrorFallback({ error, resetErrorBoundary }) {
   );
 }
 
-export function handleError(error) {
+export function handleError(error: Error) {
   StackTrace.fromError(error).then((stackframes) => {
     const stackString = stackframes
       .map((sf) => `${sf.functionName || 'anonymous'} (${sf.fileName}:${sf.lineNumber}:${sf.columnNumber})`)

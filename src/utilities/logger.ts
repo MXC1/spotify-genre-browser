@@ -1,7 +1,8 @@
 import { getCachedEntry, setCachedEntry } from './indexedDb';
 import { v4 as uuidv4 } from 'uuid';
+import { LogLevel } from "./LogLevel";
 
-let sessionID;
+let sessionID: string;
 
 async function fetchOrGenerateSessionID() {
   const cachedSessionID = await getCachedEntry('auth', 'session_id');
@@ -21,8 +22,10 @@ function isRunningLocally() {
          window.location.hostname === '127.0.0.1';
 }
 
-async function logToCloudWatch(logPayload) {
-  if (!['main', 'staging', 'dev'].includes(process.env.REACT_APP_ENV) || isRunningLocally()) {
+async function logToCloudWatch(logPayload: LogPayload) {
+  const env = process.env.REACT_APP_ENV ?? ""; // Defaults to empty string if undefined
+
+  if (!['main', 'staging', 'dev'].includes(env) || isRunningLocally()) {
     return;
   }
 
@@ -40,10 +43,10 @@ async function logToCloudWatch(logPayload) {
 }
 
 // -- Logging Functionality --
-async function logMessage(level, message, event_id = null, context = {}) {
+async function logMessage(level: string, message: string, event_id: string | null = null, context = {}) {
   if (!sessionID) await fetchOrGenerateSessionID();
 
-  const logPayload = {
+  const logPayload : LogPayload = {
     timestamp: new Date().toISOString(),
     level,
     session_id: sessionID,
@@ -59,11 +62,20 @@ async function logMessage(level, message, event_id = null, context = {}) {
   logToCloudWatch(logPayload);
 }
 
+type LogPayload = {
+  timestamp: string;
+  level: string;
+  session_id: string;
+  message: string;
+  event_id: string | null;
+  context?: Record<string, unknown>;
+};
+
 // -- Public API --
 export const logger = {
-  info: (event_id, msg, context = {}) => logMessage('INFO', msg, event_id, context),
-  error: (event_id, msg, context = {}) => logMessage('ERROR', msg, event_id, context),
-  warn: (event_id, msg, context = {}) => logMessage('WARN', msg, event_id, context),
-  debug: (event_id, msg, context = {}) => logMessage('DEBUG', msg, event_id, context),
+  info: (event_id: string, msg: string, context = {}) => logMessage(LogLevel.INFO, msg, event_id, context),
+  error: (event_id: string, msg: string, context = {}) => logMessage(LogLevel.ERROR, msg, event_id, context),
+  warn: (event_id: string, msg: string, context = {}) => logMessage(LogLevel.WARN, msg, event_id, context),
+  debug: (event_id: string, msg: string, context = {}) => logMessage(LogLevel.DEBUG, msg, event_id, context),
 };
 
