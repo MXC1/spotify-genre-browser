@@ -22,4 +22,4 @@
 - [ ] Appropriate logging has been added
 - [ ] Appropriate tests have been written
 - [ ] There are no TODOs in the code without a very good reason
-8 [ ] There are no build warnings in Node
+- [ ] There are no build warnings in Node
